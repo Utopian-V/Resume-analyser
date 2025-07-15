@@ -7,6 +7,7 @@ import GraphicalAnalysis from "./components/GraphicalAnalysis";
 import PDFViewer from "./components/PDFViewer";
 import { uploadResume } from "./api";
 import { AnimatePresence, motion } from "framer-motion";
+import jsPDF from "jspdf";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -117,6 +118,44 @@ function App() {
     setLoading(false);
   };
 
+  const handleDownload = () => {
+    if (!feedback) return;
+    const doc = new jsPDF();
+    doc.setFont("Inter", "normal");
+    doc.setFontSize(18);
+    doc.text("AI Resume Review Feedback", 14, 18);
+    doc.setFontSize(12);
+    let y = 30;
+    const addText = (label, value) => {
+      doc.setFont(undefined, "bold");
+      doc.text(label, 14, y);
+      doc.setFont(undefined, "normal");
+      if (typeof value === "string") {
+        doc.text(value, 14, y + 6);
+        y += 12;
+      } else if (Array.isArray(value)) {
+        value.forEach((v, i) => {
+          doc.text("- " + v, 18, y + 6 + i * 6);
+        });
+        y += 6 * value.length + 6;
+      } else if (typeof value === "object" && value !== null) {
+        Object.entries(value).forEach(([k, v]) => {
+          doc.text(`${k}: ${Array.isArray(v) ? v.join(", ") : v}`, 18, y + 6);
+          y += 6;
+        });
+        y += 6;
+      }
+    };
+    addText("Score", String(feedback.score || "N/A"));
+    addText("ATS Compliance", feedback.ats_compliance);
+    addText("Improvements", feedback.improvements?.map(i => `${i.suggestion} (${i.reason})`));
+    addText("Skill Match", feedback.skill_match);
+    addText("Targeted Roles", feedback.targeted_roles);
+    addText("Red Flags", feedback.red_flags);
+    addText("Comments", feedback.comments);
+    doc.save("resume_feedback.pdf");
+  };
+
   // Highlight logic: when a feedback improvement is clicked, highlight keywords in PDF
   const handleHighlight = (text) => {
     if (!text) return;
@@ -157,7 +196,7 @@ function App() {
                 <GraphicalAnalysis feedback={feedback} />
                 <FeedbackDisplay
                   feedback={feedback}
-                  onDownload={() => {}}
+                  onDownload={handleDownload}
                   onFeedbackClick={handleHighlight}
                 />
               </motion.div>

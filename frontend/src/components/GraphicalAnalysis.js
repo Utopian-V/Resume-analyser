@@ -3,53 +3,57 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 
 const Card = styled(motion.div)`
-  background: #f5f7ff;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.04);
-  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
-  margin-bottom: 1.2rem;
+  background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 1.5rem;
 `;
 
 const SectionTitle = styled.h3`
   color: #3730a3;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.7rem 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.01em;
 `;
 
 const ProgressBar = styled.div`
-  background: #e0e7ff;
-  border-radius: 1rem;
-  height: 18px;
+  background: linear-gradient(90deg, #e0e7ff 60%, #f5f7ff 100%);
+  border-radius: 1.2rem;
+  height: 20px;
   width: 100%;
-  margin-bottom: 0.7rem;
+  margin-bottom: 1rem;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.07);
 `;
 const Progress = styled.div`
   background: linear-gradient(90deg, #6366f1 0%, #22c55e 100%);
   height: 100%;
-  border-radius: 1rem;
+  border-radius: 1.2rem;
   transition: width 0.7s cubic-bezier(.4,0,.2,1);
 `;
 
 const Tag = styled.span`
   display: inline-block;
-  background: #6366f1;
+  background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
   color: #fff;
-  border-radius: 0.7em;
-  padding: 0.2em 0.8em;
-  font-size: 0.95em;
+  border-radius: 0.9em;
+  padding: 0.25em 1em;
+  font-size: 1em;
   margin: 0.2em 0.3em 0.2em 0;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.10);
 `;
 
 const CheckList = styled.ul`
   margin: 0 0 0 1.2rem;
   padding: 0;
-  font-size: 1em;
+  font-size: 1.05em;
 `;
 const CheckItem = styled.li`
   color: ${props => props.passed ? '#22c55e' : '#ef4444'};
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.2em;
 `;
 

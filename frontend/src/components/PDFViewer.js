@@ -5,19 +5,20 @@ import styled from "styled-components";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const PDFContainer = styled.div`
-  background: #fff;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.04);
-  padding: 1rem;
+  background: linear-gradient(120deg, #fff 60%, #f5f7ff 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+  padding: 1.5rem;
   margin: 0 auto;
   max-width: 100%;
   overflow-x: auto;
 `;
 
 const Highlight = styled.span`
-  background: #ffe066;
-  border-radius: 0.2em;
-  padding: 0.1em 0.2em;
+  background: linear-gradient(90deg, #ffe066 60%, #fffbe6 100%);
+  border-radius: 0.3em;
+  padding: 0.1em 0.3em;
+  box-shadow: 0 1px 4px #ffe06644;
 `;
 
 function highlightText(text, highlights) {
