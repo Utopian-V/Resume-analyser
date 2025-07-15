@@ -6,7 +6,7 @@
    ```
    npm install
    ```
-2. Copy `.env.example` to `.env` and set your backend API URL.
+2. Copy `.env.example` to `.env` and set your backend API URL. (If `.env.example` is missing, create a `.env` file with the following line: `REACT_APP_API_URL=https://your-backend-url.com`)
 3. Start the app:
    ```
    npm start
