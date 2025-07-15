@@ -103,6 +103,7 @@ function App() {
   const [highlighted, setHighlighted] = useState([]);
 
   const handleFileSelected = async (file) => {
+    console.log('Selected file:', file);
     setLoading(true);
     setFeedback(null);
     setSuccess(false);
