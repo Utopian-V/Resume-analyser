@@ -71,6 +71,12 @@ class UserProgress(BaseModel):
     resume_score: Optional[int] = None
     last_analysis_date: Optional[str] = None
 
+class InterviewMessage(BaseModel):
+    user_id: str
+    role: str
+    message: str
+    conversation_id: Optional[str] = None
+
 # Sample data initialization
 def initialize_sample_data():
     global job_listings, dsa_questions
@@ -201,6 +207,17 @@ def build_enhanced_prompt(resume_text):
         "Return ONLY valid JSON, no explanation, no markdown, no extra text."
     )
 
+def build_interview_prompt(role, user_message, conversation_history=""):
+    return (
+        f"You are an AI interviewer for a {role} position. You should ask relevant technical and behavioral questions based on the candidate's responses. "
+        f"Keep your responses professional, encouraging, and focused on assessing the candidate's skills and experience for the {role} role. "
+        f"Ask follow-up questions to dig deeper into their responses. "
+        f"Conversation history: {conversation_history}\n"
+        f"Candidate's latest response: {user_message}\n"
+        f"Provide your next question or response as an interviewer for the {role} position. "
+        f"Keep it conversational and professional. Don't include any JSON formatting or special instructions."
+    )
+
 def call_groq(prompt, model=GROQ_MODEL):
     try:
         response = requests.post(
@@ -259,23 +276,23 @@ async def analyze_resume(file: UploadFile = File(...)):
     finally:
         os.remove(file_location)
 
-# User management endpoints
-@app.post("/register/")
-async def register_user(user: User):
-    user_id = str(uuid.uuid4())
-    users_db[user_id] = user.dict()
-    user_sessions[user_id] = user_id
+# Firebase user management (simplified)
+@app.post("/user/register/")
+async def register_firebase_user(user_id: str, email: str, name: str):
+    users_db[user_id] = {
+        "email": email,
+        "name": name,
+        "skills": [],
+        "target_roles": []
+    }
     user_progress[user_id] = UserProgress(user_id=user_id).dict()
-    return {"user_id": user_id, "token": user_id, "message": "User registered successfully"}
+    return {"user_id": user_id, "message": "User registered successfully"}
 
-@app.post("/login/")
-async def login_user(email: str):
-    # Simple login - in production, add proper authentication
-    user_id = str(uuid.uuid4())
-    user_sessions[user_id] = user_id
-    if user_id not in user_progress:
-        user_progress[user_id] = UserProgress(user_id=user_id).dict()
-    return {"user_id": user_id, "token": user_id, "message": "Login successful"}
+@app.get("/user/{user_id}/profile/")
+async def get_user_profile(user_id: str):
+    if user_id not in users_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    return users_db[user_id]
 
 # Job listings endpoints
 @app.get("/jobs/")
@@ -374,4 +391,21 @@ async def update_resume_score(user_id: str, score: int):
     user_progress[user_id]["resume_score"] = score
     user_progress[user_id]["last_analysis_date"] = datetime.now().isoformat()
     
-    return {"message": "Resume score updated successfully", "score": score} 
+    return {"message": "Resume score updated successfully", "score": score}
+
+# Interview chat endpoint
+@app.post("/interview/chat/")
+async def interview_chat(message: InterviewMessage):
+    try:
+        # Build conversation context
+        conversation_history = ""  # In production, fetch from database
+        
+        prompt = build_interview_prompt(message.role, message.message, conversation_history)
+        response = call_groq(prompt)
+        
+        return {
+            "response": response,
+            "conversation_id": message.conversation_id or str(uuid.uuid4())
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Interview chat error: {str(e)}") 

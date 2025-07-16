@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder } from "react-icons/fi";
+import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { auth, googleProvider } from "./firebase";
 import FileUpload from "./components/FileUpload";
 import FeedbackDisplay from "./components/FeedbackDisplay";
 import GraphicalAnalysis from "./components/GraphicalAnalysis";
 import PDFViewer from "./components/PDFViewer";
 import UserDashboard from "./components/UserDashboard";
 import DSAPreparation from "./components/DSAPreparation";
+import EnhancedDSABank from "./components/EnhancedDSABank";
 import JobListings from "./components/JobListings";
 import ProjectAnalysis from "./components/ProjectAnalysis";
+import InterviewPrep from "./components/InterviewPrep";
 import { uploadResume } from "./api";
 import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
@@ -33,9 +37,19 @@ const MainLayout = styled.div`
 
 const Header = styled.header`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+`;
+
+const HeaderLeft = styled.div`
+  display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
 `;
 
 const Mascot = styled.div`
@@ -54,7 +68,39 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   color: #6366f1;
   font-weight: 600;
-  margin: 0 0 1.5rem 0;
+  margin: 0;
+`;
+
+const AuthSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3730a3;
+  font-weight: 600;
+`;
+
+const AuthButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #6366f1;
+  background: ${props => props.isLoggedIn ? '#ef4444' : '#6366f1'};
+  color: white;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: ${props => props.isLoggedIn ? '#dc2626' : '#3730a3'};
+  }
 `;
 
 const TabContainer = styled.div`
@@ -62,6 +108,10 @@ const TabContainer = styled.div`
   gap: 0.5rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
+  background: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
 `;
 
 const Tab = styled.button`
@@ -139,14 +189,59 @@ const ResumeSection = styled.div`
   }
 `;
 
+const LoginPrompt = styled.div`
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+`;
+
+const LoginTitle = styled.h2`
+  color: #3730a3;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+`;
+
+const LoginText = styled.p`
+  color: #6366f1;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+`;
+
 function App() {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [highlighted, setHighlighted] = useState([]);
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const handleFileSelected = async (file) => {
     console.log('Selected file:', file);
@@ -210,12 +305,25 @@ function App() {
   };
 
   const renderTabContent = () => {
+    if (!user) {
+      return (
+        <LoginPrompt>
+          <LoginTitle>Welcome to AI Resume Reviewer</LoginTitle>
+          <LoginText>Please sign in with Google to access all features</LoginText>
+          <AuthButton onClick={handleGoogleSignIn}>
+            <FiUser size={18} />
+            Sign in with Google
+          </AuthButton>
+        </LoginPrompt>
+      );
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return (
           <UserDashboard 
-            userId={userId} 
-            setUserId={setUserId}
+            userId={user.uid} 
+            setUserId={() => {}} // Not needed with Firebase
             onResumeAnalyzed={feedback}
           />
         );
@@ -260,17 +368,18 @@ function App() {
         );
       case 'dsa':
         return (
-          <DSAPreparation 
-            userId={userId}
-            dsaRecommendations={feedback?.dsa_recommendations}
-          />
+          <EnhancedDSABank userId={user.uid} />
         );
       case 'jobs':
         return (
           <JobListings 
-            userId={userId}
+            userId={user.uid}
             userSkills={feedback?.skill_match?.matched_skills || []}
           />
+        );
+      case 'interview':
+        return (
+          <InterviewPrep userId={user.uid} />
         );
       default:
         return null;
@@ -281,44 +390,78 @@ function App() {
     <>
       <GlobalStyle />
       <Header>
-        <Mascot>🦉</Mascot>
-        <div>
-          <Title>AI Resume Reviewer</Title>
-          <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
-        </div>
+        <HeaderLeft>
+          <Mascot>🦉</Mascot>
+          <div>
+            <Title>AI Resume Reviewer</Title>
+            <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
+          </div>
+        </HeaderLeft>
+        <AuthSection>
+          {user ? (
+            <>
+              <UserInfo>
+                <img 
+                  src={user.photoURL} 
+                  alt={user.displayName}
+                  style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                />
+                {user.displayName}
+              </UserInfo>
+              <AuthButton isLoggedIn={true} onClick={handleSignOut}>
+                <FiLogOut size={18} />
+                Sign Out
+              </AuthButton>
+            </>
+          ) : (
+            <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
+              <FiUser size={18} />
+              Sign In
+            </AuthButton>
+          )}
+        </AuthSection>
       </Header>
       
       <MainLayout>
-        <TabContainer>
-          <Tab 
-            active={activeTab === 'dashboard'} 
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <FiUser size={18} />
-            Dashboard
-          </Tab>
-          <Tab 
-            active={activeTab === 'resume'} 
-            onClick={() => setActiveTab('resume')}
-          >
-            <FiUploadCloud size={18} />
-            Resume Analysis
-          </Tab>
-          <Tab 
-            active={activeTab === 'dsa'} 
-            onClick={() => setActiveTab('dsa')}
-          >
-            <FiCode size={18} />
-            DSA Preparation
-          </Tab>
-          <Tab 
-            active={activeTab === 'jobs'} 
-            onClick={() => setActiveTab('jobs')}
-          >
-            <FiBriefcase size={18} />
-            Job Opportunities
-          </Tab>
-        </TabContainer>
+        {user && (
+          <TabContainer>
+            <Tab 
+              active={activeTab === 'dashboard'} 
+              onClick={() => setActiveTab('dashboard')}
+            >
+              <FiUser size={18} />
+              Dashboard
+            </Tab>
+            <Tab 
+              active={activeTab === 'resume'} 
+              onClick={() => setActiveTab('resume')}
+            >
+              <FiUploadCloud size={18} />
+              Resume Analysis
+            </Tab>
+            <Tab 
+              active={activeTab === 'dsa'} 
+              onClick={() => setActiveTab('dsa')}
+            >
+              <FiCode size={18} />
+              DSA Practice
+            </Tab>
+            <Tab 
+              active={activeTab === 'jobs'} 
+              onClick={() => setActiveTab('jobs')}
+            >
+              <FiBriefcase size={18} />
+              Job Opportunities
+            </Tab>
+            <Tab 
+              active={activeTab === 'interview'} 
+              onClick={() => setActiveTab('interview')}
+            >
+              <FiMessageSquare size={18} />
+              Interview Prep
+            </Tab>
+          </TabContainer>
+        )}
         
         <ContentArea>
           {renderTabContent()}

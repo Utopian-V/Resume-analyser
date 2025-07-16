@@ -11,14 +11,14 @@ export const uploadResume = async (file) => {
   return response.data;
 };
 
-// User management
-export const registerUser = async (userData) => {
-  const response = await axios.post(`${API_URL}/register/`, userData);
+// Firebase user management
+export const registerFirebaseUser = async (userData) => {
+  const response = await axios.post(`${API_URL}/user/register/`, userData);
   return response.data;
 };
 
-export const loginUser = async (email) => {
-  const response = await axios.post(`${API_URL}/login/`, { email });
+export const getUserProfile = async (userId) => {
+  const response = await axios.get(`${API_URL}/user/${userId}/profile/`);
   return response.data;
 };
 
@@ -63,5 +63,16 @@ export const getUserProgress = async (userId) => {
 
 export const updateResumeScore = async (userId, score) => {
   const response = await axios.post(`${API_URL}/user/progress/resume-score/`, { user_id: userId, score });
+  return response.data;
+};
+
+// Interview chat
+export const sendInterviewMessage = async (userId, role, message, conversationId = null) => {
+  const response = await axios.post(`${API_URL}/interview/chat/`, {
+    user_id: userId,
+    role: role,
+    message: message,
+    conversation_id: conversationId
+  });
   return response.data;
 }; 
