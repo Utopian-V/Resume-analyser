@@ -41,6 +41,7 @@ user_progress = {}
 # --- Aptitude Test Persistence ---
 APTITUDE_TESTS_FILE = "aptitude_tests.json"
 aptitude_tests = {}  # {test_id: {...}}
+_aptitude_tests_loaded = False  # Cache flag
 
 # Pydantic models
 class User(BaseModel):
@@ -103,7 +104,10 @@ class TestSubmission(BaseModel):
 
 # --- Aptitude Test Persistence Functions ---
 def load_aptitude_tests():
-    global aptitude_tests
+    global aptitude_tests, _aptitude_tests_loaded
+    if _aptitude_tests_loaded:
+        return  # Already loaded, skip file operation
+    
     try:
         if os.path.exists(APTITUDE_TESTS_FILE):
             with open(APTITUDE_TESTS_FILE, "r") as f:
@@ -112,10 +116,12 @@ def load_aptitude_tests():
             # Initialize with a comprehensive test bank
             aptitude_tests["test1"] = create_comprehensive_test()
             save_aptitude_tests()
+        _aptitude_tests_loaded = True
     except Exception as e:
         print(f"Error loading aptitude tests: {e}")
         # Fallback to default test
         aptitude_tests["test1"] = create_comprehensive_test()
+        _aptitude_tests_loaded = True
 
 def create_comprehensive_test():
     return {
@@ -444,6 +450,8 @@ def save_aptitude_tests():
     try:
         with open(APTITUDE_TESTS_FILE, "w") as f:
             json.dump(aptitude_tests, f, indent=2)
+        global _aptitude_tests_loaded
+        _aptitude_tests_loaded = True  # Ensure cache is marked as loaded
     except Exception as e:
         print(f"Error saving aptitude tests: {e}")
 
@@ -783,22 +791,37 @@ async def interview_chat(message: InterviewMessage):
 # --- API Endpoints ---
 @app.on_event("startup")
 async def startup_event():
+    print("🚀 Starting Resume Review AI Backend...")
+    print("📊 Initializing sample data...")
     initialize_sample_data()
+    print("🧠 Loading aptitude tests...")
     load_aptitude_tests()
+    print(f"✅ Loaded {len(aptitude_tests)} aptitude test(s)")
+    print("🎯 Backend ready!")
 
 @app.get("/api/aptitude/tests")
 async def get_aptitude_tests():
+    load_aptitude_tests()  # Ensure tests are loaded
     return {"tests": list(aptitude_tests.values())}
 
 @app.get("/api/aptitude/test/{test_id}")
 async def get_aptitude_test(test_id: str):
+    import time
+    start_time = time.time()
+    
+    load_aptitude_tests()  # Ensure tests are loaded
     test = aptitude_tests.get(test_id)
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
+    
+    response_time = time.time() - start_time
+    print(f"📊 Aptitude test loaded in {response_time:.3f}s")
+    
     return test
 
 @app.post("/api/aptitude/test/{test_id}/submit")
 async def submit_aptitude_test(test_id: str, submission: TestSubmission):
+    load_aptitude_tests()  # Ensure tests are loaded
     test = aptitude_tests.get(test_id)
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
@@ -835,6 +858,7 @@ async def submit_aptitude_test(test_id: str, submission: TestSubmission):
 @app.post("/api/aptitude/questions/add")
 async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test1"):
     try:
+        load_aptitude_tests()  # Ensure tests are loaded
         test = aptitude_tests.get(test_id)
         if not test:
             raise HTTPException(status_code=404, detail="Test not found")

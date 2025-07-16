@@ -269,17 +269,19 @@ const AptitudeTest = ({ userId }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(0);
-  const [results, setResults] = useState(null);
   const [review, setReview] = useState(false);
+  const [results, setResults] = useState(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [leaderboardError, setLeaderboardError] = useState(null);
+  const [testLoaded, setTestLoaded] = useState(false); // Cache flag
 
   useEffect(() => {
-    fetchTest();
-    // eslint-disable-next-line
-  }, []);
+    if (!testLoaded) {
+      fetchTest();
+    }
+  }, [testLoaded]);
 
   useEffect(() => {
     let timer;
@@ -303,6 +305,8 @@ const AptitudeTest = ({ userId }) => {
   }, [showLeaderboard]);
 
   const fetchTest = async () => {
+    if (testLoaded) return; // Skip if already loaded
+    
     try {
       setLoading(true);
       setError(null);
@@ -312,6 +316,7 @@ const AptitudeTest = ({ userId }) => {
       }
       setTest(data);
       setTimeLeft(data.duration * 60);
+      setTestLoaded(true); // Mark test as loaded
     } catch (error) {
       setError(`Failed to load the test: ${error.message}`);
     } finally {

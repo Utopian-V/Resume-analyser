@@ -78,9 +78,25 @@ export const sendInterviewMessage = async (userId, role, message, conversationId
 };
 
 // Aptitude test endpoints
+// Simple cache for aptitude test data
+let aptitudeTestCache = null;
+let aptitudeTestCacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export const getAptitudeTest = async (testId) => {
   try {
+    // Check cache first
+    const now = Date.now();
+    if (aptitudeTestCache && (now - aptitudeTestCacheTime) < CACHE_DURATION) {
+      return aptitudeTestCache;
+    }
+    
     const response = await axios.get(`${API_URL}/api/aptitude/test/${testId}`);
+    
+    // Update cache
+    aptitudeTestCache = response.data;
+    aptitudeTestCacheTime = now;
+    
     return response.data;
   } catch (error) {
     console.error('Error fetching aptitude test:', error);
@@ -104,6 +120,11 @@ export const submitAptitudeTest = async (testId, answers, userId) => {
 export const addAptitudeQuestion = async (question, testId = 'test1') => {
   try {
     const response = await axios.post(`${API_URL}/api/aptitude/questions/add?test_id=${testId}`, question);
+    
+    // Invalidate cache when new question is added
+    aptitudeTestCache = null;
+    aptitudeTestCacheTime = 0;
+    
     return response.data;
   } catch (error) {
     console.error('Error adding aptitude question:', error);
