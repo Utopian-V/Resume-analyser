@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  apiKey: "AIzaSyDn67ro1Rxcr9VMh4TDZ5yvxf0STFvTojg",
   authDomain: "resume-review-ai.firebaseapp.com",
   projectId: "resume-review-ai",
   storageBucket: "resume-review-ai.appspot.com",

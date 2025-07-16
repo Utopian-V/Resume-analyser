@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiMessageSquare, FiSend, FiUser, FiBot, FiBriefcase, FiTarget } from "react-icons/fi";
+import { FiMessageSquare, FiSend, FiUser, FiMessageCircle, FiBriefcase, FiTarget } from "react-icons/fi";
 import { sendInterviewMessage } from "../api";
 
 const Container = styled.div`
@@ -366,7 +366,7 @@ const InterviewPrep = ({ userId }) => {
               {messages.map((message) => (
                 <Message key={message.id}>
                   <MessageAvatar isUser={message.isUser}>
-                    {message.isUser ? <FiUser /> : <FiBot />}
+                    {message.isUser ? <FiUser /> : <FiMessageCircle />}
                   </MessageAvatar>
                   <MessageContent isUser={message.isUser}>
                     {message.text}
@@ -376,7 +376,7 @@ const InterviewPrep = ({ userId }) => {
               {isLoading && (
                 <Message>
                   <MessageAvatar isUser={false}>
-                    <FiBot />
+                    <FiMessageCircle />
                   </MessageAvatar>
                   <MessageContent isUser={false}>
                     <div style={{ display: 'flex', gap: '0.3rem' }}>
