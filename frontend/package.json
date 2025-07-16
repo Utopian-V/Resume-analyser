@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "axios": "^1.6.0",
     "firebase": "^11.10.0",
     "framer-motion": "^11.18.2",

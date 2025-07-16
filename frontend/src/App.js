@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-import { auth, googleProvider } from "./firebase";
+import { useAuth0 } from "@auth0/auth0-react";
 import FileUpload from "./components/FileUpload";
 import FeedbackDisplay from "./components/FeedbackDisplay";
 import GraphicalAnalysis from "./components/GraphicalAnalysis";
@@ -228,22 +227,13 @@ const LoginText = styled.p`
 `;
 
 function App() {
+  const { loginWithRedirect, logout, isAuthenticated, user, isLoading } = useAuth0();
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [highlighted, setHighlighted] = useState([]);
-  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed:', user ? user.email : 'No user');
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   // Add Firebase status check
   useEffect(() => {
@@ -456,23 +446,21 @@ function App() {
           </div>
         </HeaderLeft>
         <AuthSection>
-          {user ? (
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : isAuthenticated ? (
             <>
               <UserInfo>
-                <img 
-                  src={user.photoURL} 
-                  alt={user.displayName}
-                  style={{ width: '32px', height: '32px', borderRadius: '50%' }}
-                />
-                {user.displayName}
+                <img src={user.picture} alt={user.name} style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                {user.name}
               </UserInfo>
-              <AuthButton isLoggedIn={true} onClick={handleSignOut}>
+              <AuthButton isLoggedIn={true} onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
                 <FiLogOut size={18} />
                 Sign Out
               </AuthButton>
             </>
           ) : (
-            <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
+            <AuthButton isLoggedIn={false} onClick={loginWithRedirect}>
               <FiUser size={18} />
               Sign In
             </AuthButton>
