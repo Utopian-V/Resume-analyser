@@ -154,28 +154,34 @@ const AptitudeQuestionManager = ({ userId }) => {
   }, [optionsText]);
 
   const parseOptions = (text) => {
-    const optionRegex = /(?:\\(([A-D])\\)|([A-D])[).]) *([^\\n(A-D)]+)/g;
     const options = [];
-    let match;
     let correctOption = null;
 
-    const lines = text.split('\\n');
+    // Split by newlines and process each line
+    const lines = text.split('\n').filter(line => line.trim());
+    
     for (let line of lines) {
-      match = optionRegex.exec(line);
-      if (match) {
-        const optionLetter = match[1] || match[2];
-        const optionText = match[3].trim();
-        const isCorrect = line.toLowerCase().includes('(correct)') || 
-                         line.toLowerCase().includes('[correct]') ||
-                         line.toLowerCase().includes('*correct*');
+      // Match patterns like (A), (B), A), A., etc.
+      const optionMatch = line.match(/^[\(]?([A-D])[\)\.]?\s*(.+)$/i);
+      if (optionMatch) {
+        const optionLetter = optionMatch[1].toLowerCase();
+        let optionText = optionMatch[2].trim();
+        
+        // Check if this option is marked as correct
+        const isCorrect = optionText.toLowerCase().includes('(correct)') || 
+                         optionText.toLowerCase().includes('[correct]') ||
+                         optionText.toLowerCase().includes('*correct*');
         
         if (isCorrect) {
-          correctOption = optionLetter.toLowerCase();
+          correctOption = optionLetter;
         }
 
+        // Clean up the option text
+        optionText = optionText.replace(/[\(\[]correct[\)\]]/gi, '').trim();
+
         options.push({
-          id: optionLetter.toLowerCase(),
-          text: optionText.replace(/[\(\[]correct[\)\]]/gi, '').trim(),
+          id: optionLetter,
+          text: optionText,
           is_correct: false // Will be set after all options are parsed
         });
       }
@@ -199,14 +205,37 @@ const AptitudeQuestionManager = ({ userId }) => {
     
     try {
       setLoading(true);
+      
+      // Validate question text
+      if (!questionText.trim()) {
+        throw new Error('Please enter a question text');
+      }
+      
+      // Validate options text
+      if (!optionsText.trim()) {
+        throw new Error('Please enter options');
+      }
+      
       const options = parseOptions(optionsText);
       
       if (options.length === 0) {
-        throw new Error('Please enter options in the correct format: (A) option1 (B) option2...');
+        throw new Error('Please enter options in the correct format. Example:\n(A) First option (correct)\n(B) Second option\n(C) Third option\n(D) Fourth option');
       }
 
       if (options.length !== 4) {
-        throw new Error('Please provide exactly 4 options (A, B, C, D)');
+        throw new Error(`Please provide exactly 4 options (A, B, C, D). Found ${options.length} options.`);
+      }
+      
+      // Validate that all options have text
+      const emptyOptions = options.filter(opt => !opt.text.trim());
+      if (emptyOptions.length > 0) {
+        throw new Error('All options must have text content');
+      }
+      
+      // Validate that exactly one option is marked as correct
+      const correctOptions = options.filter(opt => opt.is_correct);
+      if (correctOptions.length !== 1) {
+        throw new Error('Please mark exactly one option as correct using "(correct)"');
       }
 
       const question = {
@@ -279,11 +308,33 @@ const AptitudeQuestionManager = ({ userId }) => {
           </FormGroup>
 
           <FormGroup>
-            <Label>Options (Format: (A) option1 (B) option2 ...)</Label>
+            <Label>Options (One per line, mark correct with "(correct)")</Label>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <Button 
+                type="button" 
+                onClick={() => setOptionsText(`(A) First option (correct)
+(B) Second option
+(C) Third option
+(D) Fourth option`)}
+                style={{ background: '#10b981', fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+              >
+                Load Example
+              </Button>
+              <Button 
+                type="button" 
+                onClick={() => setOptionsText('')}
+                style={{ background: '#6b7280', fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+              >
+                Clear
+              </Button>
+            </div>
             <TextArea
               value={optionsText}
               onChange={e => setOptionsText(e.target.value)}
-              placeholder="(A) First option\n(B) Second option\n(C) Third option\n(D) Fourth option"
+              placeholder="(A) First option (correct)
+(B) Second option
+(C) Third option
+(D) Fourth option"
               required
             />
           </FormGroup>
@@ -348,6 +399,18 @@ const AptitudeQuestionManager = ({ userId }) => {
           <div style={{ marginTop: 8, color: '#64748b' }}>
             <b>Category:</b> {category} | <b>Difficulty:</b> {difficulty} | <b>Time Limit:</b> {timeLimit}s | <b>Points:</b> {points}
           </div>
+          
+          {/* Validation Status */}
+          {optionsText.trim() && (
+            <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: previewOptions.length === 4 && previewOptions.filter(o => o.is_correct).length === 1 ? '#dcfce7' : '#fef3c7', color: previewOptions.length === 4 && previewOptions.filter(o => o.is_correct).length === 1 ? '#166534' : '#92400e' }}>
+              <b>Validation:</b> {
+                previewOptions.length === 0 ? 'No options detected' :
+                previewOptions.length !== 4 ? `Found ${previewOptions.length} options (need 4)` :
+                previewOptions.filter(o => o.is_correct).length !== 1 ? 'Need exactly one correct option' :
+                '✓ Valid question ready to submit'
+              }
+            </div>
+          )}
         </div>
       </Card>
     </Container>
