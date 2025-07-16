@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare } from "react-icons/fi";
+import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { FaBrain } from "react-icons/fa";
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -309,7 +309,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
         <Link to="/aptitude">
           <Card>
             <IconContainer>
-              <FaBrain size={24} />
+              <BiBrain size={24} />
             </IconContainer>
             <Title>Aptitude Test</Title>
             <Description>Take an aptitude assessment to evaluate your analytical and problem-solving skills.</Description>
