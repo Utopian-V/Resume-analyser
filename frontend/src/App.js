@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut, FiBrain } from "react-icons/fi";
+import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
+import { BiBrain } from 'react-icons/bi';
 import { auth, googleProvider } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import FileUpload from "./components/FileUpload";
@@ -509,7 +510,7 @@ function App() {
                     active={activeTab === 'aptitude'} 
                     onClick={() => setActiveTab('aptitude')}
                   >
-                    <FiBrain size={18} />
+                    <BiBrain size={18} />
                     Aptitude Test
                   </Tab>
                   <Tab 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare } from "react-icons/fi";
+import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiBriefcase as FiJob } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
