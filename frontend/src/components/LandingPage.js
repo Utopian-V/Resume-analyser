@@ -15,11 +15,10 @@ const Background = styled.div`
   min-height: 100vh;
   width: 100vw;
   background: linear-gradient(120deg, #0a0c16 0%, #181c2f 100%);
-  position: fixed;
+  position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  z-index: -2;
+  z-index: -1;
   overflow-x: hidden;
-  pointer-events: none;
 `;
 
 const AnimatedBlock = styled(motion.div)`
@@ -260,7 +259,8 @@ export default function LandingPage() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   return (
-    <Background>
+    <>
+      <Background />
       {/* Animated floating blocks */}
       {blocks.map((b, i) => (
         <AnimatedBlock
@@ -347,6 +347,6 @@ export default function LandingPage() {
       <Footer>
         &copy; {new Date().getFullYear()} ResumeAI. All rights reserved.
       </Footer>
-    </Background>
+    </>
   );
 } 
