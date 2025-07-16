@@ -85,23 +85,70 @@ class AptitudeOption(BaseModel):
     is_correct: bool
 
 class AptitudeQuestion(BaseModel):
-    id: str
     question_text: str
     category: str
     difficulty: str
     time_limit: int
     points: int
     options: List[AptitudeOption]
-    explanation: Optional[str]
+    explanation: Optional[str] = None
 
-class AptitudeTest(BaseModel):
-    id: str
-    title: str
-    duration: int
-    total_questions: int
-    passing_score: int
-    instructions: List[str]
-    questions: List[AptitudeQuestion]
+class TestSubmission(BaseModel):
+    answers: dict
+    user_id: str
+
+# Initialize sample aptitude test
+APTITUDE_TEST = {
+    "id": "test1",
+    "title": "Quantitative Aptitude Assessment",
+    "duration": 30,
+    "total_questions": 20,
+    "passing_score": 60,
+    "instructions": [
+        "Read each question carefully before answering",
+        "Each question has only one correct answer",
+        "Time limit is strictly enforced",
+        "No negative marking",
+        "Calculator usage is not permitted"
+    ],
+    "questions": []
+}
+
+# Add sample questions
+SAMPLE_QUESTIONS = [
+    {
+        "id": "q1",
+        "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
+        "category": "Numerical",
+        "difficulty": "Easy",
+        "time_limit": 90,
+        "points": 5,
+        "options": [
+            {"id": "a", "text": "72", "is_correct": True},
+            {"id": "b", "text": "70", "is_correct": False},
+            {"id": "c", "text": "75", "is_correct": False},
+            {"id": "d", "text": "80", "is_correct": False}
+        ],
+        "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
+    },
+    {
+        "id": "q2",
+        "question_text": "What is 15% of 200?",
+        "category": "Numerical",
+        "difficulty": "Easy",
+        "time_limit": 60,
+        "points": 5,
+        "options": [
+            {"id": "a", "text": "20", "is_correct": False},
+            {"id": "b", "text": "30", "is_correct": True},
+            {"id": "c", "text": "40", "is_correct": False},
+            {"id": "d", "text": "50", "is_correct": False}
+        ],
+        "explanation": "15% of 200 = (15/100) × 200 = 30"
+    }
+]
+
+APTITUDE_TEST["questions"] = SAMPLE_QUESTIONS
 
 # Sample data initialization
 def initialize_sample_data():
@@ -493,31 +540,25 @@ async def startup_event():
     initialize_aptitude_data()
 
 # Aptitude test endpoints
-@app.get("/aptitude/tests/")
-async def get_aptitude_tests():
-    return {"tests": aptitude_tests}
-
-@app.get("/aptitude/test/{test_id}")
+@app.get("/api/aptitude/test/{test_id}")
 async def get_aptitude_test(test_id: str):
-    test = next((t for t in aptitude_tests if t["id"] == test_id), None)
-    if not test:
+    if test_id != "test1":
         raise HTTPException(status_code=404, detail="Test not found")
-    return test
+    return APTITUDE_TEST
 
-@app.post("/aptitude/test/{test_id}/submit")
-async def submit_aptitude_test(test_id: str, answers: Dict[str, str]):
-    test = next((t for t in aptitude_tests if t["id"] == test_id), None)
-    if not test:
+@app.post("/api/aptitude/test/{test_id}/submit")
+async def submit_aptitude_test(test_id: str, submission: TestSubmission):
+    if test_id != "test1":
         raise HTTPException(status_code=404, detail="Test not found")
     
     score = 0
     total_possible = 0
     results = []
     
-    for question in test["questions"]:
-        if question["id"] in answers:
-            total_possible += question["points"]
-            user_answer = answers[question["id"]]
+    for question in APTITUDE_TEST["questions"]:
+        total_possible += question["points"]
+        if question["id"] in submission.answers:
+            user_answer = submission.answers[question["id"]]
             correct_answer = next(o["id"] for o in question["options"] if o["is_correct"])
             
             if user_answer == correct_answer:
@@ -526,7 +567,8 @@ async def submit_aptitude_test(test_id: str, answers: Dict[str, str]):
             results.append({
                 "question_id": question["id"],
                 "correct": user_answer == correct_answer,
-                "points_earned": question["points"] if user_answer == correct_answer else 0
+                "points_earned": question["points"] if user_answer == correct_answer else 0,
+                "correct_answer": correct_answer
             })
     
     percentage = (score / total_possible) * 100 if total_possible > 0 else 0
@@ -535,20 +577,24 @@ async def submit_aptitude_test(test_id: str, answers: Dict[str, str]):
         "score": score,
         "total_possible": total_possible,
         "percentage": percentage,
-        "passed": percentage >= test["passing_score"],
+        "passed": percentage >= APTITUDE_TEST["passing_score"],
         "results": results
     }
 
-@app.post("/aptitude/questions/add")
+@app.post("/api/aptitude/questions/add")
 async def add_aptitude_question(question: AptitudeQuestion):
-    if not aptitude_tests:
-        raise HTTPException(status_code=400, detail="No test available to add questions to")
-    
     try:
+        # Generate a new question ID
+        question_id = f"q{len(APTITUDE_TEST['questions']) + 1}"
+        
+        # Convert the question to a dict and add the ID
         question_dict = question.dict()
-        question_dict["id"] = f"q{len(aptitude_tests[0]['questions']) + 1}"
-        aptitude_tests[0]["questions"].append(question_dict)
-        aptitude_tests[0]["total_questions"] = len(aptitude_tests[0]["questions"])
-        return {"message": "Question added successfully"}
+        question_dict["id"] = question_id
+        
+        # Add the question to the test
+        APTITUDE_TEST["questions"].append(question_dict)
+        APTITUDE_TEST["total_questions"] = len(APTITUDE_TEST["questions"])
+        
+        return {"message": "Question added successfully", "question_id": question_id}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
