@@ -19,6 +19,7 @@ const Background = styled.div`
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: -2;
   overflow-x: hidden;
+  pointer-events: none;
 `;
 
 const AnimatedBlock = styled(motion.div)`
@@ -43,6 +44,7 @@ const GlassNavBar = styled.nav`
   top: 0;
   z-index: 10;
   box-shadow: 0 4px 32px #000a;
+  pointer-events: auto;
 `;
 
 const Logo = styled.div`
@@ -82,6 +84,8 @@ const Section = styled.section`
   max-width: 1100px;
   padding: 5rem 2vw 2rem 2vw;
   color: #e0e7ff;
+  pointer-events: auto;
+  z-index: 1;
 `;
 
 const Hero = styled(Section)`
@@ -92,6 +96,8 @@ const Hero = styled(Section)`
   min-height: 80vh;
   text-align: center;
   padding-top: 7vh;
+  pointer-events: auto;
+  z-index: 1;
 `;
 
 const Headline = styled(motion.h1)`
@@ -189,6 +195,8 @@ const AboutSection = styled(Section)`
   border-radius: 1.5rem;
   margin-top: 3rem;
   box-shadow: 0 2px 24px #23294633;
+  pointer-events: auto;
+  z-index: 1;
 `;
 
 const PricingSection = styled(Section)`
@@ -196,6 +204,8 @@ const PricingSection = styled(Section)`
   border-radius: 1.5rem;
   margin-top: 3rem;
   box-shadow: 0 2px 24px #23294633;
+  pointer-events: auto;
+  z-index: 1;
 `;
 
 const ContactSection = styled(Section)`
@@ -203,6 +213,8 @@ const ContactSection = styled(Section)`
   border-radius: 1.5rem;
   margin-top: 3rem;
   box-shadow: 0 2px 24px #23294633;
+  pointer-events: auto;
+  z-index: 1;
 `;
 
 const Footer = styled.footer`
