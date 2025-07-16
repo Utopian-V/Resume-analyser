@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward } from "react-icons/fi";
+import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare } from "react-icons/fi";
 import { getUserProgress, updateResumeScore } from "../api";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -136,9 +137,52 @@ const WelcomeText = styled.p`
   margin: 0;
 `;
 
+const QuickLinks = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+`;
+const QuickLinkCard = styled.button`
+  background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
+  color: white;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 1.2rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.13);
+  transition: background 0.2s, transform 0.1s;
+  &:hover {
+    background: linear-gradient(90deg, #3730a3 60%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.05);
+  }
+`;
+const ProgressBar = styled.div`
+  background: #e0e7ff;
+  border-radius: 1rem;
+  height: 18px;
+  width: 100%;
+  margin: 0.7rem 0 1.2rem 0;
+  overflow: hidden;
+`;
+const ProgressFill = styled.div`
+  background: linear-gradient(90deg, #22c55e 60%, #6366f1 100%);
+  height: 100%;
+  border-radius: 1rem;
+  width: ${props => props.percent || 0}%;
+  transition: width 0.5s;
+`;
+
 const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
+  // For navigation to other tabs (if using react-router)
+  const navigate = useNavigate();
 
   const loadUserProgress = async () => {
     if (!userId) return;
@@ -179,6 +223,24 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     }
   }, [onResumeAnalyzed]);
 
+  // Recent activity
+  const lastResume = userProgress?.last_analysis_date ? new Date(userProgress.last_analysis_date).toLocaleString() : 'Never';
+  const lastDSA = userProgress?.completed_questions?.length ? userProgress.completed_questions[userProgress.completed_questions.length-1]?.title || 'N/A' : 'None';
+  const lastJob = userProgress?.applied_jobs?.length ? userProgress.applied_jobs[userProgress.applied_jobs.length-1]?.title || 'N/A' : 'None';
+
+  // Progress chart
+  const dsaTotal = (userProgress?.completed_questions?.length || 0) + 10; // Example
+  const dsaSolved = userProgress?.completed_questions?.length || 0;
+  const dsaPercent = dsaTotal ? Math.round((dsaSolved/dsaTotal)*100) : 0;
+
+  // Personalized greeting
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
   if (!userId) {
     return (
       <Container>
@@ -201,94 +263,43 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     <Container>
       <SectionTitle>
         <FiUser size={24} />
-        Your Dashboard
+        {greeting()}, here’s your dashboard
       </SectionTitle>
-      
-      {userProgress && (
-        <>
-          <ProgressGrid>
-            <ProgressCard
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <ProgressIcon>
-                <FiAward />
-              </ProgressIcon>
-              <ProgressNumber>{userProgress.resume_score || 0}</ProgressNumber>
-              <ProgressLabel>Resume Score</ProgressLabel>
-            </ProgressCard>
-            
-            <ProgressCard
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <ProgressIcon>
-                <FiCode />
-              </ProgressIcon>
-              <ProgressNumber>{userProgress.completed_questions?.length || 0}</ProgressNumber>
-              <ProgressLabel>DSA Questions Completed</ProgressLabel>
-            </ProgressCard>
-            
-            <ProgressCard
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <ProgressIcon>
-                <FiBriefcase />
-              </ProgressIcon>
-              <ProgressNumber>{userProgress.applied_jobs?.length || 0}</ProgressNumber>
-              <ProgressLabel>Jobs Applied</ProgressLabel>
-            </ProgressCard>
-          </ProgressGrid>
-          
-          <StatsContainer>
-            <StatCard>
-              <StatTitle>
-                <FiTrendingUp size={16} />
-                Recent Activity
-              </StatTitle>
-              <StatValue>
-                {userProgress.last_analysis_date ? 
-                  new Date(userProgress.last_analysis_date).toLocaleDateString() : 
-                  'No recent activity'
-                }
-              </StatValue>
-              <StatDescription>
-                Last resume analysis
-              </StatDescription>
-            </StatCard>
-            
-            <StatCard>
-              <StatTitle>
-                <FiCode size={16} />
-                DSA Progress
-              </StatTitle>
-              <StatValue>
-                {userProgress.completed_questions?.length || 0} / {userProgress.completed_questions?.length + 10 || 10}
-              </StatValue>
-              <StatDescription>
-                Questions completed this week
-              </StatDescription>
-            </StatCard>
-            
-            <StatCard>
-              <StatTitle>
-                <FiBriefcase size={16} />
-                Job Applications
-              </StatTitle>
-              <StatValue>
-                {userProgress.applied_jobs?.length || 0}
-              </StatValue>
-              <StatDescription>
-                Applications submitted
-              </StatDescription>
-            </StatCard>
-          </StatsContainer>
-        </>
-      )}
+      <QuickLinks>
+        <QuickLinkCard onClick={() => navigate('/resume')}>
+          <FiUploadCloud size={22} /> Resume Upload
+        </QuickLinkCard>
+        <QuickLinkCard onClick={() => navigate('/dsa')}>
+          <FiCode size={22} /> DSA Practice
+        </QuickLinkCard>
+        <QuickLinkCard onClick={() => navigate('/interview')}>
+          <FiMessageSquare size={22} /> Interview Prep
+        </QuickLinkCard>
+      </QuickLinks>
+      <UserInfo>
+        <UserName>Your Progress</UserName>
+        <UserEmail>Last resume upload: {lastResume}</UserEmail>
+        <UserEmail>Last DSA solved: {lastDSA}</UserEmail>
+        <UserEmail>Last job applied: {lastJob}</UserEmail>
+      </UserInfo>
+      <ProgressGrid>
+        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <ProgressIcon><FiAward /></ProgressIcon>
+          <ProgressNumber>{userProgress?.resume_score || 0}</ProgressNumber>
+          <ProgressLabel>Resume Score</ProgressLabel>
+        </ProgressCard>
+        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+          <ProgressIcon><FiCode /></ProgressIcon>
+          <ProgressNumber>{dsaSolved}</ProgressNumber>
+          <ProgressLabel>DSA Questions Completed</ProgressLabel>
+          <ProgressBar><ProgressFill percent={dsaPercent} /></ProgressBar>
+        </ProgressCard>
+        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          <ProgressIcon><FiBriefcase /></ProgressIcon>
+          <ProgressNumber>{userProgress?.applied_jobs?.length || 0}</ProgressNumber>
+          <ProgressLabel>Jobs Applied</ProgressLabel>
+        </ProgressCard>
+      </ProgressGrid>
       
       {loading && (
         <div style={{ textAlign: 'center', padding: '2rem' }}>

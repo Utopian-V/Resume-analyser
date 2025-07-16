@@ -269,37 +269,89 @@ const EnhancedDSABank = ({ userId }) => {
     (search ? q.title.toLowerCase().includes(search.toLowerCase()) : true)
   );
 
+  // Progress calculation
+  const total = questions.length;
+  const solved = questions.filter(q => userProgress[q.title] === 'solved').length;
+  const attempted = questions.filter(q => userProgress[q.title] === 'attempted').length;
+  const percentage = total ? Math.round((solved / total) * 100) : 0;
+
   return (
-    <MobileContainer>
-      <div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-          {categories.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)} style={{ fontWeight: selectedCategory === cat ? 'bold' : 'normal' }}>{cat}</button>
-          ))}
-          <input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} style={{ marginLeft: 16 }} />
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-            <option value="all">All</option>
-            <option value="unsolved">Unsolved</option>
-            <option value="solved">Solved</option>
-            <option value="attempted">Attempted</option>
-          </select>
-        </div>
-        <div>
-          {filteredQuestions.map(q => (
-            <div key={q.title} style={{ border: '1px solid #eee', borderRadius: 8, margin: 8, padding: 12 }}>
-              <div style={{ fontWeight: 600 }}>{q.title}</div>
-              <div style={{ fontSize: 13, color: '#555' }}>{q.brief}</div>
-              <a href={q.link} target="_blank" rel="noopener noreferrer">Link</a>
-              <div style={{ marginTop: 8 }}>
-                <button onClick={() => updateQuestionStatus(q.title, 'solved')}>Mark Solved</button>
-                <button onClick={() => updateQuestionStatus(q.title, 'attempted')}>Mark Attempted</button>
-              </div>
-              <div>Status: {userProgress[q.title] || q.status}</div>
-            </div>
-          ))}
-        </div>
+    <Container>
+      <Header>
+        <Title>
+          <FiCode size={24} />
+          DSA Question Bank
+        </Title>
+        <ProgressCard>
+          <ProgressNumber>{solved}/{total}</ProgressNumber>
+          <ProgressText>Solved ({percentage}%)</ProgressText>
+        </ProgressCard>
+      </Header>
+      <CategoryTabs>
+        {categories.map(category => (
+          <CategoryTab
+            key={category}
+            active={selectedCategory === category}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category}
+          </CategoryTab>
+        ))}
+      </CategoryTabs>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 18, flexWrap: 'wrap' }}>
+        <input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} style={{ padding: '0.7rem 1rem', borderRadius: 8, border: '1.5px solid #e0e7ff', minWidth: 180 }} />
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '0.7rem 1rem', borderRadius: 8, border: '1.5px solid #e0e7ff' }}>
+          <option value="all">All</option>
+          <option value="unsolved">Unsolved</option>
+          <option value="solved">Solved</option>
+          <option value="attempted">Attempted</option>
+        </select>
       </div>
-    </MobileContainer>
+      <QuestionGrid>
+        {filteredQuestions.map((q, index) => (
+          <QuestionCard
+            key={q.title}
+            difficulty={q.difficulty}
+            status={userProgress[q.title] || 'unsolved'}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
+          >
+            <QuestionTitle>
+              {q.title}
+              {userProgress[q.title] === 'solved' && <FiCheckCircle color="#22c55e" />}
+            </QuestionTitle>
+            <QuestionMeta>
+              <DifficultyBadge difficulty={q.difficulty || 'Easy'}>
+                {q.difficulty || 'Easy'}
+              </DifficultyBadge>
+              <StatusBadge status={userProgress[q.title] || 'unsolved'}>
+                {userProgress[q.title] || 'unsolved'}
+              </StatusBadge>
+            </QuestionMeta>
+            <QuestionDescription>{q.brief}</QuestionDescription>
+            <ActionButtons>
+              <Button className="primary" onClick={() => window.open(q.link, '_blank')}>
+                <FiExternalLink size={14} />
+                Link
+              </Button>
+              {userProgress[q.title] !== 'solved' && (
+                <Button className="success" onClick={() => updateQuestionStatus(q.title, 'solved')}>
+                  <FiCheckCircle size={14} />
+                  Mark Solved
+                </Button>
+              )}
+              {userProgress[q.title] !== 'attempted' && userProgress[q.title] !== 'solved' && (
+                <Button className="warning" onClick={() => updateQuestionStatus(q.title, 'attempted')}>
+                  <FiTarget size={14} />
+                  Mark Attempted
+                </Button>
+              )}
+            </ActionButtons>
+          </QuestionCard>
+        ))}
+      </QuestionGrid>
+    </Container>
   );
 };
 

@@ -61,6 +61,8 @@ const MAX_SIZE_MB = 5;
 
 const FileUpload = ({ onFileSelected }) => {
   const fileInputRef = useRef();
+  const [fileName, setFileName] = useState("");
+  const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState("");
 
   const handleFileChange = (e) => {
@@ -75,21 +77,43 @@ const FileUpload = ({ onFileSelected }) => {
       setError(`File size must be less than ${MAX_SIZE_MB}MB.`);
       return;
     }
+    setFileName(file.name);
     onFileSelected(file);
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileChange({ target: { files: e.dataTransfer.files } });
+    }
+  };
+
   return (
-    <div>
-      <input
-        type="file"
-        accept="application/pdf"
-        ref={fileInputRef}
-        style={{ display: "none" }}
-        onChange={handleFileChange}
-      />
-      <button onClick={() => fileInputRef.current.click()}>Upload PDF</button>
+    <>
+      <UploadBox
+        style={dragActive ? { background: "#e0e7ff", borderColor: "#3730a3" } : {}}
+        onClick={() => fileInputRef.current.click()}
+        onDragOver={e => { e.preventDefault(); setDragActive(true); }}
+        onDragLeave={e => { e.preventDefault(); setDragActive(false); }}
+        onDrop={handleDrop}
+      >
+        <FiUploadCloud size={38} style={{ marginBottom: 8 }} />
+        <div>Drag & drop your PDF here, or click to select</div>
+        <input
+          type="file"
+          accept="application/pdf"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+        {fileName && <FileName>{fileName}</FileName>}
+      </UploadBox>
+      <UploadButton onClick={() => fileInputRef.current.click()} type="button">
+        <FiUploadCloud size={20} /> Upload Resume (PDF)
+      </UploadButton>
       {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
-    </div>
+    </>
   );
 };
 
