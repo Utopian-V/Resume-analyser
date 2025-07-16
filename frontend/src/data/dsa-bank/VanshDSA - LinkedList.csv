@@ -1,0 +1,36 @@
+Problem,Status,Remark
+Write a Program to reverse the Linked List. (Both Iterative and recursive),solve again,Only Iteratie done
+Reverse a Linked List in group of Given Size. [Very Imp],Yet to do,
+Write a program to Detect loop in a linked list.,Done,Fast slow method
+Find the starting point of the loop. ,Done,
+Remove Duplicates in a sorted Linked List.,Done,
+Remove Duplicates in a Un-sorted Linked List.,Done,
+Write a Program to Move the last element to Front in a Linked List.,Done,
+Add “1” to a number represented as a Linked List.,Done,Recurssion use karke kiya hai and ig its the best solution
+Add two numbers represented by linked lists.,Done,Recurssion use karna hai but dikkat yeh hai ke num1 ya num 2 khatm ho jaay toh kya(i.e jo chota number hai usske head ke baad)
+Intersection of two Sorted Linked List.,Done,
+Intersection Point of two Linked Lists.,Yet to do,Abhi toh bohot bekkar method use kar raha hu need to find a optimal solution as time limit exceed ho rahi hai
+Merge Sort For Linked lists.[Very Important],solve again,
+Quicksort for Linked Lists.[Very Important],Yet to do,
+Find the middle Element of a linked list.,Done,
+Check if a linked list is a circular linked list.,Done,
+Split a Circular linked list into two halves.,solve again,Teaches how to use pair
+Write a Program to check whether the Singly Linked list is a palindrome or not.,Yet to do,
+Deletion from a Circular Linked List.,solve again,Bhai issme bohot bohot complications hai acche se dekhna maine kya kya kiya hai to understand all the complications
+Reverse a Doubly Linked list.,Done,
+Find pairs with a given sum in a DLL.,Done,
+Count triplets in a sorted DLL whose sum is equal to given value “X”.,Done,
+Sort a “k”sorted Doubly Linked list.[Very IMP],Yet to do,
+Rotate DoublyLinked list by N nodes.,Yet to do,
+Rotate a Doubly Linked list in group of Given Size.[Very IMP],Yet to do,
+Can we reverse a linked list in less than O(n) ?,Yet to do,
+Why Quicksort is preferred for. Arrays and Merge Sort for LinkedLists ?,Yet to do,
+Flatten a Linked List,Done,
+"Sort a LL of 0's, 1's and 2's",Done,
+Clone a linked list with next and random pointer,Done,
+Merge K sorted Linked list,Done,
+Multiply 2 no. represented by LL,Done,
+Delete nodes which have a greater value on right side,Done,
+Segregate even and odd nodes in a Linked List,Done,
+Program for n’th node from the end of a Linked List,Done,
+Find the first non-repeating character from a stream of characters,Done,

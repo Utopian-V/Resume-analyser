@@ -1,0 +1,61 @@
+Problem,Status
+Coin ChangeProblem,Done
+Knapsack Problem,Done
+Binomial CoefficientProblem,Done
+Permutation CoefficientProblem,Done
+Program for nth Catalan Number,Done
+Matrix Chain Multiplication ,Yet to do
+Edit Distance,Yet to do
+Subset Sum Problem,Yet to do
+Friends Pairing Problem,Yet to do
+Gold Mine Problem,Done
+Assembly Line SchedulingProblem,Yet to do
+Painting the Fenceproblem,Done
+Maximize The Cut Segments,Done
+Longest Common Subsequence,Done
+Longest Repeated Subsequence,Done
+Longest Increasing Subsequence,Yet to do
+Space Optimized Solution of LCS,Done
+LCS (Longest Common Subsequence) of three strings,Done
+Maximum Sum Increasing Subsequence,Done
+Count all subsequences having product less than K,Yet to do
+Longest subsequence such that difference between adjacent is one,Yet to do
+Maximum subsequence sum such that no three are consecutive,Yet to do
+Egg Dropping Problem,Yet to do
+Maximum Length Chain of Pairs,Yet to do
+Maximum size square sub-matrix with all 1s,Done
+Maximum sum of pairs with specific difference,Done
+Min Cost PathProblem,Done
+Maximum difference of zeros and ones in binary string,Done
+Minimum number of jumps to reach end,Yet to do
+Minimum cost to fill given weight in a bag,Done
+Minimum removals from array to make max –min <= K,Yet to do
+Longest Common Substring,Done
+Count number of ways to reacha given score in a game,Done
+Count Balanced Binary Trees of Height h,Yet to do
+LargestSum Contiguous Subarray [V>V>V>V IMP ],Done
+Smallest sum contiguous subarray,Done
+Unbounded Knapsack (Repetition of items allowed),Done
+Word Break Problem,Done
+Largest Independent Set Problem,Yet to do
+Partition problem,Done
+Longest Palindromic Subsequence,Done
+Count All Palindromic Subsequence in a given String,Done
+Longest Palindromic Substring,Done
+Longest alternating subsequence,Done
+Weighted Job Scheduling,Yet to do
+Coin game winner where every player has three choices,Done
+Count Derangements (Permutation such that no element appears in its original position) [ IMPORTANT ],Yet to do
+Maximum profit by buying and selling a share at most twice [ IMP ],Yet to do
+Optimal Strategy for a Game,Yet to do
+Optimal Binary Search Tree,Yet to do
+Palindrome PartitioningProblem,Yet to do
+Word Wrap Problem,Yet to do
+Mobile Numeric Keypad Problem [ IMP ],Yet to do
+Boolean Parenthesization Problem,Yet to do
+Largest rectangular sub-matrix whose sum is 0,Yet to do
+Largest area rectangular sub-matrix with equal number of 1’s and 0’s [ IMP ],Yet to do
+Maximum sum rectangle in a 2D matrix,Yet to do
+Maximum profit by buying and selling a share at most k times,Yet to do
+Find if a string is interleaved of two other strings,Yet to do
+Maximum Length of Pair Chain,Done

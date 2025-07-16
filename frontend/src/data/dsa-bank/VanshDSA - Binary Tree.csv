@@ -1,0 +1,36 @@
+Problem,Status
+level order traversal,Done
+Reverse Level Order traversal,Yet to do
+Height of a tree,Done
+Diameter of a tree,Done
+Mirror of a tree,Done
+Inorder Traversal of a tree both using recursion and Iteration,Done
+Preorder Traversal of a tree both using recursion and Iteration,Done
+Postorder Traversal of a tree both using recursion and Iteration,Done
+Left View of a tree,Yet to do
+Right View of Tree,Yet to do
+Top View of a tree,Yet to do
+Bottom View of a tree,Yet to do
+Zig-Zag traversal of a binary tree,Yet to do
+Check if a tree is balanced or not,Yet to do
+Diagnol Traversal of a Binary tree,Yet to do
+Boundary traversal of a Binary tree,Yet to do
+Construct Binary Tree from String with Bracket Representation,Yet to do
+Convert Binary tree into Doubly Linked List,Yet to do
+Convert Binary tree into Sum tree,Yet to do
+Construct Binary tree from Inorder and preorder traversal,Yet to do
+Find minimum swaps required to convert a Binary tree into BST,Yet to do
+Check if Binary tree is Sum tree or not,Yet to do
+Check if all leaf nodes are at same level or not,Yet to do
+Check if a Binary Tree contains duplicate subtrees of size 2 or more [ IMP ],Yet to do
+Check if 2 trees are mirror or not,Yet to do
+Sum of Nodes on the Longest path from root to leaf node ,Yet to do
+Check if given graph is tree or not.  [ IMP ],Yet to do
+Find Largest subtree sum in a tree,Yet to do
+Maximum Sum of nodes in Binary tree such that no two are adjacent ,Yet to do
+"Print all ""K"" Sum paths in a Binary tree",Done
+Find LCA in a Binary tree,Yet to do
+Find distance between 2 nodes in a Binary tree,Yet to do
+Kth Ancestor of node in a Binary tree,Done
+Find all Duplicate subtrees in a Binary tree [ IMP ],Done
+Tree Isomorphism Problem,Done
