@@ -66,6 +66,9 @@ const NavLink = styled.a`
   text-decoration: none;
   transition: color 0.2s, border-bottom 0.2s;
   cursor: pointer;
+  user-select: none;
+  position: relative;
+  z-index: 2;
   border-bottom: 2px solid transparent;
   padding-bottom: 2px;
   &:hover, &.active {
@@ -105,13 +108,22 @@ const Headline = styled(motion.h1)`
 `;
 
 const Subheadline = styled(motion.p)`
-  font-size: 1.5rem;
-  color: #c7d2fe;
-  font-weight: 500;
-  margin-bottom: 2.5rem;
+  font-size: 1.35rem;
+  color: #e0e7ff;
+  font-weight: 400;
+  margin-bottom: 2.8rem;
   max-width: 600px;
+  background: rgba(36, 40, 62, 0.45);
+  border-radius: 1.2rem;
+  padding: 1.2rem 2rem;
+  box-shadow: 0 2px 16px #23294633;
+  backdrop-filter: blur(8px);
+  border: 1.5px solid #232946;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
   @media (max-width: 600px) {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    padding: 1rem 1rem;
   }
 `;
 
@@ -119,19 +131,24 @@ const CTAButton = styled(motion.button)`
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  background: linear-gradient(90deg, #6366f1 60%, #a21caf 100%);
+  background: rgba(36, 40, 62, 0.25);
   color: #fff;
   font-size: 1.25rem;
   font-weight: 700;
-  border: none;
+  border: 1.5px solid #6366f1;
   border-radius: 1.2rem;
   padding: 1.1rem 2.5rem;
   box-shadow: 0 4px 32px #23294644;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  &:hover {
-    background: linear-gradient(90deg, #a21caf 0%, #6366f1 100%);
-    transform: translateY(-2px) scale(1.04);
+  transition: background 0.2s, transform 0.2s, border 0.2s, color 0.2s;
+  backdrop-filter: blur(8px);
+  outline: none;
+  z-index: 2;
+  &:hover, &:focus {
+    background: rgba(99,102,241,0.18);
+    color: #a21caf;
+    border: 1.5px solid #a21caf;
+    transform: translateY(-2px) scale(1.05);
   }
 `;
 
@@ -263,12 +280,14 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          Get instant, actionable feedback on your resume, practice DSA, and discover top jobs—all in one beautiful, modern platform.
+          <span style={{ fontWeight: 600, color: '#6366f1', fontSize: '1.1em' }}>AI-powered career growth,</span> resume feedback, DSA prep, and curated jobs—all in one beautiful, modern platform.
         </Subheadline>
         <CTAButton
           whileHover={{ scale: 1.07 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate("/app")}
+          tabIndex={0}
+          aria-label="Let's Get Started"
         >
           Let's Get Started <FiArrowRight size={22} />
         </CTAButton>
