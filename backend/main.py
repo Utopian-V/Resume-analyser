@@ -19,6 +19,7 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-8b-8192")
 
 app = FastAPI()
 
+# CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,7 +37,10 @@ user_sessions = {}
 job_listings = []
 dsa_questions = []
 user_progress = {}
-aptitude_tests = []
+
+# --- Aptitude Test Persistence ---
+APTITUDE_TESTS_FILE = "aptitude_tests.json"
+aptitude_tests = {}  # {test_id: {...}}
 
 # Pydantic models
 class User(BaseModel):
@@ -94,61 +98,68 @@ class AptitudeQuestion(BaseModel):
     explanation: Optional[str] = None
 
 class TestSubmission(BaseModel):
-    answers: dict
+    answers: Dict[str, str]
     user_id: str
 
-# Initialize sample aptitude test
-APTITUDE_TEST = {
-    "id": "test1",
-    "title": "Quantitative Aptitude Assessment",
-    "duration": 30,
-    "total_questions": 20,
-    "passing_score": 60,
-    "instructions": [
-        "Read each question carefully before answering",
-        "Each question has only one correct answer",
-        "Time limit is strictly enforced",
-        "No negative marking",
-        "Calculator usage is not permitted"
-    ],
-    "questions": []
-}
+# --- Aptitude Test Persistence Functions ---
+def load_aptitude_tests():
+    global aptitude_tests
+    if os.path.exists(APTITUDE_TESTS_FILE):
+        with open(APTITUDE_TESTS_FILE, "r") as f:
+            aptitude_tests = json.load(f)
+    else:
+        # Initialize with a default test if file doesn't exist
+        aptitude_tests["test1"] = {
+            "id": "test1",
+            "title": "Quantitative Aptitude Assessment",
+            "duration": 30,
+            "total_questions": 2,
+            "passing_score": 60,
+            "instructions": [
+                "Read each question carefully before answering",
+                "Each question has only one correct answer",
+                "Time limit is strictly enforced",
+                "No negative marking",
+                "Calculator usage is not permitted"
+            ],
+            "questions": [
+                {
+                    "id": "q1",
+                    "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
+                    "category": "Numerical",
+                    "difficulty": "Easy",
+                    "time_limit": 90,
+                    "points": 5,
+                    "options": [
+                        {"id": "a", "text": "72", "is_correct": True},
+                        {"id": "b", "text": "70", "is_correct": False},
+                        {"id": "c", "text": "75", "is_correct": False},
+                        {"id": "d", "text": "80", "is_correct": False}
+                    ],
+                    "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
+                },
+                {
+                    "id": "q2",
+                    "question_text": "What is 15% of 200?",
+                    "category": "Numerical",
+                    "difficulty": "Easy",
+                    "time_limit": 60,
+                    "points": 5,
+                    "options": [
+                        {"id": "a", "text": "20", "is_correct": False},
+                        {"id": "b", "text": "30", "is_correct": True},
+                        {"id": "c", "text": "40", "is_correct": False},
+                        {"id": "d", "text": "50", "is_correct": False}
+                    ],
+                    "explanation": "15% of 200 = (15/100) × 200 = 30"
+                }
+            ]
+        }
+        save_aptitude_tests()
 
-# Add sample questions
-SAMPLE_QUESTIONS = [
-    {
-        "id": "q1",
-        "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
-        "category": "Numerical",
-        "difficulty": "Easy",
-        "time_limit": 90,
-        "points": 5,
-        "options": [
-            {"id": "a", "text": "72", "is_correct": True},
-            {"id": "b", "text": "70", "is_correct": False},
-            {"id": "c", "text": "75", "is_correct": False},
-            {"id": "d", "text": "80", "is_correct": False}
-        ],
-        "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
-    },
-    {
-        "id": "q2",
-        "question_text": "What is 15% of 200?",
-        "category": "Numerical",
-        "difficulty": "Easy",
-        "time_limit": 60,
-        "points": 5,
-        "options": [
-            {"id": "a", "text": "20", "is_correct": False},
-            {"id": "b", "text": "30", "is_correct": True},
-            {"id": "c", "text": "40", "is_correct": False},
-            {"id": "d", "text": "50", "is_correct": False}
-        ],
-        "explanation": "15% of 200 = (15/100) × 200 = 30"
-    }
-]
-
-APTITUDE_TEST["questions"] = SAMPLE_QUESTIONS
+def save_aptitude_tests():
+    with open(APTITUDE_TESTS_FILE, "w") as f:
+        json.dump(aptitude_tests, f, indent=2)
 
 # Sample data initialization
 def initialize_sample_data():
@@ -483,118 +494,79 @@ async def interview_chat(message: InterviewMessage):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Interview chat error: {str(e)}")
 
-def initialize_aptitude_data():
-    global aptitude_tests
-    aptitude_tests = [
-        {
-            "id": "test1",
-            "title": "Quantitative Aptitude Assessment",
-            "duration": 30,
-            "total_questions": 20,
-            "passing_score": 60,
-            "instructions": [
-                "Read each question carefully",
-                "Each question has only one correct answer",
-                "Time limit is strictly enforced",
-                "No negative marking",
-                "Calculator usage is not permitted"
-            ],
-            "questions": [
-                {
-                    "id": "q1",
-                    "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
-                    "category": "Numerical",
-                    "difficulty": "Easy",
-                    "time_limit": 90,
-                    "points": 5,
-                    "options": [
-                        {"id": "a", "text": "72", "is_correct": True},
-                        {"id": "b", "text": "70", "is_correct": False},
-                        {"id": "c", "text": "75", "is_correct": False},
-                        {"id": "d", "text": "80", "is_correct": False}
-                    ],
-                    "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
-                },
-                {
-                    "id": "q2",
-                    "question_text": "What is 15% of 200?",
-                    "category": "Numerical",
-                    "difficulty": "Easy",
-                    "time_limit": 60,
-                    "points": 5,
-                    "options": [
-                        {"id": "a", "text": "20", "is_correct": False},
-                        {"id": "b", "text": "30", "is_correct": True},
-                        {"id": "c", "text": "40", "is_correct": False},
-                        {"id": "d", "text": "50", "is_correct": False}
-                    ],
-                    "explanation": "15% of 200 = (15/100) × 200 = 30"
-                }
-            ]
-        }
-    ]
-
+# --- API Endpoints ---
 @app.on_event("startup")
 async def startup_event():
     initialize_sample_data()
-    initialize_aptitude_data()
+    load_aptitude_tests()
 
-# Aptitude test endpoints
+@app.get("/api/aptitude/tests")
+async def get_aptitude_tests():
+    return {"tests": list(aptitude_tests.values())}
+
 @app.get("/api/aptitude/test/{test_id}")
 async def get_aptitude_test(test_id: str):
-    if test_id != "test1":
+    test = aptitude_tests.get(test_id)
+    if not test:
         raise HTTPException(status_code=404, detail="Test not found")
-    return APTITUDE_TEST
+    return test
 
 @app.post("/api/aptitude/test/{test_id}/submit")
 async def submit_aptitude_test(test_id: str, submission: TestSubmission):
-    if test_id != "test1":
+    test = aptitude_tests.get(test_id)
+    if not test:
         raise HTTPException(status_code=404, detail="Test not found")
-    
     score = 0
     total_possible = 0
     results = []
-    
-    for question in APTITUDE_TEST["questions"]:
+    for question in test["questions"]:
         total_possible += question["points"]
-        if question["id"] in submission.answers:
-            user_answer = submission.answers[question["id"]]
-            correct_answer = next(o["id"] for o in question["options"] if o["is_correct"])
-            
-            if user_answer == correct_answer:
-                score += question["points"]
-            
-            results.append({
-                "question_id": question["id"],
-                "correct": user_answer == correct_answer,
-                "points_earned": question["points"] if user_answer == correct_answer else 0,
-                "correct_answer": correct_answer
-            })
-    
+        user_answer = submission.answers.get(question["id"])
+        correct_answer = next(o["id"] for o in question["options"] if o["is_correct"])
+        is_correct = user_answer == correct_answer
+        if is_correct:
+            score += question["points"]
+        results.append({
+            "question_id": question["id"],
+            "question_text": question["question_text"],
+            "user_answer": user_answer,
+            "correct_answer": correct_answer,
+            "is_correct": is_correct,
+            "points_earned": question["points"] if is_correct else 0,
+            "explanation": question.get("explanation", "")
+        })
     percentage = (score / total_possible) * 100 if total_possible > 0 else 0
-    
+    passed = percentage >= test["passing_score"]
+    # Optionally, update leaderboard here
     return {
         "score": score,
         "total_possible": total_possible,
         "percentage": percentage,
-        "passed": percentage >= APTITUDE_TEST["passing_score"],
+        "passed": passed,
         "results": results
     }
 
 @app.post("/api/aptitude/questions/add")
-async def add_aptitude_question(question: AptitudeQuestion):
+async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test1"):
     try:
-        # Generate a new question ID
-        question_id = f"q{len(APTITUDE_TEST['questions']) + 1}"
-        
-        # Convert the question to a dict and add the ID
+        test = aptitude_tests.get(test_id)
+        if not test:
+            raise HTTPException(status_code=404, detail="Test not found")
+        question_id = f"q{len(test['questions']) + 1}"
         question_dict = question.dict()
         question_dict["id"] = question_id
-        
-        # Add the question to the test
-        APTITUDE_TEST["questions"].append(question_dict)
-        APTITUDE_TEST["total_questions"] = len(APTITUDE_TEST["questions"])
-        
+        test["questions"].append(question_dict)
+        test["total_questions"] = len(test["questions"])
+        aptitude_tests[test_id] = test
+        save_aptitude_tests()
         return {"message": "Question added successfully", "question_id": question_id}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# --- Leaderboard (stub) ---
+leaderboard = []  # [{user_id, score, percentage, date}]
+
+@app.get("/api/aptitude/leaderboard/{test_id}")
+async def get_leaderboard(test_id: str):
+    # For now, just return the stub
+    return {"leaderboard": leaderboard}

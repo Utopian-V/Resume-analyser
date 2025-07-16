@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { addAptitudeQuestion } from '../api';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -134,25 +135,53 @@ const AptitudeQuestionManager = () => {
   const [timeLimit, setTimeLimit] = useState(90);
   const [points, setPoints] = useState(5);
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  // Add state for preview
+  const [previewOptions, setPreviewOptions] = useState([]);
+
+  // Update preview when optionsText changes
+  useEffect(() => {
+    setPreviewOptions(parseOptions(optionsText));
+    // eslint-disable-next-line
+  }, [optionsText]);
 
   const parseOptions = (text) => {
-    // Parse options from formats like:
-    // (A) option1 (B) option2
-    // A) option1 B) option2
-    // A. option1 B. option2
     const optionRegex = /(?:\\(([A-D])\\)|([A-D])[).]) *([^\\n(A-D)]+)/g;
     const options = [];
     let match;
+    let correctOption = null;
 
-    while ((match = optionRegex.exec(text)) !== null) {
-      const optionLetter = match[1] || match[2];
-      const optionText = match[3].trim();
-      options.push({
-        id: optionLetter.toLowerCase(),
-        text: optionText,
-        is_correct: false
-      });
+    const lines = text.split('\\n');
+    for (let line of lines) {
+      match = optionRegex.exec(line);
+      if (match) {
+        const optionLetter = match[1] || match[2];
+        const optionText = match[3].trim();
+        const isCorrect = line.toLowerCase().includes('(correct)') || 
+                         line.toLowerCase().includes('[correct]') ||
+                         line.toLowerCase().includes('*correct*');
+        
+        if (isCorrect) {
+          correctOption = optionLetter.toLowerCase();
+        }
+
+        options.push({
+          id: optionLetter.toLowerCase(),
+          text: optionText.replace(/[\(\[]correct[\)\]]/gi, '').trim(),
+          is_correct: false // Will be set after all options are parsed
+        });
+      }
     }
+
+    // If no correct option was marked, use the first one
+    if (!correctOption && options.length > 0) {
+      correctOption = options[0].id;
+    }
+
+    // Set the correct option
+    options.forEach(option => {
+      option.is_correct = option.id === correctOption;
+    });
 
     return options;
   };
@@ -161,26 +190,16 @@ const AptitudeQuestionManager = () => {
     e.preventDefault();
     
     try {
+      setLoading(true);
       const options = parseOptions(optionsText);
       
       if (options.length === 0) {
-        setMessage({
-          type: 'error',
-          text: 'Please enter options in the correct format: (A) option1 (B) option2...'
-        });
-        return;
+        throw new Error('Please enter options in the correct format: (A) option1 (B) option2...');
       }
 
       if (options.length !== 4) {
-        setMessage({
-          type: 'error',
-          text: 'Please provide exactly 4 options (A, B, C, D)'
-        });
-        return;
+        throw new Error('Please provide exactly 4 options (A, B, C, D)');
       }
-
-      // Set the first option as correct by default
-      options[0].is_correct = true;
 
       const question = {
         question_text: questionText,
@@ -191,15 +210,7 @@ const AptitudeQuestionManager = () => {
         options
       };
 
-      const response = await fetch('/api/aptitude/questions/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(question)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to add question');
-      }
+      await addAptitudeQuestion(question);
 
       setMessage({
         type: 'success',
@@ -213,14 +224,15 @@ const AptitudeQuestionManager = () => {
       setDifficulty('Medium');
       setTimeLimit(90);
       setPoints(5);
-      
-      // Clear message after 3 seconds
-      setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       setMessage({
         type: 'error',
-        text: 'Error adding question: ' + error.message
+        text: error.message || 'Error adding question. Please try again.'
       });
+    } finally {
+      setLoading(false);
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -260,7 +272,7 @@ const AptitudeQuestionManager = () => {
             <TextArea
               value={optionsText}
               onChange={e => setOptionsText(e.target.value)}
-              placeholder="(A) First option&#10;(B) Second option&#10;(C) Third option&#10;(D) Fourth option"
+              placeholder="(A) First option\n(B) Second option\n(C) Third option\n(D) Fourth option"
               required
             />
           </FormGroup>
@@ -306,8 +318,26 @@ const AptitudeQuestionManager = () => {
             </FormGroup>
           </Grid>
 
-          <Button type="submit">Add Question</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Adding Question...' : 'Add Question'}
+          </Button>
         </Form>
+
+        {/* Live Preview */}
+        <div style={{ marginTop: 32, background: '#f3f4f6', borderRadius: 12, padding: 24 }}>
+          <h3 style={{ color: '#6366f1', marginBottom: 12 }}>Live Preview</h3>
+          <div style={{ marginBottom: 8 }}><b>Question:</b> {questionText || <span style={{ color: '#9ca3af' }}>[Enter question text]</span>}</div>
+          <ul style={{ paddingLeft: 24 }}>
+            {previewOptions.length > 0 ? previewOptions.map(opt => (
+              <li key={opt.id} style={{ color: opt.is_correct ? '#22c55e' : '#374151', fontWeight: opt.is_correct ? 700 : 400 }}>
+                ({opt.id.toUpperCase()}) {opt.text} {opt.is_correct && <span style={{ fontSize: 12, color: '#22c55e' }}>(Correct)</span>}
+              </li>
+            )) : <li style={{ color: '#9ca3af' }}>[Options will appear here]</li>}
+          </ul>
+          <div style={{ marginTop: 8, color: '#64748b' }}>
+            <b>Category:</b> {category} | <b>Difficulty:</b> {difficulty} | <b>Time Limit:</b> {timeLimit}s | <b>Points:</b> {points}
+          </div>
+        </div>
       </Card>
     </Container>
   );

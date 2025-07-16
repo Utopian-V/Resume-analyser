@@ -75,4 +75,48 @@ export const sendInterviewMessage = async (userId, role, message, conversationId
     conversation_id: conversationId
   });
   return response.data;
-}; 
+};
+
+// Aptitude test endpoints
+export const getAptitudeTest = async (testId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/aptitude/test/${testId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching aptitude test:', error);
+    throw error;
+  }
+};
+
+export const submitAptitudeTest = async (testId, answers, userId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/aptitude/test/${testId}/submit`, {
+      answers,
+      user_id: userId
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting aptitude test:', error);
+    throw error;
+  }
+};
+
+export const addAptitudeQuestion = async (question, testId = 'test1') => {
+  try {
+    const response = await axios.post(`${API_URL}/api/aptitude/questions/add?test_id=${testId}`, question);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding aptitude question:', error);
+    throw error;
+  }
+};
+
+export const getAptitudeLeaderboard = async (testId = 'test1') => {
+  try {
+    const response = await axios.get(`${API_URL}/api/aptitude/leaderboard/${testId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching aptitude leaderboard:', error);
+    throw error;
+  }
+};
