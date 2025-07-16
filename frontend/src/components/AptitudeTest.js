@@ -10,6 +10,13 @@ const Container = styled.div`
   padding: 0 1rem;
 `;
 
+const Card = styled(motion.div)`
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.15);
+`;
+
 const LoadingContainer = styled.div`
   display: flex;
   flex-direction: column;
