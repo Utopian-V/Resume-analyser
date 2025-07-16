@@ -434,105 +434,103 @@ function App() {
   return (
     <>
       <GlobalStyle />
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/app" element={
-            <>
-              <Header>
-                <HeaderLeft>
-                  <Mascot>🦉</Mascot>
-                  <div>
-                    <Title>AI Resume Reviewer</Title>
-                    <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
-                  </div>
-                </HeaderLeft>
-                <AuthSection>
-                  {isLoading ? (
-                    <div>Loading...</div>
-                  ) : user ? (
-                    <>
-                      <UserInfo>
-                        {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
-                        {user.displayName}
-                      </UserInfo>
-                      <AuthButton isLoggedIn={true} onClick={handleSignOut}>
-                        <FiLogOut size={18} />
-                        Sign Out
-                      </AuthButton>
-                    </>
-                  ) : (
-                    <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
-                      <FiUser size={18} />
-                      Sign in with Google
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/app" element={
+          <>
+            <Header>
+              <HeaderLeft>
+                <Mascot>🦉</Mascot>
+                <div>
+                  <Title>AI Resume Reviewer</Title>
+                  <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
+                </div>
+              </HeaderLeft>
+              <AuthSection>
+                {isLoading ? (
+                  <div>Loading...</div>
+                ) : user ? (
+                  <>
+                    <UserInfo>
+                      {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
+                      {user.displayName}
+                    </UserInfo>
+                    <AuthButton isLoggedIn={true} onClick={handleSignOut}>
+                      <FiLogOut size={18} />
+                      Sign Out
                     </AuthButton>
-                  )}
-                </AuthSection>
-              </Header>
-              <MainLayout>
-                {user && (
-                  <TabContainer>
-                    <Tab 
-                      active={activeTab === 'dashboard'} 
-                      onClick={() => setActiveTab('dashboard')}
-                    >
-                      <FiUser size={18} />
-                      Dashboard
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'resume'} 
-                      onClick={() => setActiveTab('resume')}
-                    >
-                      <FiUploadCloud size={18} />
-                      Resume Analysis
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'dsa'} 
-                      onClick={() => setActiveTab('dsa')}
-                    >
-                      <FiCode size={18} />
-                      DSA Practice
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'jobs'} 
-                      onClick={() => setActiveTab('jobs')}
-                    >
-                      <FiBriefcase size={18} />
-                      Job Opportunities
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'interview'} 
-                      onClick={() => setActiveTab('interview')}
-                    >
-                      <FiMessageSquare size={18} />
-                      Interview Prep
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'aptitude'} 
-                      onClick={() => setActiveTab('aptitude')}
-                    >
-                      <BiBrain size={18} />
-                      Aptitude Test
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'question-manager'} 
-                      onClick={() => setActiveTab('question-manager')}
-                    >
-                      <FiFolder size={18} />
-                      Question Manager
-                    </Tab>
-                  </TabContainer>
+                  </>
+                ) : (
+                  <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
+                    <FiUser size={18} />
+                    Sign in with Google
+                  </AuthButton>
                 )}
-                <ContentArea>
-                  {renderTabContent()}
-                </ContentArea>
-              </MainLayout>
-            </>
-          } />
-          <Route path="/aptitude" element={<AptitudeTest />} />
-          <Route path="/aptitude/manage" element={<AptitudeQuestionManager />} />
-        </Routes>
-      </Router>
+              </AuthSection>
+            </Header>
+            <MainLayout>
+              {user && (
+                <TabContainer>
+                  <Tab 
+                    active={activeTab === 'dashboard'} 
+                    onClick={() => setActiveTab('dashboard')}
+                  >
+                    <FiUser size={18} />
+                    Dashboard
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'resume'} 
+                    onClick={() => setActiveTab('resume')}
+                  >
+                    <FiUploadCloud size={18} />
+                    Resume Analysis
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'dsa'} 
+                    onClick={() => setActiveTab('dsa')}
+                  >
+                    <FiCode size={18} />
+                    DSA Practice
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'jobs'} 
+                    onClick={() => setActiveTab('jobs')}
+                  >
+                    <FiBriefcase size={18} />
+                    Job Opportunities
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'interview'} 
+                    onClick={() => setActiveTab('interview')}
+                  >
+                    <FiMessageSquare size={18} />
+                    Interview Prep
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'aptitude'} 
+                    onClick={() => setActiveTab('aptitude')}
+                  >
+                    <BiBrain size={18} />
+                    Aptitude Test
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'question-manager'} 
+                    onClick={() => setActiveTab('question-manager')}
+                  >
+                    <FiFolder size={18} />
+                    Question Manager
+                  </Tab>
+                </TabContainer>
+              )}
+              <ContentArea>
+                {renderTabContent()}
+              </ContentArea>
+            </MainLayout>
+          </>
+        } />
+        <Route path="/aptitude" element={<AptitudeTest />} />
+        <Route path="/aptitude/manage" element={<AptitudeQuestionManager />} />
+      </Routes>
     </>
   );
 }
