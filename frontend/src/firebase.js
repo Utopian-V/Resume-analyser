@@ -8,9 +8,10 @@ const firebaseConfig = {
   apiKey: "AIzaSyDn67ro1Rxcr9VMh4TDZ5yvxf0STFvTojg",
   authDomain: "project-507e4.firebaseapp.com",
   projectId: "project-507e4",
-  storageBucket: "project-507e4.appspot.com",
-  messagingSenderId: "11738231891", // Replace with your actual messagingSenderId
-  appId: "1:123456789:web:abcdefghijklmnop" // Replace with your actual appId
+  storageBucket: "project-507e4.firebasestorage.app",
+  messagingSenderId: "11738231891",
+  appId: "1:11738231891:web:9730c7abde5935bdbc02a6",
+  measurementId: "G-MNPKH7YY85"
 };
 
 // Validate Firebase config
