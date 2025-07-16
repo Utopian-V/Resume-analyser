@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
-import { useAuth0 } from "@auth0/auth0-react";
+import { auth, googleProvider } from "./firebase";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import FileUpload from "./components/FileUpload";
 import FeedbackDisplay from "./components/FeedbackDisplay";
 import GraphicalAnalysis from "./components/GraphicalAnalysis";
@@ -227,7 +228,8 @@ const LoginText = styled.p`
 `;
 
 function App() {
-  const { loginWithRedirect, logout, isAuthenticated, user, isLoading } = useAuth0();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -235,32 +237,23 @@ function App() {
   const [highlighted, setHighlighted] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Add Firebase status check
   useEffect(() => {
-    console.log('Firebase auth status:', {
-      auth: !!auth,
-      googleProvider: !!googleProvider,
-      user: !!user
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setIsLoading(false);
     });
-  }, [auth, googleProvider, user]);
+    return () => unsubscribe();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log('Attempting Google sign in...');
       if (!auth || !googleProvider) {
-        console.error('Firebase auth not initialized properly');
-        alert('Firebase authentication is not properly configured. Please check the console for details.');
+        alert('Firebase authentication is not properly configured.');
         return;
       }
-      
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log('Sign in successful:', result.user.email);
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      console.error('Error signing in with Google:', error);
-      
-      // Provide user-friendly error messages
       let errorMessage = 'Sign in failed. Please try again.';
-      
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Sign in was cancelled. Please try again.';
       } else if (error.code === 'auth/popup-blocked') {
@@ -270,23 +263,14 @@ function App() {
       } else if (error.code === 'auth/network-request-failed') {
         errorMessage = 'Network error. Please check your internet connection.';
       }
-      
       alert(errorMessage);
     }
   };
 
   const handleSignOut = async () => {
     try {
-      console.log('Attempting sign out...');
-      if (!auth) {
-        console.error('Firebase auth not initialized properly');
-        return;
-      }
-      
       await signOut(auth);
-      console.log('Sign out successful');
     } catch (error) {
-      console.error('Error signing out:', error);
       alert('Sign out failed. Please try again.');
     }
   };
@@ -448,21 +432,21 @@ function App() {
         <AuthSection>
           {isLoading ? (
             <div>Loading...</div>
-          ) : isAuthenticated ? (
+          ) : user ? (
             <>
               <UserInfo>
-                <img src={user.picture} alt={user.name} style={{ width: 32, height: 32, borderRadius: '50%' }} />
-                {user.name}
+                {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
+                {user.displayName}
               </UserInfo>
-              <AuthButton isLoggedIn={true} onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+              <AuthButton isLoggedIn={true} onClick={handleSignOut}>
                 <FiLogOut size={18} />
                 Sign Out
               </AuthButton>
             </>
           ) : (
-            <AuthButton isLoggedIn={false} onClick={loginWithRedirect}>
+            <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
               <FiUser size={18} />
-              Sign In
+              Sign in with Google
             </AuthButton>
           )}
         </AuthSection>
