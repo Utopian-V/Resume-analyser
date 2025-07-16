@@ -12,18 +12,37 @@ const Container = styled.div`
 
 const LoadingContainer = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 60vh;
   text-align: center;
   color: #6366f1;
 `;
 
-const Card = styled(motion.div)`
-  background: white;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 24px rgba(99,102,241,0.15);
+const LoadingSpinner = styled.div`
+  border: 4px solid #e0e7ff;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 2rem;
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingText = styled.div`
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+`;
+
+const LoadingSubtext = styled.div`
+  color: #6b7280;
+  font-size: 1rem;
 `;
 
 const Timer = styled.div`
@@ -32,14 +51,17 @@ const Timer = styled.div`
   right: 1rem;
   background: #6366f1;
   color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 0.8rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.2);
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 20px rgba(99,102,241,0.3);
   z-index: 100;
+  min-width: 120px;
+  justify-content: center;
 `;
 
 const Instructions = styled.ul`
@@ -75,44 +97,55 @@ const Button = styled.button`
 
 const QuestionCard = styled(motion.div)`
   background: white;
-  padding: 2rem;
-  border-radius: 1rem;
+  padding: 3rem;
+  border-radius: 1.2rem;
   margin: 1rem 0;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  box-shadow: 0 4px 20px rgba(99,102,241,0.12);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   h3 {
     color: #374151;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
   }
 
   p {
     color: #4b5563;
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
   }
 `;
 
 const Option = styled.button`
   width: 100%;
-  padding: 1rem;
-  margin: 0.5rem 0;
+  padding: 1.5rem;
+  margin: 0.8rem 0;
   border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   background: white;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
   color: #374151;
+  font-size: 1.1rem;
   
   &:hover:not(.selected) {
     border-color: #6366f1;
     background: #f5f7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.15);
   }
   
   &.selected {
     background: #6366f1;
     color: white;
     border-color: #6366f1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
   }
 `;
 
@@ -123,7 +156,7 @@ const NavigationButtons = styled.div`
   gap: 1rem;
 `;
 
-const ResultCard = styled(Card)`
+const ResultCard = styled(motion.div)`
   text-align: center;
 
   h2 {
@@ -172,7 +205,7 @@ const Progress = styled.div`
   transition: width 0.4s cubic-bezier(.4,2,.3,1);
 `;
 
-const ReviewCard = styled(Card)`
+const ReviewCard = styled(motion.div)`
   text-align: left;
   h3 { color: #6366f1; margin-bottom: 1rem; }
   ul { padding-left: 1.5rem; }
@@ -331,7 +364,13 @@ const AptitudeTest = ({ userId }) => {
 
   // --- UI Renders ---
   if (loading) {
-    return <LoadingContainer><div>Loading test...</div></LoadingContainer>;
+    return (
+      <LoadingContainer>
+        <LoadingSpinner />
+        <LoadingText>Loading your aptitude test...</LoadingText>
+        <LoadingSubtext>Preparing 20 comprehensive questions for you</LoadingSubtext>
+      </LoadingContainer>
+    );
   }
   if (error) {
     return (

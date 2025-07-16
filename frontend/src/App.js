@@ -528,8 +528,6 @@ function App() {
             </MainLayout>
           </>
         } />
-        <Route path="/aptitude" element={<AptitudeTest />} />
-        <Route path="/aptitude/manage" element={<AptitudeQuestionManager />} />
       </Routes>
     </>
   );

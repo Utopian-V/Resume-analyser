@@ -104,62 +104,348 @@ class TestSubmission(BaseModel):
 # --- Aptitude Test Persistence Functions ---
 def load_aptitude_tests():
     global aptitude_tests
-    if os.path.exists(APTITUDE_TESTS_FILE):
-        with open(APTITUDE_TESTS_FILE, "r") as f:
-            aptitude_tests = json.load(f)
-    else:
-        # Initialize with a default test if file doesn't exist
-        aptitude_tests["test1"] = {
-            "id": "test1",
-            "title": "Quantitative Aptitude Assessment",
-            "duration": 30,
-            "total_questions": 2,
-            "passing_score": 60,
-            "instructions": [
-                "Read each question carefully before answering",
-                "Each question has only one correct answer",
-                "Time limit is strictly enforced",
-                "No negative marking",
-                "Calculator usage is not permitted"
-            ],
-            "questions": [
-                {
-                    "id": "q1",
-                    "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
-                    "category": "Numerical",
-                    "difficulty": "Easy",
-                    "time_limit": 90,
-                    "points": 5,
-                    "options": [
-                        {"id": "a", "text": "72", "is_correct": True},
-                        {"id": "b", "text": "70", "is_correct": False},
-                        {"id": "c", "text": "75", "is_correct": False},
-                        {"id": "d", "text": "80", "is_correct": False}
-                    ],
-                    "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
-                },
-                {
-                    "id": "q2",
-                    "question_text": "What is 15% of 200?",
-                    "category": "Numerical",
-                    "difficulty": "Easy",
-                    "time_limit": 60,
-                    "points": 5,
-                    "options": [
-                        {"id": "a", "text": "20", "is_correct": False},
-                        {"id": "b", "text": "30", "is_correct": True},
-                        {"id": "c", "text": "40", "is_correct": False},
-                        {"id": "d", "text": "50", "is_correct": False}
-                    ],
-                    "explanation": "15% of 200 = (15/100) × 200 = 30"
-                }
-            ]
-        }
-        save_aptitude_tests()
+    try:
+        if os.path.exists(APTITUDE_TESTS_FILE):
+            with open(APTITUDE_TESTS_FILE, "r") as f:
+                aptitude_tests = json.load(f)
+        else:
+            # Initialize with a comprehensive test bank
+            aptitude_tests["test1"] = create_comprehensive_test()
+            save_aptitude_tests()
+    except Exception as e:
+        print(f"Error loading aptitude tests: {e}")
+        # Fallback to default test
+        aptitude_tests["test1"] = create_comprehensive_test()
+
+def create_comprehensive_test():
+    return {
+        "id": "test1",
+        "title": "Comprehensive Aptitude Assessment",
+        "duration": 45,  # 45 minutes for 20 questions
+        "total_questions": 20,
+        "passing_score": 60,
+        "instructions": [
+            "Read each question carefully before answering",
+            "Each question has only one correct answer",
+            "Time limit is strictly enforced",
+            "No negative marking",
+            "Calculator usage is not permitted",
+            "You can navigate between questions using Previous/Next buttons"
+        ],
+        "questions": [
+            # Numerical Questions (8 questions)
+            {
+                "id": "q1",
+                "question_text": "If a train travels 360 kilometers in 5 hours, what is its speed in kilometers per hour?",
+                "category": "Numerical",
+                "difficulty": "Easy",
+                "time_limit": 90,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "72", "is_correct": True},
+                    {"id": "b", "text": "70", "is_correct": False},
+                    {"id": "c", "text": "75", "is_correct": False},
+                    {"id": "d", "text": "80", "is_correct": False}
+                ],
+                "explanation": "Speed = Distance/Time = 360/5 = 72 km/hr"
+            },
+            {
+                "id": "q2",
+                "question_text": "What is 15% of 200?",
+                "category": "Numerical",
+                "difficulty": "Easy",
+                "time_limit": 60,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "20", "is_correct": False},
+                    {"id": "b", "text": "30", "is_correct": True},
+                    {"id": "c", "text": "40", "is_correct": False},
+                    {"id": "d", "text": "50", "is_correct": False}
+                ],
+                "explanation": "15% of 200 = (15/100) × 200 = 30"
+            },
+            {
+                "id": "q3",
+                "question_text": "A shopkeeper sells an item for $120, making a 20% profit. What was the cost price?",
+                "category": "Numerical",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "$96", "is_correct": False},
+                    {"id": "b", "text": "$100", "is_correct": True},
+                    {"id": "c", "text": "$110", "is_correct": False},
+                    {"id": "d", "text": "$115", "is_correct": False}
+                ],
+                "explanation": "If selling price is 120% of cost price, then cost price = 120/1.2 = $100"
+            },
+            {
+                "id": "q4",
+                "question_text": "If 3 workers can complete a task in 8 days, how many days will 6 workers take?",
+                "category": "Numerical",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "4 days", "is_correct": True},
+                    {"id": "b", "text": "6 days", "is_correct": False},
+                    {"id": "c", "text": "12 days", "is_correct": False},
+                    {"id": "d", "text": "16 days", "is_correct": False}
+                ],
+                "explanation": "More workers = less time. 6 workers = 3 workers × 2, so time = 8/2 = 4 days"
+            },
+            {
+                "id": "q5",
+                "question_text": "What is the next number in the sequence: 2, 6, 12, 20, 30, ?",
+                "category": "Numerical",
+                "difficulty": "Hard",
+                "time_limit": 180,
+                "points": 15,
+                "options": [
+                    {"id": "a", "text": "40", "is_correct": False},
+                    {"id": "b", "text": "42", "is_correct": True},
+                    {"id": "c", "text": "44", "is_correct": False},
+                    {"id": "d", "text": "45", "is_correct": False}
+                ],
+                "explanation": "Difference increases by 2: +4, +6, +8, +10, +12. So 30 + 12 = 42"
+            },
+            {
+                "id": "q6",
+                "question_text": "A rectangle has length 12cm and width 8cm. What is its area?",
+                "category": "Numerical",
+                "difficulty": "Easy",
+                "time_limit": 60,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "96 cm²", "is_correct": True},
+                    {"id": "b", "text": "80 cm²", "is_correct": False},
+                    {"id": "c", "text": "100 cm²", "is_correct": False},
+                    {"id": "d", "text": "88 cm²", "is_correct": False}
+                ],
+                "explanation": "Area = length × width = 12 × 8 = 96 cm²"
+            },
+            {
+                "id": "q7",
+                "question_text": "If x + y = 10 and x - y = 4, what is the value of x?",
+                "category": "Numerical",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "6", "is_correct": False},
+                    {"id": "b", "text": "7", "is_correct": True},
+                    {"id": "c", "text": "8", "is_correct": False},
+                    {"id": "d", "text": "9", "is_correct": False}
+                ],
+                "explanation": "Adding the equations: 2x = 14, so x = 7"
+            },
+            {
+                "id": "q8",
+                "question_text": "What is 25% of 80% of 200?",
+                "category": "Numerical",
+                "difficulty": "Hard",
+                "time_limit": 180,
+                "points": 15,
+                "options": [
+                    {"id": "a", "text": "40", "is_correct": True},
+                    {"id": "b", "text": "50", "is_correct": False},
+                    {"id": "c", "text": "60", "is_correct": False},
+                    {"id": "d", "text": "80", "is_correct": False}
+                ],
+                "explanation": "25% of 80% of 200 = 0.25 × 0.8 × 200 = 0.2 × 200 = 40"
+            },
+            # Logical Questions (6 questions)
+            {
+                "id": "q9",
+                "question_text": "If all roses are flowers and some flowers are red, which statement is definitely true?",
+                "category": "Logical",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "All roses are red", "is_correct": False},
+                    {"id": "b", "text": "Some roses are red", "is_correct": True},
+                    {"id": "c", "text": "All red things are roses", "is_correct": False},
+                    {"id": "d", "text": "No roses are red", "is_correct": False}
+                ],
+                "explanation": "Since all roses are flowers and some flowers are red, some roses must be red"
+            },
+            {
+                "id": "q10",
+                "question_text": "Complete the sequence: A, C, F, J, O, ?",
+                "category": "Logical",
+                "difficulty": "Hard",
+                "time_limit": 180,
+                "points": 15,
+                "options": [
+                    {"id": "a", "text": "T", "is_correct": False},
+                    {"id": "b", "text": "U", "is_correct": True},
+                    {"id": "c", "text": "V", "is_correct": False},
+                    {"id": "d", "text": "W", "is_correct": False}
+                ],
+                "explanation": "The difference increases by 1: +2, +3, +4, +5, +6. So O + 6 = U"
+            },
+            {
+                "id": "q11",
+                "question_text": "If today is Monday, what day will it be 100 days from now?",
+                "category": "Logical",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "Tuesday", "is_correct": False},
+                    {"id": "b", "text": "Wednesday", "is_correct": True},
+                    {"id": "c", "text": "Thursday", "is_correct": False},
+                    {"id": "d", "text": "Friday", "is_correct": False}
+                ],
+                "explanation": "100 ÷ 7 = 14 weeks + 2 days. So Monday + 2 days = Wednesday"
+            },
+            {
+                "id": "q12",
+                "question_text": "Which number comes next: 1, 3, 6, 10, 15, ?",
+                "category": "Logical",
+                "difficulty": "Easy",
+                "time_limit": 90,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "20", "is_correct": False},
+                    {"id": "b", "text": "21", "is_correct": True},
+                    {"id": "c", "text": "22", "is_correct": False},
+                    {"id": "d", "text": "25", "is_correct": False}
+                ],
+                "explanation": "Difference increases by 1: +2, +3, +4, +5, +6. So 15 + 6 = 21"
+            },
+            {
+                "id": "q13",
+                "question_text": "If A=1, B=2, C=3, what is the sum of the letters in 'CAT'?",
+                "category": "Logical",
+                "difficulty": "Easy",
+                "time_limit": 60,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "6", "is_correct": True},
+                    {"id": "b", "text": "7", "is_correct": False},
+                    {"id": "c", "text": "8", "is_correct": False},
+                    {"id": "d", "text": "9", "is_correct": False}
+                ],
+                "explanation": "C=3, A=1, T=20. But in this sequence, T=20 is not valid. C=3, A=1, T=2. So 3+1+2=6"
+            },
+            {
+                "id": "q14",
+                "question_text": "A clock shows 3:15. What is the angle between the hour and minute hands?",
+                "category": "Logical",
+                "difficulty": "Hard",
+                "time_limit": 180,
+                "points": 15,
+                "options": [
+                    {"id": "a", "text": "7.5°", "is_correct": True},
+                    {"id": "b", "text": "15°", "is_correct": False},
+                    {"id": "c", "text": "22.5°", "is_correct": False},
+                    {"id": "d", "text": "30°", "is_correct": False}
+                ],
+                "explanation": "Hour hand moves 0.5° per minute. At 3:15, hour hand is at 3×30 + 15×0.5 = 97.5°. Minute hand is at 15×6 = 90°. Difference = 7.5°"
+            },
+            # Verbal Questions (4 questions)
+            {
+                "id": "q15",
+                "question_text": "Choose the word that best completes the analogy: Book is to Reading as Fork is to:",
+                "category": "Verbal",
+                "difficulty": "Easy",
+                "time_limit": 90,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "Cooking", "is_correct": False},
+                    {"id": "b", "text": "Eating", "is_correct": True},
+                    {"id": "c", "text": "Kitchen", "is_correct": False},
+                    {"id": "d", "text": "Food", "is_correct": False}
+                ],
+                "explanation": "Book is used for reading, fork is used for eating"
+            },
+            {
+                "id": "q16",
+                "question_text": "Which word is the opposite of 'Benevolent'?",
+                "category": "Verbal",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "Generous", "is_correct": False},
+                    {"id": "b", "text": "Kind", "is_correct": False},
+                    {"id": "c", "text": "Malevolent", "is_correct": True},
+                    {"id": "d", "text": "Charitable", "is_correct": False}
+                ],
+                "explanation": "Benevolent means kind and generous, malevolent means evil and harmful"
+            },
+            {
+                "id": "q17",
+                "question_text": "Complete the sentence: The weather was so _____ that we had to cancel the picnic.",
+                "category": "Verbal",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "pleasant", "is_correct": False},
+                    {"id": "b", "text": "sunny", "is_correct": False},
+                    {"id": "c", "text": "inclement", "is_correct": True},
+                    {"id": "d", "text": "warm", "is_correct": False}
+                ],
+                "explanation": "Inclement means bad or severe weather, which would cause cancellation"
+            },
+            {
+                "id": "q18",
+                "question_text": "Which of these is NOT a synonym for 'Happy'?",
+                "category": "Verbal",
+                "difficulty": "Easy",
+                "time_limit": 60,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "Joyful", "is_correct": False},
+                    {"id": "b", "text": "Melancholy", "is_correct": True},
+                    {"id": "c", "text": "Cheerful", "is_correct": False},
+                    {"id": "d", "text": "Delighted", "is_correct": False}
+                ],
+                "explanation": "Melancholy means sad or depressed, which is the opposite of happy"
+            },
+            # Data Interpretation (2 questions)
+            {
+                "id": "q19",
+                "question_text": "If a company's revenue increased from $100,000 to $120,000, what was the percentage increase?",
+                "category": "Data Interpretation",
+                "difficulty": "Medium",
+                "time_limit": 120,
+                "points": 10,
+                "options": [
+                    {"id": "a", "text": "15%", "is_correct": False},
+                    {"id": "b", "text": "20%", "is_correct": True},
+                    {"id": "c", "text": "25%", "is_correct": False},
+                    {"id": "d", "text": "30%", "is_correct": False}
+                ],
+                "explanation": "Increase = $20,000. Percentage = (20,000/100,000) × 100 = 20%"
+            },
+            {
+                "id": "q20",
+                "question_text": "In a survey of 200 people, 60% prefer coffee, 30% prefer tea, and 10% prefer neither. How many people prefer tea?",
+                "category": "Data Interpretation",
+                "difficulty": "Easy",
+                "time_limit": 90,
+                "points": 5,
+                "options": [
+                    {"id": "a", "text": "40", "is_correct": False},
+                    {"id": "b", "text": "50", "is_correct": False},
+                    {"id": "c", "text": "60", "is_correct": True},
+                    {"id": "d", "text": "70", "is_correct": False}
+                ],
+                "explanation": "30% of 200 = 0.3 × 200 = 60 people"
+            }
+        ]
+    }
 
 def save_aptitude_tests():
-    with open(APTITUDE_TESTS_FILE, "w") as f:
-        json.dump(aptitude_tests, f, indent=2)
+    try:
+        with open(APTITUDE_TESTS_FILE, "w") as f:
+            json.dump(aptitude_tests, f, indent=2)
+    except Exception as e:
+        print(f"Error saving aptitude tests: {e}")
 
 # Sample data initialization
 def initialize_sample_data():

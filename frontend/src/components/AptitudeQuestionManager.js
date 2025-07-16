@@ -15,13 +15,21 @@ const Card = styled(motion.div)`
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 4px 24px rgba(99,102,241,0.15);
+  margin-bottom: 2rem;
 `;
 
 const Title = styled.h2`
   color: #374151;
   margin-bottom: 2rem;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
+`;
+
+const Subtitle = styled.p`
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
 `;
 
 const Form = styled.form`
@@ -127,7 +135,7 @@ const Message = styled(motion.div)`
   }
 `;
 
-const AptitudeQuestionManager = () => {
+const AptitudeQuestionManager = ({ userId }) => {
   const [questionText, setQuestionText] = useState('');
   const [optionsText, setOptionsText] = useState('');
   const [category, setCategory] = useState('Numerical');
@@ -243,6 +251,9 @@ const AptitudeQuestionManager = () => {
         animate={{ opacity: 1, y: 0 }}
       >
         <Title>Add Aptitude Question</Title>
+        <Subtitle>
+          Add new questions to the aptitude test bank. Questions will be immediately available for testing.
+        </Subtitle>
 
         {message && (
           <Message
