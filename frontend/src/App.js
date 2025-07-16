@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { FiUploadCloud, FiCheckCircle } from "react-icons/fi";
+import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder } from "react-icons/fi";
 import FileUpload from "./components/FileUpload";
 import FeedbackDisplay from "./components/FeedbackDisplay";
 import GraphicalAnalysis from "./components/GraphicalAnalysis";
 import PDFViewer from "./components/PDFViewer";
+import UserDashboard from "./components/UserDashboard";
+import DSAPreparation from "./components/DSAPreparation";
+import JobListings from "./components/JobListings";
+import ProjectAnalysis from "./components/ProjectAnalysis";
 import { uploadResume } from "./api";
 import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
@@ -20,26 +24,11 @@ const GlobalStyle = createGlobalStyle`
 
 const MainLayout = styled.div`
   display: flex;
-  flex-direction: row;
-  max-width: 1200px;
-  margin: 2.5rem auto;
-  gap: 2.5rem;
-  @media (max-width: 900px) {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-`;
-
-const LeftPanel = styled.div`
-  flex: 1.2;
-  min-width: 340px;
-`;
-const RightPanel = styled.div`
-  flex: 1.5;
-  min-width: 420px;
-  @media (max-width: 900px) {
-    min-width: 0;
-  }
+  flex-direction: column;
+  max-width: 1400px;
+  margin: 2rem auto;
+  gap: 2rem;
+  padding: 0 2rem;
 `;
 
 const Header = styled.header`
@@ -66,6 +55,53 @@ const Subtitle = styled.p`
   color: #6366f1;
   font-weight: 600;
   margin: 0 0 1.5rem 0;
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+`;
+
+const Tab = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #6366f1;
+  background: ${props => props.active ? '#6366f1' : 'transparent'};
+  color: ${props => props.active ? 'white' : '#6366f1'};
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #6366f1;
+    color: white;
+  }
+`;
+
+const ContentArea = styled.div`
+  display: flex;
+  gap: 2rem;
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+`;
+
+const LeftPanel = styled.div`
+  flex: 1;
+  min-width: 400px;
+`;
+
+const RightPanel = styled.div`
+  flex: 1.2;
+  min-width: 500px;
+  @media (max-width: 1200px) {
+    min-width: 0;
+  }
 `;
 
 const UploadSection = styled.section`
@@ -95,12 +131,22 @@ const Success = styled.div`
   margin-top: 1rem;
 `;
 
+const ResumeSection = styled.div`
+  display: flex;
+  gap: 2rem;
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+`;
+
 function App() {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [highlighted, setHighlighted] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   const handleFileSelected = async (file) => {
     console.log('Selected file:', file);
@@ -157,12 +203,78 @@ function App() {
     doc.save("resume_feedback.pdf");
   };
 
-  // Highlight logic: when a feedback improvement is clicked, highlight keywords in PDF
   const handleHighlight = (text) => {
     if (!text) return;
-    // Extract keywords (naive: split by space, filter stopwords, etc.)
     const keywords = text.split(/\s+/).filter(w => w.length > 4);
     setHighlighted(keywords);
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return (
+          <UserDashboard 
+            userId={userId} 
+            setUserId={setUserId}
+            onResumeAnalyzed={feedback}
+          />
+        );
+      case 'resume':
+        return (
+          <ResumeSection>
+            <LeftPanel>
+              <UploadSection>
+                <FileUpload onFileSelected={handleFileSelected} />
+              </UploadSection>
+              {loading && <LoadingSpinner />}
+              {success && (
+                <Success>
+                  <FiCheckCircle size={22} /> Resume analyzed!
+                </Success>
+              )}
+              <AnimatePresence>
+                {feedback && !loading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.7 }}
+                  >
+                    <GraphicalAnalysis feedback={feedback} />
+                    <FeedbackDisplay
+                      feedback={feedback}
+                      onDownload={handleDownload}
+                      onFeedbackClick={handleHighlight}
+                    />
+                    <ProjectAnalysis projectAnalysis={feedback.project_analysis} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </LeftPanel>
+            <RightPanel>
+              {pdfFile && (
+                <PDFViewer file={pdfFile} highlights={highlighted} />
+              )}
+            </RightPanel>
+          </ResumeSection>
+        );
+      case 'dsa':
+        return (
+          <DSAPreparation 
+            userId={userId}
+            dsaRecommendations={feedback?.dsa_recommendations}
+          />
+        );
+      case 'jobs':
+        return (
+          <JobListings 
+            userId={userId}
+            userSkills={feedback?.skill_match?.matched_skills || []}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -172,43 +284,45 @@ function App() {
         <Mascot>🦉</Mascot>
         <div>
           <Title>AI Resume Reviewer</Title>
-          <Subtitle>Get instant, actionable, and graphical feedback on your resume.</Subtitle>
+          <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
         </div>
       </Header>
+      
       <MainLayout>
-        <LeftPanel>
-          <UploadSection>
-            <FileUpload onFileSelected={handleFileSelected} />
-          </UploadSection>
-          {loading && <LoadingSpinner />}
-          {success && (
-            <Success>
-              <FiCheckCircle size={22} /> Resume analyzed!
-            </Success>
-          )}
-          <AnimatePresence>
-            {feedback && !loading && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.7 }}
-              >
-                <GraphicalAnalysis feedback={feedback} />
-                <FeedbackDisplay
-                  feedback={feedback}
-                  onDownload={handleDownload}
-                  onFeedbackClick={handleHighlight}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </LeftPanel>
-        <RightPanel>
-          {pdfFile && (
-            <PDFViewer file={pdfFile} highlights={highlighted} />
-          )}
-        </RightPanel>
+        <TabContainer>
+          <Tab 
+            active={activeTab === 'dashboard'} 
+            onClick={() => setActiveTab('dashboard')}
+          >
+            <FiUser size={18} />
+            Dashboard
+          </Tab>
+          <Tab 
+            active={activeTab === 'resume'} 
+            onClick={() => setActiveTab('resume')}
+          >
+            <FiUploadCloud size={18} />
+            Resume Analysis
+          </Tab>
+          <Tab 
+            active={activeTab === 'dsa'} 
+            onClick={() => setActiveTab('dsa')}
+          >
+            <FiCode size={18} />
+            DSA Preparation
+          </Tab>
+          <Tab 
+            active={activeTab === 'jobs'} 
+            onClick={() => setActiveTab('jobs')}
+          >
+            <FiBriefcase size={18} />
+            Job Opportunities
+          </Tab>
+        </TabContainer>
+        
+        <ContentArea>
+          {renderTabContent()}
+        </ContentArea>
       </MainLayout>
     </>
   );
