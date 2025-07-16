@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiMessageSquare, FiSend, FiUser, FiMessageCircle, FiBriefcase, FiTarget } from "react-icons/fi";
 import { sendInterviewMessage } from "../api";
+import { getInterviewQuestionsByRole } from "../utils/interviewCsv";
+
+const csvUrl = require('../data/interview_questions.csv');
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -214,69 +217,85 @@ const InterviewPrep = ({ userId }) => {
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
+  const [questionFlow, setQuestionFlow] = useState([]);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [csvLoaded, setCsvLoaded] = useState(false);
   const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (selectedRole) {
+      fetch(csvUrl)
+        .then(res => res.text())
+        .then(text => {
+          setQuestionFlow(getInterviewQuestionsByRole(text, selectedRole));
+          setCsvLoaded(true);
+        });
+    }
+  }, [selectedRole]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const startInterview = () => {
-    if (!selectedRole) return;
-    
-    const welcomeMessage = {
-      id: Date.now(),
-      text: `Hello! I'm your AI interviewer for the ${selectedRole} position. I'll be asking you questions to assess your skills and experience. Let's begin with your introduction and why you're interested in this role.`,
-      isUser: false,
-      timestamp: new Date()
-    };
-    
-    setMessages([welcomeMessage]);
+    if (!selectedRole || !csvLoaded) return;
+    setMessages([]);
     setIsInterviewStarted(true);
     setConversationId(`conv_${Date.now()}`);
+    setCurrentQ(0);
+    // Start with the first question from the flow
+    if (questionFlow.length > 0) {
+      setMessages([{ id: Date.now(), text: questionFlow[0].question, isUser: false, timestamp: new Date() }]);
+    }
   };
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
-
     const userMessage = {
       id: Date.now(),
       text: inputMessage,
       isUser: true,
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
-
     try {
-      const response = await sendInterviewMessage(userId, selectedRole, inputMessage, conversationId);
-      
-      const aiResponse = {
-        id: Date.now() + 1,
-        text: response.response,
-        isUser: false,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, aiResponse]);
-      setIsLoading(false);
+      // If there are more scripted questions, use them
+      if (currentQ + 1 < questionFlow.length) {
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: Date.now() + 1,
+            text: questionFlow[currentQ + 1].question,
+            isUser: false,
+            timestamp: new Date()
+          }]);
+          setCurrentQ(currentQ + 1);
+          setIsLoading(false);
+        }, 700);
+      } else {
+        // Otherwise, fallback to AI for dynamic follow-up
+        const response = await sendInterviewMessage(userId, selectedRole, inputMessage, conversationId);
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          text: response.response,
+          isUser: false,
+          timestamp: new Date()
+        }]);
+        setIsLoading(false);
+      }
     } catch (error) {
-      console.error('Error sending message:', error);
       setIsLoading(false);
-      
-      // Fallback response
-      const fallbackResponse = {
+      setMessages(prev => [...prev, {
         id: Date.now() + 1,
         text: "I apologize, but I'm having trouble processing your response right now. Could you please try again?",
         isUser: false,
         timestamp: new Date()
-      };
-      setMessages(prev => [...prev, fallbackResponse]);
+      }]);
     }
   };
 

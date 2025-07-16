@@ -1,0 +1,12 @@
+category,title,link,status,brief
+Arrays,Reverse the array,https://leetcode.com/problems/reverse-array/,unsolved,Reverse the elements of an array in place.
+Arrays,Find the maximum and minimum element in an array,https://leetcode.com/problems/maximum-and-minimum-in-array/,unsolved,Find the largest and smallest element in an array.
+Arrays,Find the "Kth" max and min element of an array,https://leetcode.com/problems/kth-largest-element-in-an-array/,unsolved,Find the Kth largest and Kth smallest element in an array.
+Arrays,Sort the array of 0, 1 and 2,https://leetcode.com/problems/sort-colors/,unsolved,Sort an array containing only 0s, 1s, and 2s.
+Arrays,Move all the negative elements to one side of the array,https://www.geeksforgeeks.org/move-negative-numbers-beginning-positive-end-constant-extra-space/,unsolved,Move all negative numbers to the beginning and positive to the end.
+Arrays,Find the Union and Intersection of the two sorted arrays,https://www.geeksforgeeks.org/union-and-intersection-of-two-sorted-arrays-2/,unsolved,Find union and intersection of two sorted arrays.
+Arrays,Write a program to cyclically rotate an array by one,https://www.geeksforgeeks.org/c-program-cyclically-rotate-array-one/,unsolved,Rotate an array by one position in a cyclic manner.
+Arrays,Find Largest sum contiguous Subarray,https://leetcode.com/problems/maximum-subarray/,unsolved,Find the contiguous subarray with the largest sum.
+Arrays,Minimise the maximum difference between heights,https://www.geeksforgeeks.org/minimize-the-maximum-difference-between-the-heights/,unsolved,Minimize the maximum difference between heights after modifying array elements.
+Arrays,Minimum no. of Jumps to reach end of an array,https://leetcode.com/problems/jump-game-ii/,unsolved,Find the minimum number of jumps to reach the end of the array.
+// ... (repeat for all 400+ questions, one per line, with category, title, link, status, brief) 

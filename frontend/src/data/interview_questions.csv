@@ -1,0 +1,12 @@
+role,order,question,category,brief
+Software Engineer,1,Describe a challenging technical problem you solved.,Technical,Problem-solving skills
+Software Engineer,2,How do you approach debugging complex issues?,Technical,Debugging
+Software Engineer,3,What is your experience with version control systems like Git?,Technical,Version control
+Software Engineer,4,Can you explain the difference between REST and GraphQL APIs?,Technical,API knowledge
+Software Engineer,5,How do you stay updated with the latest technologies?,Behavioral,Learning
+Frontend Developer,1,What is your experience with modern JavaScript frameworks?,Technical,JS frameworks
+Frontend Developer,2,How do you ensure your applications are accessible?,Technical,Accessibility
+Frontend Developer,3,Can you explain the concept of virtual DOM?,Technical,React/DOM
+Frontend Developer,4,What is your approach to responsive design?,Technical,Responsiveness
+Frontend Developer,5,How do you optimize frontend performance?,Technical,Performance
+// ...repeat for all roles and flows 

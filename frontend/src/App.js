@@ -24,6 +24,9 @@ const GlobalStyle = createGlobalStyle`
     min-height: 100vh;
     margin: 0;
   }
+  * {
+    box-sizing: border-box;
+  }
 `;
 
 const MainLayout = styled.div`
@@ -32,7 +35,7 @@ const MainLayout = styled.div`
   max-width: 1400px;
   margin: 2rem auto;
   gap: 2rem;
-  padding: 0 2rem;
+  padding: 0 2vw;
 `;
 
 const Header = styled.header`
@@ -97,9 +100,12 @@ const AuthButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
-  &:hover {
-    background: ${props => props.isLoggedIn ? '#dc2626' : '#3730a3'};
+  font-size: 1rem;
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 1rem 0.5rem;
   }
 `;
 
@@ -112,6 +118,11 @@ const TabContainer = styled.div`
   padding: 1rem;
   border-radius: 1rem;
   box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
 `;
 
 const Tab = styled.button`
@@ -138,19 +149,25 @@ const ContentArea = styled.div`
   gap: 2rem;
   @media (max-width: 1200px) {
     flex-direction: column;
+    gap: 1rem;
   }
 `;
 
 const LeftPanel = styled.div`
   flex: 1;
-  min-width: 400px;
+  min-width: 300px;
+  @media (max-width: 800px) {
+    min-width: 0;
+    width: 100%;
+  }
 `;
 
 const RightPanel = styled.div`
   flex: 1.2;
-  min-width: 500px;
-  @media (max-width: 1200px) {
+  min-width: 300px;
+  @media (max-width: 800px) {
     min-width: 0;
+    width: 100%;
   }
 `;
 
@@ -351,7 +368,7 @@ function App() {
         <LoginPrompt>
           <LoginTitle>Welcome to AI Resume Reviewer</LoginTitle>
           <LoginText>Please sign in with Google to access all features</LoginText>
-          <AuthButton onClick={handleGoogleSignIn}>
+          <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
             <FiUser size={18} />
             Sign in with Google
           </AuthButton>

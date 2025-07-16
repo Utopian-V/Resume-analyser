@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp, FiBookOpen, FiTarget, FiBarChart3 } from "react-icons/fi";
+import { parseCSV } from "../utils/csv";
+
+const csvUrl = require('../data/dsa_questions.csv');
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -222,302 +225,81 @@ const FilterButton = styled.button`
   }
 `;
 
-// Enhanced DSA question data based on Google Sheets
-const dsaQuestions = {
-  "Arrays": [
-    {
-      id: "arr1",
-      title: "Two Sum",
-      difficulty: "Easy",
-      description: "Find two numbers that add up to target",
-      leetcode_url: "https://leetcode.com/problems/two-sum/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/two-sum/1",
-      status: "unsolved"
-    },
-    {
-      id: "arr2",
-      title: "Best Time to Buy and Sell Stock",
-      difficulty: "Easy",
-      description: "Find maximum profit from buying and selling stock",
-      leetcode_url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/stock-buy-and-sell-1587115621/1",
-      status: "unsolved"
-    },
-    {
-      id: "arr3",
-      title: "Contains Duplicate",
-      difficulty: "Easy",
-      description: "Check if array contains any duplicates",
-      leetcode_url: "https://leetcode.com/problems/contains-duplicate/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/contains-duplicate/1",
-      status: "unsolved"
+const MobileContainer = styled.div`
+  @media (max-width: 700px) {
+    padding: 0.5rem;
+    font-size: 0.98rem;
+    button, input, select {
+      font-size: 1rem;
+      padding: 0.5rem 0.7rem;
     }
-  ],
-  "Strings": [
-    {
-      id: "str1",
-      title: "Valid Parentheses",
-      difficulty: "Easy",
-      description: "Check if parentheses are valid",
-      leetcode_url: "https://leetcode.com/problems/valid-parentheses/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/parenthesis-checker2744/1",
-      status: "unsolved"
-    },
-    {
-      id: "str2",
-      title: "Valid Anagram",
-      difficulty: "Easy",
-      description: "Check if two strings are anagrams",
-      leetcode_url: "https://leetcode.com/problems/valid-anagram/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/anagram-1587115620/1",
-      status: "unsolved"
+    div[role='tablist'] {
+      flex-direction: column;
     }
-  ],
-  "Linked Lists": [
-    {
-      id: "ll1",
-      title: "Reverse Linked List",
-      difficulty: "Easy",
-      description: "Reverse a singly linked list",
-      leetcode_url: "https://leetcode.com/problems/reverse-linked-list/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/reverse-a-linked-list/1",
-      status: "unsolved"
-    },
-    {
-      id: "ll2",
-      title: "Merge Two Sorted Lists",
-      difficulty: "Easy",
-      description: "Merge two sorted linked lists",
-      leetcode_url: "https://leetcode.com/problems/merge-two-sorted-lists/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/merge-two-sorted-linked-lists/1",
-      status: "unsolved"
-    }
-  ],
-  "Trees": [
-    {
-      id: "tree1",
-      title: "Maximum Depth of Binary Tree",
-      difficulty: "Easy",
-      description: "Find the maximum depth of a binary tree",
-      leetcode_url: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/height-of-binary-tree/1",
-      status: "unsolved"
-    },
-    {
-      id: "tree2",
-      title: "Invert Binary Tree",
-      difficulty: "Easy",
-      description: "Invert a binary tree",
-      leetcode_url: "https://leetcode.com/problems/invert-binary-tree/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/mirror-tree/1",
-      status: "unsolved"
-    }
-  ],
-  "Dynamic Programming": [
-    {
-      id: "dp1",
-      title: "Climbing Stairs",
-      difficulty: "Easy",
-      description: "Count ways to climb n stairs",
-      leetcode_url: "https://leetcode.com/problems/climbing-stairs/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/count-ways-to-reach-the-nth-stair-1587115620/1",
-      status: "unsolved"
-    },
-    {
-      id: "dp2",
-      title: "Fibonacci Number",
-      difficulty: "Easy",
-      description: "Calculate nth Fibonacci number",
-      leetcode_url: "https://leetcode.com/problems/fibonacci-number/",
-      gfg_url: "https://practice.geeksforgeeks.org/problems/nth-fibonacci-number1335/1",
-      status: "unsolved"
-    }
-  ]
-};
+  }
+`;
 
 const EnhancedDSABank = ({ userId }) => {
-  const [selectedCategory, setSelectedCategory] = useState("Arrays");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [questions, setQuestions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [userProgress, setUserProgress] = useState({});
 
-  const categories = Object.keys(dsaQuestions);
+  useEffect(() => {
+    fetch(csvUrl)
+      .then(res => res.text())
+      .then(text => {
+        const parsed = parseCSV(text);
+        setQuestions(parsed);
+        const cats = Array.from(new Set(parsed.map(q => q.category)));
+        setCategories(cats);
+        setSelectedCategory(cats[0] || '');
+      });
+  }, []);
 
-  const updateQuestionStatus = (questionId, status) => {
-    setUserProgress(prev => ({
-      ...prev,
-      [questionId]: status
-    }));
+  const updateQuestionStatus = (title, status) => {
+    setUserProgress(prev => ({ ...prev, [title]: status }));
   };
 
-  const getFilteredQuestions = () => {
-    let questions = dsaQuestions[selectedCategory] || [];
-    
-    if (statusFilter !== "all") {
-      questions = questions.filter(q => userProgress[q.id] === statusFilter);
-    }
-    
-    if (difficultyFilter !== "all") {
-      questions = questions.filter(q => q.difficulty === difficultyFilter);
-    }
-    
-    return questions;
-  };
-
-  const getOverallProgress = () => {
-    const allQuestions = Object.values(dsaQuestions).flat();
-    const solved = allQuestions.filter(q => userProgress[q.id] === "solved").length;
-    const attempted = allQuestions.filter(q => userProgress[q.id] === "attempted").length;
-    const total = allQuestions.length;
-    
-    return { solved, attempted, total, percentage: Math.round((solved / total) * 100) };
-  };
-
-  const progress = getOverallProgress();
+  const filteredQuestions = questions.filter(q =>
+    (selectedCategory ? q.category === selectedCategory : true) &&
+    (statusFilter === 'all' ? true : (userProgress[q.title] || q.status) === statusFilter) &&
+    (search ? q.title.toLowerCase().includes(search.toLowerCase()) : true)
+  );
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <FiCode size={24} />
-          DSA Question Bank
-        </Title>
-        <ProgressCard>
-          <ProgressNumber>{progress.solved}/{progress.total}</ProgressNumber>
-          <ProgressText>Solved ({progress.percentage}%)</ProgressText>
-        </ProgressCard>
-      </Header>
-
-      <CategoryTabs>
-        {categories.map(category => (
-          <CategoryTab
-            key={category}
-            active={selectedCategory === category}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </CategoryTab>
-        ))}
-      </CategoryTabs>
-
-      <FilterContainer>
-        <FilterButton 
-          active={statusFilter === 'all'} 
-          onClick={() => setStatusFilter('all')}
-        >
-          All Status
-        </FilterButton>
-        <FilterButton 
-          active={statusFilter === 'solved'} 
-          onClick={() => setStatusFilter('solved')}
-        >
-          Solved
-        </FilterButton>
-        <FilterButton 
-          active={statusFilter === 'attempted'} 
-          onClick={() => setStatusFilter('attempted')}
-        >
-          Attempted
-        </FilterButton>
-        <FilterButton 
-          active={statusFilter === 'unsolved'} 
-          onClick={() => setStatusFilter('unsolved')}
-        >
-          Unsolved
-        </FilterButton>
-      </FilterContainer>
-
-      <FilterContainer>
-        <FilterButton 
-          active={difficultyFilter === 'all'} 
-          onClick={() => setDifficultyFilter('all')}
-        >
-          All Difficulties
-        </FilterButton>
-        <FilterButton 
-          active={difficultyFilter === 'Easy'} 
-          onClick={() => setDifficultyFilter('Easy')}
-        >
-          Easy
-        </FilterButton>
-        <FilterButton 
-          active={difficultyFilter === 'Medium'} 
-          onClick={() => setDifficultyFilter('Medium')}
-        >
-          Medium
-        </FilterButton>
-        <FilterButton 
-          active={difficultyFilter === 'Hard'} 
-          onClick={() => setDifficultyFilter('Hard')}
-        >
-          Hard
-        </FilterButton>
-      </FilterContainer>
-
-      <QuestionGrid>
-        {getFilteredQuestions().map((question, index) => (
-          <QuestionCard
-            key={question.id}
-            difficulty={question.difficulty}
-            status={userProgress[question.id] || 'unsolved'}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            <QuestionTitle>
-              {question.title}
-              {userProgress[question.id] === 'solved' && <FiCheckCircle color="#22c55e" />}
-            </QuestionTitle>
-            
-            <QuestionMeta>
-              <DifficultyBadge difficulty={question.difficulty}>
-                {question.difficulty}
-              </DifficultyBadge>
-              <StatusBadge status={userProgress[question.id] || 'unsolved'}>
-                {userProgress[question.id] || 'unsolved'}
-              </StatusBadge>
-            </QuestionMeta>
-            
-            <QuestionDescription>{question.description}</QuestionDescription>
-            
-            <ActionButtons>
-              <Button 
-                className="primary"
-                onClick={() => window.open(question.leetcode_url, '_blank')}
-              >
-                <FiExternalLink size={14} />
-                LeetCode
-              </Button>
-              <Button 
-                className="primary"
-                onClick={() => window.open(question.gfg_url, '_blank')}
-              >
-                <FiBookOpen size={14} />
-                GeeksforGeeks
-              </Button>
-              {userProgress[question.id] !== 'solved' && (
-                <Button 
-                  className="success"
-                  onClick={() => updateQuestionStatus(question.id, 'solved')}
-                >
-                  <FiCheckCircle size={14} />
-                  Mark Solved
-                </Button>
-              )}
-              {userProgress[question.id] !== 'attempted' && userProgress[question.id] !== 'solved' && (
-                <Button 
-                  className="warning"
-                  onClick={() => updateQuestionStatus(question.id, 'attempted')}
-                >
-                  <FiTarget size={14} />
-                  Mark Attempted
-                </Button>
-              )}
-            </ActionButtons>
-          </QuestionCard>
-        ))}
-      </QuestionGrid>
-    </Container>
+    <MobileContainer>
+      <div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+          {categories.map(cat => (
+            <button key={cat} onClick={() => setSelectedCategory(cat)} style={{ fontWeight: selectedCategory === cat ? 'bold' : 'normal' }}>{cat}</button>
+          ))}
+          <input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} style={{ marginLeft: 16 }} />
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="all">All</option>
+            <option value="unsolved">Unsolved</option>
+            <option value="solved">Solved</option>
+            <option value="attempted">Attempted</option>
+          </select>
+        </div>
+        <div>
+          {filteredQuestions.map(q => (
+            <div key={q.title} style={{ border: '1px solid #eee', borderRadius: 8, margin: 8, padding: 12 }}>
+              <div style={{ fontWeight: 600 }}>{q.title}</div>
+              <div style={{ fontSize: 13, color: '#555' }}>{q.brief}</div>
+              <a href={q.link} target="_blank" rel="noopener noreferrer">Link</a>
+              <div style={{ marginTop: 8 }}>
+                <button onClick={() => updateQuestionStatus(q.title, 'solved')}>Mark Solved</button>
+                <button onClick={() => updateQuestionStatus(q.title, 'attempted')}>Mark Attempted</button>
+              </div>
+              <div>Status: {userProgress[q.title] || q.status}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </MobileContainer>
   );
 };
 

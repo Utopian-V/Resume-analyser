@@ -57,52 +57,39 @@ const FileName = styled.div`
   font-weight: 600;
 `;
 
+const MAX_SIZE_MB = 5;
+
 const FileUpload = ({ onFileSelected }) => {
-  const fileInput = useRef();
-  const [fileName, setFileName] = useState("");
-  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef();
+  const [error, setError] = useState("");
 
   const handleFileChange = (e) => {
+    setError("");
     const file = e.target.files[0];
-    if (file) {
-      setFileName(file.name);
-      onFileSelected(file);
+    if (!file) return;
+    if (!file.type.includes("pdf")) {
+      setError("Please upload a PDF file.");
+      return;
     }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFileName(e.dataTransfer.files[0].name);
-      onFileSelected(e.dataTransfer.files[0]);
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setError(`File size must be less than ${MAX_SIZE_MB}MB.`);
+      return;
     }
+    onFileSelected(file);
   };
 
   return (
-    <>
-      <UploadBox
-        style={dragActive ? { background: "#e0e7ff", borderColor: "#3730a3" } : {}}
-        onClick={() => fileInput.current.click()}
-        onDragOver={e => { e.preventDefault(); setDragActive(true); }}
-        onDragLeave={e => { e.preventDefault(); setDragActive(false); }}
-        onDrop={handleDrop}
-      >
-        <FiUploadCloud size={38} style={{ marginBottom: 8 }} />
-        <div>Drag & drop your PDF here, or click to select</div>
-        <input
-          type="file"
-          accept="application/pdf"
-          ref={fileInput}
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
-        {fileName && <FileName>{fileName}</FileName>}
-      </UploadBox>
-      <UploadButton onClick={() => fileInput.current.click()} type="button">
-        <FiUploadCloud size={20} /> Upload Resume (PDF)
-      </UploadButton>
-    </>
+    <div>
+      <input
+        type="file"
+        accept="application/pdf"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
+      <button onClick={() => fileInputRef.current.click()}>Upload PDF</button>
+      {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
+    </div>
   );
 };
 
