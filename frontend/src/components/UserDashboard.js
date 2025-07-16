@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare } from "react-icons/fi";
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { FaBrain } from "react-icons/fa";
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -178,6 +180,35 @@ const ProgressFill = styled.div`
   transition: width 0.5s;
 `;
 
+const Card = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  text-align: center;
+  flex: 1 1 200px;
+  min-width: 180px;
+`;
+
+const IconContainer = styled.div`
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #6366f1;
+`;
+
+const Title = styled.h5`
+  color: #3730a3;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+`;
+
+const Description = styled.p`
+  color: #6366f1;
+  font-size: 0.9rem;
+  margin: 0;
+`;
+
 const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -275,6 +306,15 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
         <QuickLinkCard onClick={() => navigate('/interview')}>
           <FiMessageSquare size={22} /> Interview Prep
         </QuickLinkCard>
+        <Link to="/aptitude">
+          <Card>
+            <IconContainer>
+              <FaBrain size={24} />
+            </IconContainer>
+            <Title>Aptitude Test</Title>
+            <Description>Take an aptitude assessment to evaluate your analytical and problem-solving skills.</Description>
+          </Card>
+        </Link>
       </QuickLinks>
       <UserInfo>
         <UserName>Your Progress</UserName>
@@ -319,4 +359,4 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   );
 };
 
-export default UserDashboard; 
+export default UserDashboard;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
+import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut, FiBrain } from "react-icons/fi";
 import { auth, googleProvider } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import FileUpload from "./components/FileUpload";
@@ -13,6 +13,8 @@ import EnhancedDSABank from "./components/EnhancedDSABank";
 import JobListings from "./components/JobListings";
 import ProjectAnalysis from "./components/ProjectAnalysis";
 import InterviewPrep from "./components/InterviewPrep";
+import AptitudeTest from "./components/AptitudeTest";
+import AptitudeQuestionManager from "./components/AptitudeQuestionManager";
 import { uploadResume } from "./api";
 import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
@@ -415,6 +417,14 @@ function App() {
         return (
           <InterviewPrep userId={user.uid} />
         );
+      case 'aptitude':
+        return (
+          <AptitudeTest userId={user.uid} />
+        );
+      case 'question-manager':
+        return (
+          <AptitudeQuestionManager userId={user.uid} />
+        );
       default:
         return null;
     }
@@ -495,6 +505,20 @@ function App() {
                     <FiMessageSquare size={18} />
                     Interview Prep
                   </Tab>
+                  <Tab 
+                    active={activeTab === 'aptitude'} 
+                    onClick={() => setActiveTab('aptitude')}
+                  >
+                    <FiBrain size={18} />
+                    Aptitude Test
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'question-manager'} 
+                    onClick={() => setActiveTab('question-manager')}
+                  >
+                    <FiFolder size={18} />
+                    Question Manager
+                  </Tab>
                 </TabContainer>
               )}
               <ContentArea>
@@ -503,9 +527,11 @@ function App() {
             </MainLayout>
           </>
         } />
+        <Route path="/aptitude" element={<AptitudeTest />} />
+        <Route path="/aptitude/manage" element={<AptitudeQuestionManager />} />
       </Routes>
     </>
   );
 }
 
-export default App; 
+export default App;
