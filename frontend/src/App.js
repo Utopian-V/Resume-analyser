@@ -221,25 +221,66 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed:', user ? user.email : 'No user');
       setUser(user);
     });
 
     return () => unsubscribe();
   }, []);
 
+  // Add Firebase status check
+  useEffect(() => {
+    console.log('Firebase auth status:', {
+      auth: !!auth,
+      googleProvider: !!googleProvider,
+      user: !!user
+    });
+  }, [auth, googleProvider, user]);
+
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      console.log('Attempting Google sign in...');
+      if (!auth || !googleProvider) {
+        console.error('Firebase auth not initialized properly');
+        alert('Firebase authentication is not properly configured. Please check the console for details.');
+        return;
+      }
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('Sign in successful:', result.user.email);
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Sign in failed. Please try again.';
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Pop-up was blocked by your browser. Please allow pop-ups and try again.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = 'This domain is not authorized for Firebase authentication.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your internet connection.';
+      }
+      
+      alert(errorMessage);
     }
   };
 
   const handleSignOut = async () => {
     try {
+      console.log('Attempting sign out...');
+      if (!auth) {
+        console.error('Firebase auth not initialized properly');
+        return;
+      }
+      
       await signOut(auth);
+      console.log('Sign out successful');
     } catch (error) {
       console.error('Error signing out:', error);
+      alert('Sign out failed. Please try again.');
     }
   };
 
