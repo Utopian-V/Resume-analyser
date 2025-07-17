@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiBookOpen, FiUser, FiCalendar, FiArrowRight } from 'react-icons/fi';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 export const blogs = [
   {
@@ -229,6 +230,20 @@ const Blog = () => {
   if (!selectedBlog) {
     return (
       <BlogContainer>
+        <Helmet>
+          <title>Prep Nexus Blog – Career Tips, DSA, Resume, and More</title>
+          <meta name="description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+          <meta property="og:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
+          <meta property="og:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+          <meta property="og:type" content="blog" />
+          <meta property="og:url" content="https://prepnexus.netlify.app/blog" />
+          <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
+          <meta name="twitter:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+          <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
+          <link rel="canonical" href="https://prepnexus.netlify.app/blog" />
+        </Helmet>
         <BlogHeader>
           <BlogTitle><FiBookOpen style={{ marginRight: 8 }} /> Prep Nexus Blog</BlogTitle>
           <p style={{ color: '#6366f1', fontSize: '1.1rem', marginBottom: 0 }}>
@@ -289,6 +304,20 @@ const Blog = () => {
         </Link>
       </nav>
       <article itemScope itemType="https://schema.org/BlogPosting">
+        <Helmet>
+          <title>{selectedBlog.title} – Prep Nexus Blog</title>
+          <meta name="description" content={selectedBlog.summary} />
+          <meta property="og:title" content={`${selectedBlog.title} – Prep Nexus Blog`} />
+          <meta property="og:description" content={selectedBlog.summary} />
+          <meta property="og:type" content="article" />
+          <meta property="og:url" content={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
+          <meta property="og:image" content={selectedBlog.image} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${selectedBlog.title} – Prep Nexus Blog`} />
+          <meta name="twitter:description" content={selectedBlog.summary} />
+          <meta name="twitter:image" content={selectedBlog.image} />
+          <link rel="canonical" href={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
+        </Helmet>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'BlogPosting',
@@ -374,6 +403,20 @@ export function AuthorPage() {
   if (!author) return <div style={{ color: '#ef4444', textAlign: 'center', margin: '3rem' }}>Author not found.</div>;
   return (
     <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem' }}>
+      <Helmet>
+        <title>Posts by {author ? author.name : 'Author'} – Prep Nexus Blog</title>
+        <meta name="description" content={author ? `Read all posts by ${author.name} on Prep Nexus Blog.` : 'Author not found.'} />
+        <meta property="og:title" content={`Posts by ${author ? author.name : 'Author'} – Prep Nexus Blog`} />
+        <meta property="og:description" content={author ? `Read all posts by ${author.name} on Prep Nexus Blog.` : 'Author not found.'} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={`https://prepnexus.netlify.app/blog/author/${slug}`} />
+        <meta property="og:image" content={author ? author.avatar : 'https://prepnexus.netlify.app/og-image.png'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`Posts by ${author ? author.name : 'Author'} – Prep Nexus Blog`} />
+        <meta name="twitter:description" content={author ? `Read all posts by ${author.name} on Prep Nexus Blog.` : 'Author not found.'} />
+        <meta name="twitter:image" content={author ? author.avatar : 'https://prepnexus.netlify.app/og-image.png'} />
+        <link rel="canonical" href={`https://prepnexus.netlify.app/blog/author/${slug}`} />
+      </Helmet>
       <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
         <img src={author.avatar} alt={author.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #6366f1' }} />
         <div>
@@ -406,6 +449,20 @@ export function TagPage() {
   const posts = getPostsByTag(tag);
   return (
     <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem' }}>
+      <Helmet>
+        <title>Posts tagged “{tag}” – Prep Nexus Blog</title>
+        <meta name="description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
+        <meta property="og:title" content={`Posts tagged “${tag}” – Prep Nexus Blog`} />
+        <meta property="og:description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
+        <meta property="og:type" content="blog" />
+        <meta property="og:url" content={`https://prepnexus.netlify.app/blog/tag/${tag}`} />
+        <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`Posts tagged “${tag}” – Prep Nexus Blog`} />
+        <meta name="twitter:description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
+        <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <link rel="canonical" href={`https://prepnexus.netlify.app/blog/tag/${tag}`} />
+      </Helmet>
       <h1 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2.2rem', marginBottom: 0 }}>Posts tagged “{tag}”</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginTop: 32 }}>
         {posts.length > 0 ? posts.map(blog => (

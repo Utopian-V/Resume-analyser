@@ -5,6 +5,7 @@ import { FiArrowRight, FiCheckCircle, FiMail, FiUser, FiDollarSign } from "react
 import { useNavigate } from "react-router-dom";
 import { blogs } from './Blog';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 // Animated background blocks
 const moveBlock = keyframes`
@@ -262,6 +263,28 @@ export default function LandingPage() {
   };
   return (
     <>
+      <Helmet>
+        <title>Prep Nexus – AI Resume Review, DSA Prep, and Job Opportunities</title>
+        <meta name="description" content="AI-powered resume review, DSA prep, and job opportunities. Boost your career with actionable feedback and curated job listings." />
+        <meta property="og:title" content="Prep Nexus – AI Resume Review, DSA Prep, and Job Opportunities" />
+        <meta property="og:description" content="AI-powered resume review, DSA prep, and job opportunities. Boost your career with actionable feedback and curated job listings." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://prepnexus.netlify.app/" />
+        <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Prep Nexus – AI Resume Review, DSA Prep, and Job Opportunities" />
+        <meta name="twitter:description" content="AI-powered resume review, DSA prep, and job opportunities. Boost your career with actionable feedback and curated job listings." />
+        <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <link rel="canonical" href="https://prepnexus.netlify.app/" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" }
+          ]
+        })}</script>
+      </Helmet>
       <Background />
       {/* Animated floating blocks */}
       {blocks.map((b, i) => (

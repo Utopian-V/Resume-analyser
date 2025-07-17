@@ -24,6 +24,7 @@ import LandingPage from "./components/LandingPage";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Blog, { AuthorPage, TagPage } from './components/Blog';
 import { NotFound } from './components/Blog';
+import { HelmetProvider } from 'react-helmet-async';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -448,7 +449,7 @@ function App() {
   };
 
   return (
-    <>
+    <HelmetProvider>
       <GlobalStyle />
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -559,7 +560,7 @@ function App() {
           </>
         } />
       </Routes>
-    </>
+    </HelmetProvider>
   );
 }
 
