@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiFire } from 'react-icons/fi';
+import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiZap } from 'react-icons/fi';
 import { getAllCompanyJobs } from '../api';
 import { useRef } from 'react';
 
@@ -523,7 +523,7 @@ const JobListings = () => {
                     )}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
                       {isFeatured && <Badge bg="#fef9c3" color="#eab308"><FiStar /> Featured</Badge>}
-                      {isHot && <Badge bg="#fee2e2" color="#b91c1c"><FiFire /> Hot</Badge>}
+                      {isHot && <Badge bg="#fee2e2" color="#b91c1c"><FiZap /> Hot</Badge>}
                       {isNew && <Badge bg="#dbeafe" color="#2563eb">New</Badge>}
                       {job.government_job && (
                         <Badge bg="#fef3c7" color="#92400e"><FiAward /> Government</Badge>
