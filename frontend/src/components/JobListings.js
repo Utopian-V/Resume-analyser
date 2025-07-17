@@ -38,53 +38,97 @@ const MainGrid = styled.div`
   }
 `;
 
-const FilterSidebar = styled.div`
-  min-width: 260px;
+const FilterBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   background: #f8fafc;
-  border-radius: 1.2rem;
+  border-radius: 1rem;
+  padding: 0.75rem 1.5rem;
   box-shadow: 0 2px 12px rgba(99,102,241,0.07);
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
   position: sticky;
-  top: 2rem;
-  height: fit-content;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  flex-wrap: wrap;
   @media (max-width: 900px) {
-    position: static;
-    width: 100%;
-    margin-bottom: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
   }
 `;
 
-const FilterTitle = styled.h4`
-  color: #3730a3;
-  font-size: 1.1rem;
+const FilterButton = styled.button`
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.6rem 1.2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  &:hover:not(:disabled) {
+    background: #4f46e5;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  @media (max-width: 900px) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
-const FilterGroup = styled.div`
-  margin-bottom: 1.5rem;
+const FilterChips = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: #e0e7ff;
+  border-radius: 1.5rem;
+  padding: 0.3rem 0.8rem;
+  margin-left: 1rem;
+  @media (max-width: 900px) {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
-const FilterLabel = styled.label`
-  display: block;
-  color: #6366f1;
-  font-size: 0.98rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+const Chip = styled.span`
+  background: #6366f1;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  &:hover {
+    background: #4f46e5;
+  }
 `;
 
-const FilterSelect = styled.select`
-  width: 100%;
+const FilterDropdown = styled.select`
   padding: 0.7rem;
   border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   font-size: 1rem;
   background-color: white;
-  margin-bottom: 0.5rem;
+  cursor: pointer;
   &:focus {
     outline: none;
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  }
+  @media (max-width: 900px) {
+    width: 100%;
   }
 `;
 
@@ -96,6 +140,10 @@ const SearchBar = styled.div`
   padding: 0.7rem 1rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 1px 4px rgba(99,102,241,0.04);
+  flex: 1;
+  @media (max-width: 900px) {
+    width: 100%;
+  }
 `;
 
 const SearchInput = styled.input`
@@ -445,8 +493,31 @@ const JobListings = () => {
         <button aria-label="Scroll right" onClick={() => scrollLogoBar(1)} style={{ background: 'none', border: 'none', fontSize: 24, color: '#6366f1', cursor: 'pointer' }}><FiChevronRight /></button>
       </div>
       <MainGrid>
-        <FilterSidebar>
-          <FilterTitle><FiFilter /> Filters</FilterTitle>
+        {/* Filter Bar */}
+        <FilterBar>
+          <FilterButton onClick={clearAllFilters} disabled={Object.keys(filters).length === 0 && search === '' && selectedCompanies.length === 0 && selectedCategories.length === 0 && selectedExperiences.length === 0 && selectedTags.length === 0}>Clear All Filters</FilterButton>
+          <FilterChips>
+            {selectedCompanies.map(c => (
+              <Chip key={c} onClick={() => setSelectedCompanies(prev => prev.filter(x => x !== c))}>
+                {c} <FiX />
+              </Chip>
+            ))}
+            {selectedCategories.map(cat => (
+              <Chip key={cat} onClick={() => setSelectedCategories(prev => prev.filter(x => x !== cat))}>
+                {cat} <FiX />
+              </Chip>
+            ))}
+            {selectedExperiences.map(exp => (
+              <Chip key={exp} onClick={() => setSelectedExperiences(prev => prev.filter(x => x !== exp))}>
+                {exp} <FiX />
+              </Chip>
+            ))}
+            {selectedTags.map(tag => (
+              <Chip key={tag} onClick={() => setSelectedTags(prev => prev.filter(x => x !== tag))}>
+                {tag} <FiX />
+              </Chip>
+            ))}
+          </FilterChips>
           <SearchBar>
             <FiSearch style={{ color: '#6366f1', marginRight: 8 }} />
             <SearchInput
@@ -456,12 +527,31 @@ const JobListings = () => {
               aria-label="Search jobs"
             />
           </SearchBar>
-          <MultiSelect options={companies} selected={selectedCompanies} onChange={setSelectedCompanies} placeholder="Companies" />
-          <MultiSelect options={categories} selected={selectedCategories} onChange={setSelectedCategories} placeholder="Categories" />
-          <MultiSelect options={experiences} selected={selectedExperiences} onChange={setSelectedExperiences} placeholder="Experience Levels" />
-          <MultiSelect options={tags} selected={selectedTags} onChange={setSelectedTags} placeholder="Skills/Tags" />
-          <Button onClick={clearAllFilters} style={{ width: '100%', marginTop: 12, background: '#e0e7ff', color: '#3730a3', fontWeight: 700 }}>Clear All Filters</Button>
-        </FilterSidebar>
+          <FilterDropdown value={filters.company || ''} onChange={e => setFilters(prev => ({ ...prev, company: e.target.value }))} aria-label="Filter by company">
+            <option value="">All Companies</option>
+            {companies.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </FilterDropdown>
+          <FilterDropdown value={filters.category || ''} onChange={e => setFilters(prev => ({ ...prev, category: e.target.value }))} aria-label="Filter by category">
+            <option value="">All Categories</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </FilterDropdown>
+          <FilterDropdown value={filters.experience_level || ''} onChange={e => setFilters(prev => ({ ...prev, experience_level: e.target.value }))} aria-label="Filter by experience level">
+            <option value="">All Experience Levels</option>
+            {experiences.map(exp => (
+              <option key={exp} value={exp}>{exp}</option>
+            ))}
+          </FilterDropdown>
+          <FilterDropdown value={filters.tags || ''} onChange={e => setFilters(prev => ({ ...prev, tags: e.target.value }))} aria-label="Filter by skills/tags">
+            <option value="">All Skills/Tags</option>
+            {tags.map(tag => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
+          </FilterDropdown>
+        </FilterBar>
         <div style={{ flex: 1 }}>
           {loading ? (
             <>
