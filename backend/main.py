@@ -12,6 +12,8 @@ from pydantic import BaseModel
 import uuid
 from datetime import datetime
 import glob
+import aiosqlite
+import asyncio
 
 load_dotenv()
 
@@ -834,14 +836,130 @@ async def interview_chat(message: InterviewMessage):
         raise HTTPException(status_code=500, detail=f"Interview chat error: {str(e)}")
 
 # --- API Endpoints ---
+import aiosqlite
+import asyncio
+import json
+import glob
+
+DB_PATH = os.path.join(os.path.dirname(__file__), 'jobs.db')
+
+# --- SQLite DB Setup ---
+async def init_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS jobs (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                company TEXT,
+                company_domain TEXT,
+                company_logo TEXT,
+                company_credit TEXT,
+                location TEXT,
+                description TEXT,
+                requirements TEXT,
+                salary_range TEXT,
+                posted_date TEXT,
+                application_deadline TEXT,
+                source TEXT,
+                source_url TEXT,
+                category TEXT,
+                employment_type TEXT,
+                experience_level TEXT,
+                remote_friendly INTEGER,
+                government_job INTEGER,
+                tags TEXT,
+                scraped_at TEXT
+            )
+        ''')
+        await db.execute('''
+            CREATE VIRTUAL TABLE IF NOT EXISTS jobs_fts USING fts5(
+                id, title, description, company, category, requirements, content='jobs', content_rowid='rowid'
+            )
+        ''')
+        await db.commit()
+
+async def upsert_job(job):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('''
+            INSERT OR REPLACE INTO jobs (
+                id, title, company, company_domain, company_logo, company_credit, location, description, requirements, salary_range, posted_date, application_deadline, source, source_url, category, employment_type, experience_level, remote_friendly, government_job, tags, scraped_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            job.get('id'), job.get('title'), job.get('company'), job.get('company_domain'), job.get('company_logo'), job.get('company_credit'), job.get('location'), job.get('description'), json.dumps(job.get('requirements', [])), job.get('salary_range'), job.get('posted_date'), job.get('application_deadline'), job.get('source'), job.get('source_url'), job.get('category'), job.get('employment_type'), job.get('experience_level'), int(bool(job.get('remote_friendly'))), int(bool(job.get('government_job'))), json.dumps(job.get('tags', [])), job.get('scraped_at')
+        ))
+        await db.execute('''
+            INSERT OR REPLACE INTO jobs_fts (rowid, id, title, description, company, category, requirements)
+            VALUES ((SELECT rowid FROM jobs WHERE id = ?), ?, ?, ?, ?, ?, ?)
+        ''', (
+            job.get('id'), job.get('id'), job.get('title'), job.get('description'), job.get('company'), job.get('category'), json.dumps(job.get('requirements', []))
+        ))
+        await db.commit()
+
+async def bulk_load_jobs_from_json():
+    jobs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts/ncs_scraper'))
+    job_files = glob.glob(os.path.join(jobs_dir, 'jobs_*.json'))
+    for file_path in job_files:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            jobs = data.get('jobs', [])
+            company_domain = os.path.basename(file_path)[5:-5]
+            for job in jobs:
+                job['company_domain'] = company_domain
+                job['company_logo'] = f"https://logo.clearbit.com/{company_domain}"
+                job['company_credit'] = f"Jobs scraped from {company_domain} career page"
+                job['scraped_at'] = data.get('scraped_at')
+                await upsert_job(job)
+
+async def query_jobs_from_db(filters, search, page, page_size):
+    where = []
+    params = []
+    if filters.get('category'):
+        where.append('category = ?')
+        params.append(filters['category'])
+    if filters.get('company'):
+        where.append('company = ?')
+        params.append(filters['company'])
+    if filters.get('experience'):
+        where.append('experience_level = ?')
+        params.append(filters['experience'])
+    if filters.get('remote') is not None:
+        where.append('remote_friendly = ?')
+        params.append(int(bool(filters['remote'])))
+    if filters.get('government') is not None:
+        where.append('government_job = ?')
+        params.append(int(bool(filters['government'])))
+    if filters.get('source'):
+        where.append('source LIKE ?')
+        params.append(f"%{filters['source']}%")
+    if filters.get('tags'):
+        where.append('tags LIKE ?')
+        params.append(f"%{filters['tags']}%")
+    base_query = 'SELECT * FROM jobs'
+    if search:
+        base_query = 'SELECT * FROM jobs WHERE rowid IN (SELECT rowid FROM jobs_fts WHERE jobs_fts MATCH ?)' + (' AND ' if where else '') + ' AND '.join(where)
+        params = [search] + params
+    elif where:
+        base_query += ' WHERE ' + ' AND '.join(where)
+    base_query += ' ORDER BY posted_date DESC LIMIT ? OFFSET ?'
+    params += [page_size, (page-1)*page_size]
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(base_query, params)
+        jobs = await cursor.fetchall()
+        await cursor.close()
+        return [dict(j) for j in jobs]
+
 @app.on_event("startup")
 async def startup_event():
     print("🚀 Starting Resume Review AI Backend...")
+    await init_db()
     print("📊 Initializing sample data...")
     initialize_sample_data()
     print("🧠 Loading aptitude tests...")
     load_aptitude_tests()
     print(f"✅ Loaded {len(aptitude_tests)} aptitude test(s)")
+    print("📥 Loading jobs from JSON to DB if needed...")
+    await bulk_load_jobs_from_json()
     print("🎯 Backend ready!")
 
 @app.get("/api/aptitude/tests")
@@ -1008,48 +1126,11 @@ async def get_all_company_jobs(
     remote: bool = Query(None),
     government: bool = Query(None),
     source: str = Query(None),
-    search: str = Query(None)
+    tags: str = Query(None),
+    search: str = Query(None),
+    page: int = Query(1),
+    page_size: int = Query(30)
 ):
     """Aggregate all jobs from jobs_*.json files and support filtering."""
-    jobs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts/ncs_scraper'))
-    job_files = glob.glob(os.path.join(jobs_dir, 'jobs_*.json'))
-    all_jobs = []
-    for file_path in job_files:
-        try:
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-                jobs = data.get('jobs', [])
-                # Infer company from filename
-                company_domain = os.path.basename(file_path)[5:-5]
-                for job in jobs:
-                    job['company_domain'] = company_domain
-                    job['company_logo'] = get_company_logo_url(company_domain)
-                    job['company_credit'] = f"Jobs scraped from {company_domain} career page"
-                    all_jobs.append(job)
-        except Exception as e:
-            print(f"Error reading {file_path}: {e}")
-            continue
-    # Filtering
-    def job_filter(job):
-        if category and job.get('category') != category:
-            return False
-        if company and (company.lower() not in job.get('company', '').lower() and company.lower() not in job.get('company_domain', '').lower()):
-            return False
-        if experience and job.get('experience_level') != experience:
-            return False
-        if remote is not None and bool(job.get('remote_friendly')) != remote:
-            return False
-        if government is not None and bool(job.get('government_job')) != government:
-            return False
-        if source and source.lower() not in str(job.get('source', '')).lower():
-            return False
-        if search:
-            s = search.lower()
-            if s not in job.get('title', '').lower() and s not in job.get('description', '').lower():
-                return False
-        return True
-    filtered_jobs = [job for job in all_jobs if job_filter(job)]
-    return {
-        "total": len(filtered_jobs),
-        "jobs": filtered_jobs
-    }
+    jobs = await query_jobs_from_db(dict(category=category, company=company, experience=experience, remote=remote, government=government, source=source, tags=tags), search, page, page_size)
+    return {"total": len(jobs), "jobs": jobs}
