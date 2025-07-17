@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Prep Nexus Blog</title>
+    <link>https://prepnexus.netlify.app/blog</link>
+    <description>Insights, tips, and guides to help you grow your career.</description>
+    <language>en-us</language>
+    <copyright>Prep Nexus</copyright>
+    <ttl>60</ttl>
+    <item>
+      <title>How to Make Your Resume Stand Out in 2024</title>
+      <link>https://prepnexus.netlify.app/blog/1</link>
+      <description>Discover the latest tips and tricks to craft a resume that catches recruiters’ eyes and lands you more interviews.</description>
+      <author>Jane Doe</author>
+      <pubDate>Thu, 18 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://prepnexus.netlify.app/blog/1</guid>
+    </item>
+    <item>
+      <title>Mastering DSA for Tech Interviews</title>
+      <link>https://prepnexus.netlify.app/blog/2</link>
+      <description>A practical guide to preparing for data structures and algorithms interviews, with resources and study plans.</description>
+      <author>John Smith</author>
+      <pubDate>Mon, 15 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://prepnexus.netlify.app/blog/2</guid>
+    </item>
+    <item>
+      <title>The Power of Networking in Your Job Search</title>
+      <link>https://prepnexus.netlify.app/blog/3</link>
+      <description>Learn why networking is still the #1 way to land your dream job and how to do it effectively, even online.</description>
+      <author>Priya Patel</author>
+      <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://prepnexus.netlify.app/blog/3</guid>
+    </item>
+  </channel>
+</rss> 

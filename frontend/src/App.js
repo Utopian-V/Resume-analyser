@@ -22,7 +22,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
 import LandingPage from "./components/LandingPage";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
-import Blog from './components/Blog';
+import Blog, { AuthorPage, TagPage } from './components/Blog';
+import { NotFound } from './components/Blog';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -451,6 +452,11 @@ function App() {
       <GlobalStyle />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<Blog />} />
+        <Route path="/blog/author/:slug" element={<AuthorPage />} />
+        <Route path="/blog/tag/:tag" element={<TagPage />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/app" element={
           <>
             <Header>
