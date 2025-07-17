@@ -1,0 +1,28 @@
+{
+  "source": "Career Page - vanguard.com",
+  "scraped_at": "2025-07-17T14:30:19.174794",
+  "total_jobs": 1,
+  "jobs": [
+    {
+      "id": "vanguard.com_815301",
+      "title": "Search for jobs",
+      "company": "Vanguard",
+      "location": "LocationLocations with open jobsAU, Victoria, MelbourneCA, ON, TorontoES, Madrid, MadridGB, England, LondonGB, England, ManchesterIE, Dublin, DublinMX, Distrito Federal, Mexico CityUS, AZ, PhoenixUS, AZ, ScottsdaleUS, CA, OaklandUS, CT, HartfordUS, DC, WashingtonUS, MA, BostonUS, MD, BaltimoreUS, NC, CharlotteUS, PA, ChesterbrookUS, PA, MalvernUS, PA, Newtown SquareUS, PA, PhiladelphiaUS, PA, WayneUS, TX, DallasUS, VA, Richmond",
+      "description": "Job description not available",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Vanguard",
+      "source_url": "https://www.vanguardjobs.com/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut, FiSun, FiMoon, FiMessageCircle } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
+import Sidebar from './components/Sidebar';
 import { auth, googleProvider } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import FileUpload from "./components/FileUpload";
@@ -298,42 +299,138 @@ const FloatingFAQ = styled.button`
 const FAQModalOverlay = styled.div`
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(36,40,62,0.25);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 201;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+  backdrop-filter: blur(4px);
 `;
 
 const FAQModal = styled.div`
   background: ${({ theme }) => theme.card};
   color: ${({ theme }) => theme.text};
-  border-radius: 1.2rem 1.2rem 0 0;
-  box-shadow: 0 2px 32px ${({ theme }) => theme.shadow};
-  width: 350px;
+  border-radius: 1.5rem 1.5rem 0 0;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  width: 400px;
   max-width: 95vw;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  height: 500px;
   margin: 0 2vw 2vw 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+`;
+
+const FAQHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.accent};
+  color: white;
+`;
+
+const FAQTitle = styled.h3`
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+`;
+
+const FAQCloseButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const FAQChatContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const FAQMessage = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  ${props => props.isUser ? 'justify-content: flex-end;' : ''}
+`;
+
+const FAQMessageBubble = styled.div`
+  background: ${props => props.isUser ? props.theme.accent : props.theme.tabInactive};
+  color: ${props => props.isUser ? 'white' : props.theme.text};
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  
+  ${props => props.isUser ? `
+    border-bottom-right-radius: 0.25rem;
+  ` : `
+    border-bottom-left-radius: 0.25rem;
+  `}
+`;
+
+const FAQInputContainer = styled.div`
+  padding: 1rem;
+  border-top: 1px solid ${({ theme }) => theme.border};
+  display: flex;
+  gap: 0.5rem;
 `;
 
 const FAQInput = styled.input`
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border-radius: 0.7rem;
-  border: 1.5px solid ${({ theme }) => theme.border};
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid ${({ theme }) => theme.border};
+  font-size: 0.95rem;
   background: ${({ theme }) => theme.tabInactive};
   color: ${({ theme }) => theme.text};
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.accent};
+  }
 `;
 
-const FAQAnswer = styled.div`
-  color: ${({ theme }) => theme.accent};
-  font-size: 1.08rem;
-  margin-top: 0.5rem;
-  min-height: 40px;
+const FAQSendButton = styled.button`
+  background: ${({ theme }) => theme.accent};
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: ${({ theme }) => theme.accent2};
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const FAQWelcomeMessage = styled.div`
+  text-align: center;
+  color: ${({ theme }) => theme.textSecondary};
+  font-size: 0.9rem;
+  padding: 1rem;
 `;
 
 function App() {
@@ -349,6 +446,7 @@ function App() {
   const [faqQuestion, setFaqQuestion] = useState('');
   const [faqAnswer, setFaqAnswer] = useState('');
   const [isFAQModalOpen, setIsFAQModalOpen] = useState(false);
+  const [faqMessages, setFaqMessages] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -476,6 +574,11 @@ function App() {
   const handleFAQQuestionSubmit = async (e) => {
     e.preventDefault();
     if (!faqQuestion.trim()) return;
+    
+    const userMessage = { type: 'user', content: faqQuestion, timestamp: new Date() };
+    setFaqMessages(prev => [...prev, userMessage]);
+    setFaqQuestion('');
+    
     setLoading(true);
     try {
       const answer = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/faq/answer`, {
@@ -485,11 +588,12 @@ function App() {
         },
         body: JSON.stringify({ question: faqQuestion }),
       }).then(res => res.json());
-      setFaqAnswer(answer.answer);
-      setIsFAQModalOpen(true);
+      
+      const botMessage = { type: 'bot', content: answer.answer || 'I apologize, but I couldn\'t find a specific answer to your question. Please try rephrasing or ask something else.', timestamp: new Date() };
+      setFaqMessages(prev => [...prev, botMessage]);
     } catch (err) {
-      setFaqAnswer('Error fetching answer. Please try again.');
-      setIsFAQModalOpen(true);
+      const botMessage = { type: 'bot', content: 'Sorry, I\'m having trouble connecting right now. Please try again later.', timestamp: new Date() };
+      setFaqMessages(prev => [...prev, botMessage]);
     } finally {
       setLoading(false);
     }
@@ -498,7 +602,7 @@ function App() {
   const handleFAQClose = () => {
     setIsFAQModalOpen(false);
     setFaqQuestion('');
-    setFaqAnswer('');
+    setFaqMessages([]);
   };
 
   const renderTabContent = () => {
@@ -602,121 +706,103 @@ function App() {
           <Route path="*" element={<NotFound />} />
           <Route path="/app" element={
             <>
-              <Header>
-                <HeaderLeft>
-                  <Title>AI Resume Reviewer</Title>
-                  <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
-                </HeaderLeft>
-                <AuthSection>
-                  {isLoading ? (
-                    <div>Loading...</div>
-                  ) : user ? (
-                    <>
-                      <UserInfo>
-                        {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
-                        {user.displayName}
-                      </UserInfo>
-                      <AuthButton isLoggedIn={true} onClick={handleSignOut}>
-                        <FiLogOut size={18} />
-                        Sign Out
+              {user ? (
+                <Sidebar 
+                  user={user}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  onSignOut={handleSignOut}
+                />
+              ) : (
+                <Header>
+                  <HeaderLeft>
+                    <Title>Prep Nexus</Title>
+                    <Subtitle>AI-powered career growth and interview preparation</Subtitle>
+                  </HeaderLeft>
+                  <AuthSection>
+                    {isLoading ? (
+                      <div>Loading...</div>
+                    ) : (
+                      <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
+                        <FiUser size={18} />
+                        Sign in with Google
                       </AuthButton>
-                      <ThemeToggle onClick={handleThemeToggle}>
-                        {isDarkMode ? <FiMoon /> : <FiSun />}
-                      </ThemeToggle>
-                    </>
-                  ) : (
+                    )}
+                  </AuthSection>
+                </Header>
+              )}
+              
+              {user && (
+                <div style={{ marginLeft: '280px', padding: '2rem' }}>
+                  {renderTabContent()}
+                </div>
+              )}
+              
+              {!user && (
+                <MainLayout>
+                  <LoginPrompt>
+                    <LoginTitle>Welcome to Prep Nexus</LoginTitle>
+                    <LoginText>Please sign in with Google to access all features</LoginText>
                     <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
                       <FiUser size={18} />
                       Sign in with Google
                     </AuthButton>
-                  )}
-                </AuthSection>
-              </Header>
-              <MainLayout>
-                {user && (
-                  <TabContainer>
-                    <Tab 
-                      active={activeTab === 'dashboard'} 
-                      onClick={() => setActiveTab('dashboard')}
-                    >
-                      <FiUser size={18} />
-                      Dashboard
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'resume'} 
-                      onClick={() => setActiveTab('resume')}
-                    >
-                      <FiUploadCloud size={18} />
-                      Resume Analysis
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'dsa'} 
-                      onClick={() => setActiveTab('dsa')}
-                    >
-                      <FiCode size={18} />
-                      DSA Practice
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'jobs'} 
-                      onClick={() => setActiveTab('jobs')}
-                    >
-                      <FiBriefcase size={18} />
-                      Job Opportunities
-                    </Tab>
-                    {user && <>
-                    <Tab 
-                      active={activeTab === 'interview'} 
-                      onClick={() => setActiveTab('interview')}
-                    >
-                      <FiMessageSquare size={18} />
-                      Interview Prep
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'aptitude'} 
-                      onClick={() => setActiveTab('aptitude')}
-                    >
-                      <BiBrain size={18} />
-                      Aptitude Test
-                    </Tab>
-                    <Tab 
-                      active={activeTab === 'question-manager'} 
-                      onClick={() => setActiveTab('question-manager')}
-                    >
-                      <FiFolder size={18} />
-                      Question Manager
-                    </Tab>
-                    </>}
-                  </TabContainer>
-                )}
-                <ContentArea>
-                  {renderTabContent()}
-                </ContentArea>
-                <FloatingFAQ onClick={() => setIsFAQModalOpen(true)}>
-                  <FiMessageCircle />
-                </FloatingFAQ>
-              </MainLayout>
+                  </LoginPrompt>
+                </MainLayout>
+              )}
+              
+              <FloatingFAQ onClick={() => setIsFAQModalOpen(true)}>
+                <FiMessageCircle />
+              </FloatingFAQ>
               {isFAQModalOpen && (
                 <FAQModalOverlay onClick={handleFAQClose}>
                   <FAQModal onClick={(e) => e.stopPropagation()}>
-                    <h3>AI Resume Reviewer FAQ</h3>
-                    <form onSubmit={handleFAQQuestionSubmit}>
-                      <FAQInput
-                        type="text"
-                        placeholder="Ask a question about resume review..."
-                        value={faqQuestion}
-                        onChange={(e) => setFaqQuestion(e.target.value)}
-                        disabled={loading}
-                      />
-                      <button type="submit" disabled={loading}>
-                        {loading ? 'Searching...' : 'Ask Question'}
-                      </button>
-                    </form>
-                    {faqAnswer && (
-                      <FAQAnswer>
-                        <strong>Answer:</strong> {faqAnswer}
-                      </FAQAnswer>
-                    )}
-                    <button onClick={handleFAQClose}>Close</button>
+                    <FAQHeader>
+                      <FAQTitle>Prep Nexus Assistant</FAQTitle>
+                      <FAQCloseButton onClick={handleFAQClose}>×</FAQCloseButton>
+                    </FAQHeader>
+                    
+                    <FAQChatContainer>
+                      {faqMessages.length === 0 && (
+                        <FAQWelcomeMessage>
+                          👋 Hi! I'm your Prep Nexus assistant. Ask me anything about resume optimization, interview prep, or career advice!
+                        </FAQWelcomeMessage>
+                      )}
+                      
+                      {faqMessages.map((message, index) => (
+                        <FAQMessage key={index} isUser={message.type === 'user'}>
+                          <FAQMessageBubble isUser={message.type === 'user'}>
+                            {message.content}
+                          </FAQMessageBubble>
+                        </FAQMessage>
+                      ))}
+                      
+                      {loading && (
+                        <FAQMessage isUser={false}>
+                          <FAQMessageBubble isUser={false}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ width: '16px', height: '16px', border: '2px solid #6366f1', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                              Thinking...
+                            </div>
+                          </FAQMessageBubble>
+                        </FAQMessage>
+                      )}
+                    </FAQChatContainer>
+                    
+                    <FAQInputContainer>
+                      <form onSubmit={handleFAQQuestionSubmit} style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                        <FAQInput
+                          type="text"
+                          placeholder="Ask me anything..."
+                          value={faqQuestion}
+                          onChange={(e) => setFaqQuestion(e.target.value)}
+                          disabled={loading}
+                        />
+                        <FAQSendButton type="submit" disabled={loading || !faqQuestion.trim()}>
+                          Send
+                        </FAQSendButton>
+                      </form>
+                    </FAQInputContainer>
                   </FAQModal>
                 </FAQModalOverlay>
               )}

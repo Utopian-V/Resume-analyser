@@ -18,6 +18,13 @@ app.add_middleware(
 )
 
 # =========================
+# Test Endpoint
+# =========================
+@app.get("/")
+async def root():
+    return {"message": "Prep Nexus API is running!"}
+
+# =========================
 # Routers
 # =========================
 app.include_router(jobs_router)

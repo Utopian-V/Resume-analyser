@@ -1,453 +1,289 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiBriefcase as FiJob, FiTarget, FiBookOpen, FiUsers, FiCalendar, FiCheckCircle, FiClock, FiStar } from "react-icons/fi";
+import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiTarget, FiBookOpen, FiUsers, FiCalendar, FiCheckCircle, FiClock, FiStar, FiBarChart3 } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
-const Container = styled.div`
-  background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+const DashboardContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const WelcomeSection = styled.div`
+  flex: 1;
+`;
+
+const WelcomeTitle = styled.h1`
+  color: #1e293b;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+`;
+
+const WelcomeSubtitle = styled.p`
+  color: #64748b;
+  font-size: 1.1rem;
+  margin: 0;
+`;
+
+const StatsOverview = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 2rem;
 `;
 
-const SectionTitle = styled.h3`
-  color: #3730a3;
-  font-size: 1.4rem;
+const StatCard = styled(motion.div)`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const StatHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+`;
+
+const StatIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  background: ${props => props.color || '#6366f1'};
+`;
+
+const StatValue = styled.div`
+  font-size: 2rem;
   font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+`;
+
+const StatLabel = styled.div`
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+`;
+
+const MainContent = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ContentSection = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+`;
+
+const SectionTitle = styled.h3`
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
   margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 `;
 
-const UserInfo = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  margin-bottom: 1.5rem;
-`;
-
-const UserName = styled.h4`
-  color: #3730a3;
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-`;
-
-const UserEmail = styled.p`
-  color: #6366f1;
-  font-size: 1rem;
-  margin: 0 0 1rem 0;
-`;
-
-const ProgressGrid = styled.div`
+const QuickActions = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 `;
 
-const ProgressCard = styled(motion.div)`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  text-align: center;
-  border-left: 4px solid #6366f1;
-`;
-
-const ProgressNumber = styled.div`
-  font-size: 2rem;
-  font-weight: 900;
-  color: #3730a3;
-  margin-bottom: 0.5rem;
-`;
-
-const ProgressLabel = styled.div`
-  color: #6366f1;
-  font-weight: 600;
-  font-size: 0.9rem;
-`;
-
-const ProgressIcon = styled.div`
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: #6366f1;
-`;
-
-const StatsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-`;
-
-const StatTitle = styled.h5`
-  color: #3730a3;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #6366f1;
-  margin-bottom: 0.3rem;
-`;
-
-const StatDescription = styled.p`
-  color: #6366f1;
-  font-size: 0.9rem;
-  margin: 0;
-`;
-
-const WelcomeMessage = styled.div`
-  background: linear-gradient(90deg, #f0f9ff 60%, #e0f2fe 100%);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border-left: 4px solid #6366f1;
-`;
-
-const WelcomeTitle = styled.h4`
-  color: #3730a3;
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-`;
-
-const WelcomeText = styled.p`
-  color: #6366f1;
-  line-height: 1.5;
-  margin: 0;
-`;
-
-const QuickLinks = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-`;
-
-const QuickLinkCard = styled.button`
-  background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
+const ActionButton = styled(motion.button)`
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: 1.2rem;
-  padding: 1.2rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(99,102,241,0.13);
-  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  
   &:hover {
-    background: linear-gradient(90deg, #3730a3 60%, #6366f1 100%);
-    transform: translateY(-2px) scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   }
 `;
 
+const ActionIcon = styled.div`
+  font-size: 1.5rem;
+`;
+
+const ProgressSection = styled.div`
+  margin-top: 1.5rem;
+`;
+
+const ProgressItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ProgressInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+const ProgressIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: white;
+  background: ${props => props.color || '#6366f1'};
+`;
+
+const ProgressDetails = styled.div`
+  flex: 1;
+`;
+
+const ProgressName = styled.div`
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+`;
+
 const ProgressBar = styled.div`
-  background: #e0e7ff;
-  border-radius: 1rem;
-  height: 18px;
-  width: 100%;
-  margin: 0.7rem 0 1.2rem 0;
+  background: #e2e8f0;
+  border-radius: 0.5rem;
+  height: 6px;
+  width: 100px;
   overflow: hidden;
 `;
 
 const ProgressFill = styled.div`
-  background: linear-gradient(90deg, #22c55e 60%, #6366f1 100%);
+  background: linear-gradient(90deg, #10b981 0%, #6366f1 100%);
   height: 100%;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   width: ${props => props.percent || 0}%;
-  transition: width 0.5s;
+  transition: width 0.5s ease;
 `;
 
-const Card = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  text-align: center;
-  flex: 1 1 200px;
-  min-width: 180px;
-`;
-
-const IconContainer = styled.div`
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: #6366f1;
-`;
-
-const Title = styled.h5`
-  color: #3730a3;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-`;
-
-const Description = styled.p`
+const ProgressPercent = styled.div`
+  font-weight: 600;
   color: #6366f1;
   font-size: 0.9rem;
-  margin: 0;
 `;
 
-// New components for career assistance features
-const CareerPathSection = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  margin-bottom: 1.5rem;
+const RecentActivity = styled.div`
+  margin-top: 1.5rem;
 `;
 
-const PathCard = styled.div`
-  background: linear-gradient(90deg, #f8fafc 60%, #f1f5f9 100%);
-  border-radius: 0.8rem;
-  padding: 1rem;
-  margin: 0.5rem 0;
-  border-left: 4px solid #6366f1;
+const ActivityItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
-const PathIcon = styled.div`
-  font-size: 1.5rem;
-  color: #6366f1;
+const ActivityIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: white;
+  background: ${props => props.color || '#6366f1'};
 `;
 
-const PathContent = styled.div`
+const ActivityContent = styled.div`
   flex: 1;
 `;
 
-const PathTitle = styled.h6`
-  color: #3730a3;
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 0.3rem 0;
-`;
-
-const PathDescription = styled.p`
-  color: #6366f1;
-  font-size: 0.9rem;
-  margin: 0;
-`;
-
-const ApplicationTracker = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  margin-bottom: 1.5rem;
-`;
-
-const ApplicationItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem;
-  border-radius: 0.5rem;
-  margin: 0.5rem 0;
-  background: ${props => {
-    switch(props.status) {
-      case 'applied': return '#f0f9ff';
-      case 'interview': return '#fef3c7';
-      case 'offer': return '#dcfce7';
-      default: return '#f8fafc';
-    }
-  }};
-  border-left: 4px solid ${props => {
-    switch(props.status) {
-      case 'applied': return '#6366f1';
-      case 'interview': return '#f59e0b';
-      case 'offer': return '#22c55e';
-      default: return '#94a3b8';
-    }
-  }};
-`;
-
-const ApplicationInfo = styled.div`
-  flex: 1;
-`;
-
-const ApplicationCompany = styled.div`
-  font-weight: 700;
-  color: #3730a3;
-  font-size: 1rem;
-`;
-
-const ApplicationRole = styled.div`
-  color: #6366f1;
+const ActivityTitle = styled.div`
+  font-weight: 600;
+  color: #1e293b;
   font-size: 0.9rem;
 `;
 
-const ApplicationStatus = styled.div`
+const ActivityTime = styled.div`
+  color: #64748b;
   font-size: 0.8rem;
-  font-weight: 600;
-  color: ${props => {
-    switch(props.status) {
-      case 'applied': return '#6366f1';
-      case 'interview': return '#f59e0b';
-      case 'offer': return '#22c55e';
-      default: return '#94a3b8';
-    }
-  }};
-  text-transform: uppercase;
 `;
 
-const SkillAssessment = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-  margin-bottom: 1.5rem;
+const ChartContainer = styled.div`
+  height: 300px;
+  margin-top: 1rem;
 `;
 
-const SkillItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem;
-  border-radius: 0.5rem;
-  margin: 0.5rem 0;
-  background: #f8fafc;
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
 `;
 
-const SkillName = styled.div`
-  font-weight: 600;
-  color: #3730a3;
-`;
-
-const SkillLevel = styled.div`
-  font-size: 0.9rem;
-  color: #6366f1;
-  font-weight: 600;
+const EmptyIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
 `;
 
 const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [showResumeChart, setShowResumeChart] = useState(false);
-  const [showDSAChart, setShowDSAChart] = useState(false);
-  const [showAssessmentChart, setShowAssessmentChart] = useState(false);
-  const resumeScoreData = [
-    { date: 'Jan', score: 60 },
-    { date: 'Feb', score: 70 },
-    { date: 'Mar', score: 80 },
-    { date: 'Apr', score: 85 },
-    { date: 'May', score: 90 },
-  ];
-  const dsaProgressData = [
-    { topic: 'Arrays', solved: 15, total: 20 },
-    { topic: 'DP', solved: 10, total: 15 },
-    { topic: 'Graphs', solved: 8, total: 12 },
-    { topic: 'Trees', solved: 12, total: 18 },
-  ];
-  const assessmentData = [
-    { type: 'Aptitude', value: 80 },
-    { type: 'DSA', value: 70 },
-    { type: 'Resume', value: 90 },
-  ];
-  const assessmentColors = ['#6366f1', '#22c55e', '#f59e42'];
-
-  // Mock data for new features
-  const careerPaths = [
-    {
-      title: "Frontend Developer",
-      description: "Master React, TypeScript, and modern CSS",
-      icon: <FiCode />,
-      progress: 65
-    },
-    {
-      title: "Backend Developer", 
-      description: "Learn Node.js, Python, and database design",
-      icon: <FiBriefcase />,
-      progress: 40
-    },
-    {
-      title: "Full Stack Developer",
-      description: "Combine frontend and backend skills",
-      icon: <FiTarget />,
-      progress: 25
-    }
-  ];
-
-  const applications = [
-    {
-      company: "Tech Corp",
-      role: "Frontend Developer",
-      status: "interview",
-      date: "2024-01-15"
-    },
-    {
-      company: "Startup Inc",
-      role: "Software Engineer", 
-      status: "applied",
-      date: "2024-01-10"
-    },
-    {
-      company: "Big Tech",
-      role: "Full Stack Developer",
-      status: "offer",
-      date: "2024-01-05"
-    }
-  ];
-
-  const skills = [
-    { name: "JavaScript", level: "Advanced" },
-    { name: "React", level: "Intermediate" },
-    { name: "Python", level: "Beginner" },
-    { name: "DSA", level: "Intermediate" },
-    { name: "System Design", level: "Beginner" }
-  ];
-
-  const loadUserProgress = async () => {
-    if (!userId) return;
-    
-    setLoading(true);
-    try {
-      const progress = await getUserProgress(userId);
-      setUserProgress(progress);
-    } catch (error) {
-      console.error('Error loading user progress:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProgress = async (score) => {
-    if (userId) {
-      try {
-        await updateResumeScore(userId, score);
-        await loadUserProgress();
-      } catch (error) {
-        console.error('Error updating progress:', error);
-      }
-    }
-  };
 
   useEffect(() => {
     if (userId) {
@@ -455,19 +291,37 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     }
   }, [userId]);
 
-  useEffect(() => {
-    if (onResumeAnalyzed && userId) {
-      updateProgress(onResumeAnalyzed.score);
+  const loadUserProgress = async () => {
+    try {
+      setLoading(true);
+      const progress = await getUserProgress(userId);
+      setUserProgress(progress);
+    } catch (error) {
+      console.error("Error loading user progress:", error);
+      // Set default progress for demo
+      setUserProgress({
+        dsa_questions_completed: 45,
+        aptitude_tests_taken: 3,
+        resume_score: 75,
+        total_questions_available: 200,
+        streak_days: 7
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [onResumeAnalyzed]);
+  };
 
-  const lastResume = userProgress?.last_analysis_date ? new Date(userProgress.last_analysis_date).toLocaleString() : 'Never';
-  const lastDSA = userProgress?.completed_questions?.length ? userProgress.completed_questions[userProgress.completed_questions.length-1]?.title || 'N/A' : 'None';
-  const lastJob = userProgress?.applied_jobs?.length ? userProgress.applied_jobs[userProgress.applied_jobs.length-1]?.title || 'N/A' : 'None';
-
-  const dsaTotal = (userProgress?.completed_questions?.length || 0) + 10;
-  const dsaSolved = userProgress?.completed_questions?.length || 0;
-  const dsaPercent = dsaTotal ? Math.round((dsaSolved/dsaTotal)*100) : 0;
+  const updateProgress = async (score) => {
+    try {
+      await updateResumeScore(userId, score);
+      await loadUserProgress();
+      if (onResumeAnalyzed) {
+        onResumeAnalyzed(score);
+      }
+    } catch (error) {
+      console.error("Error updating progress:", error);
+    }
+  };
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -476,198 +330,240 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     return "Good evening";
   };
 
-  if (!userId) {
+  const chartData = [
+    { name: 'Mon', questions: 5 },
+    { name: 'Tue', questions: 8 },
+    { name: 'Wed', questions: 12 },
+    { name: 'Thu', questions: 6 },
+    { name: 'Fri', questions: 10 },
+    { name: 'Sat', questions: 15 },
+    { name: 'Sun', questions: 7 }
+  ];
+
+  const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
+
+  if (loading) {
     return (
-      <Container>
-        <SectionTitle>
-          <FiUser size={24} />
-          Welcome to Resume Review AI
-        </SectionTitle>
-        
-        <WelcomeMessage>
-          <WelcomeTitle>Get Started</WelcomeTitle>
-          <WelcomeText>
-            Please sign in with Google to access your personalized dashboard and track your progress.
-          </WelcomeText>
-        </WelcomeMessage>
-      </Container>
+      <DashboardContainer>
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+          <div>Loading your dashboard...</div>
+        </div>
+      </DashboardContainer>
     );
   }
 
   return (
-    <Container>
-      <SectionTitle>
-        <FiUser size={24} />
-        {greeting()}, here's your career dashboard
-      </SectionTitle>
+    <DashboardContainer>
+      <Header>
+        <WelcomeSection>
+          <WelcomeTitle>{greeting()}, User!</WelcomeTitle>
+          <WelcomeSubtitle>Here's your learning progress and recommendations</WelcomeSubtitle>
+        </WelcomeSection>
+      </Header>
 
-      <QuickLinks>
-        <QuickLinkCard onClick={() => navigate('/resume')}>
-          <FiUploadCloud size={22} /> Resume Analysis
-        </QuickLinkCard>
-        <QuickLinkCard onClick={() => navigate('/dsa')}>
-          <FiCode size={22} /> DSA Practice
-        </QuickLinkCard>
-        <QuickLinkCard onClick={() => navigate('/interview')}>
-          <FiMessageSquare size={22} /> Interview Prep
-        </QuickLinkCard>
-        <QuickLinkCard onClick={() => navigate('/aptitude')}>
-          <BiBrain size={22} /> Aptitude Test
-        </QuickLinkCard>
-        <QuickLinkCard onClick={() => navigate('/jobs')}>
-          <FiBriefcase size={22} /> Job Opportunities
-        </QuickLinkCard>
-      </QuickLinks>
+      <StatsOverview>
+        <StatCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <StatHeader>
+            <div>
+              <StatValue>{userProgress?.dsa_questions_completed || 0}</StatValue>
+              <StatLabel>DSA Questions Completed</StatLabel>
+            </div>
+            <StatIcon color="#6366f1">
+              <FiCode />
+            </StatIcon>
+          </StatHeader>
+        </StatCard>
 
-      <ProgressGrid>
-        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <ProgressIcon><FiAward /></ProgressIcon>
-          <ProgressNumber>{userProgress?.resume_score || 0}</ProgressNumber>
-          <ProgressLabel>Resume Score</ProgressLabel>
-        </ProgressCard>
-        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-          <ProgressIcon><FiCode /></ProgressIcon>
-          <ProgressNumber>{dsaSolved}</ProgressNumber>
-          <ProgressLabel>DSA Questions Completed</ProgressLabel>
-          <ProgressBar><ProgressFill percent={dsaPercent} /></ProgressBar>
-        </ProgressCard>
-        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-          <ProgressIcon><FiBriefcase /></ProgressIcon>
-          <ProgressNumber>{userProgress?.applied_jobs?.length || 0}</ProgressNumber>
-          <ProgressLabel>Jobs Applied</ProgressLabel>
-        </ProgressCard>
-        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
-          <ProgressIcon><FiTarget /></ProgressIcon>
-          <ProgressNumber>{applications.filter(app => app.status === 'interview').length}</ProgressNumber>
-          <ProgressLabel>Interviews Scheduled</ProgressLabel>
-        </ProgressCard>
-      </ProgressGrid>
+        <StatCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <StatHeader>
+            <div>
+              <StatValue>{userProgress?.aptitude_tests_taken || 0}</StatValue>
+              <StatLabel>Aptitude Tests Taken</StatLabel>
+            </div>
+            <StatIcon color="#8b5cf6">
+              <BiBrain />
+            </StatIcon>
+          </StatHeader>
+        </StatCard>
 
-      <div style={{ margin: '2rem 0' }}>
-        <h3 style={{ color: '#3730a3', fontWeight: 800, marginBottom: 16 }}>Analytics & Progress</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32 }}>
-          {/* Resume Score Over Time */}
-          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
-            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>Resume Score Over Time</div>
-            <button onClick={() => setShowResumeChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
-            {showResumeChart && (
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={resumeScoreData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-          {/* DSA Progress */}
-          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
-            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>DSA Progress</div>
-            <button onClick={() => setShowDSAChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
-            {showDSAChart && (
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={dsaProgressData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="topic" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="solved" fill="#6366f1" />
-                  <Bar dataKey="total" fill="#e0e7ff" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-          {/* Assessment Performance */}
-          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
-            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>Assessment Performance</div>
-            <button onClick={() => setShowAssessmentChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
-            {showAssessmentChart && (
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={assessmentData} dataKey="value" nameKey="type" cx="50%" cy="50%" outerRadius={60} fill="#6366f1" label>
-                    {assessmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={assessmentColors[index % assessmentColors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-      </div>
+        <StatCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <StatHeader>
+            <div>
+              <StatValue>{userProgress?.resume_score || 0}%</StatValue>
+              <StatLabel>Resume Score</StatLabel>
+            </div>
+            <StatIcon color="#10b981">
+              <FiAward />
+            </StatIcon>
+          </StatHeader>
+        </StatCard>
 
-      <CareerPathSection>
-        <SectionTitle>
-          <FiTarget size={20} />
-          Your Career Paths
-        </SectionTitle>
-        {careerPaths.map((path, index) => (
-          <PathCard key={index}>
-            <PathIcon>{path.icon}</PathIcon>
-            <PathContent>
-              <PathTitle>{path.title}</PathTitle>
-              <PathDescription>{path.description}</PathDescription>
-            </PathContent>
-            <div style={{ color: '#6366f1', fontWeight: 600 }}>{path.progress}%</div>
-          </PathCard>
-        ))}
-      </CareerPathSection>
+        <StatCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+        >
+          <StatHeader>
+            <div>
+              <StatValue>{userProgress?.streak_days || 0}</StatValue>
+              <StatLabel>Day Streak</StatLabel>
+            </div>
+            <StatIcon color="#f59e0b">
+              <FiTrendingUp />
+            </StatIcon>
+          </StatHeader>
+        </StatCard>
+      </StatsOverview>
 
-      <ApplicationTracker>
-        <SectionTitle>
-          <FiCalendar size={20} />
-          Application Tracker
-        </SectionTitle>
-        {applications.map((app, index) => (
-          <ApplicationItem key={index} status={app.status}>
-            <ApplicationInfo>
-              <ApplicationCompany>{app.company}</ApplicationCompany>
-              <ApplicationRole>{app.role}</ApplicationRole>
-            </ApplicationInfo>
-            <ApplicationStatus status={app.status}>
-              {app.status === 'applied' && <FiClock size={12} />}
-              {app.status === 'interview' && <FiMessageSquare size={12} />}
-              {app.status === 'offer' && <FiCheckCircle size={12} />}
-              {' '}{app.status}
-            </ApplicationStatus>
-          </ApplicationItem>
-        ))}
-      </ApplicationTracker>
+      <MainContent>
+        <ContentSection>
+          <SectionTitle>
+            <FiBarChart3 />
+            Weekly Progress
+          </SectionTitle>
+          
+          <ChartContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" />
+                <YAxis stroke="#64748b" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white', 
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="questions" 
+                  stroke="#6366f1" 
+                  strokeWidth={3}
+                  dot={{ fill: '#6366f1', strokeWidth: 2, r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </ContentSection>
 
-      <SkillAssessment>
-        <SectionTitle>
-          <FiStar size={20} />
-          Skill Assessment
-        </SectionTitle>
-        {skills.map((skill, index) => (
-          <SkillItem key={index}>
-            <SkillName>{skill.name}</SkillName>
-            <SkillLevel>{skill.level}</SkillLevel>
-          </SkillItem>
-        ))}
-      </SkillAssessment>
-      
-      {loading && (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <div style={{ 
-            border: '4px solid #e0e7ff', 
-            borderTop: '4px solid #6366f1', 
-            borderRadius: '50%', 
-            width: '40px', 
-            height: '40px', 
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto'
-          }}></div>
-          <p style={{ color: '#6366f1', marginTop: '1rem' }}>Loading your progress...</p>
-        </div>
-      )}
-    </Container>
+        <ContentSection>
+          <SectionTitle>
+            <FiTarget />
+            Quick Actions
+          </SectionTitle>
+          
+          <QuickActions>
+            <ActionButton
+              onClick={() => navigate('/dsa')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ActionIcon><FiCode /></ActionIcon>
+              DSA Practice
+            </ActionButton>
+            
+            <ActionButton
+              onClick={() => navigate('/aptitude')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ActionIcon><BiBrain /></ActionIcon>
+              Aptitude Test
+            </ActionButton>
+            
+            <ActionButton
+              onClick={() => navigate('/resume')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ActionIcon><FiUploadCloud /></ActionIcon>
+              Resume Analysis
+            </ActionButton>
+            
+            <ActionButton
+              onClick={() => navigate('/jobs')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ActionIcon><FiBriefcase /></ActionIcon>
+              Job Search
+            </ActionButton>
+          </QuickActions>
+
+          <ProgressSection>
+            <SectionTitle>
+              <FiTrendingUp />
+              Your Progress
+            </SectionTitle>
+            
+            <ProgressItem>
+              <ProgressInfo>
+                <ProgressIcon color="#6366f1">
+                  <FiCode />
+                </ProgressIcon>
+                <ProgressDetails>
+                  <ProgressName>DSA Questions</ProgressName>
+                </ProgressDetails>
+              </ProgressInfo>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ProgressBar>
+                  <ProgressFill percent={Math.min((userProgress?.dsa_questions_completed || 0) / 200 * 100, 100)} />
+                </ProgressBar>
+                <ProgressPercent>{Math.round((userProgress?.dsa_questions_completed || 0) / 200 * 100)}%</ProgressPercent>
+              </div>
+            </ProgressItem>
+
+            <ProgressItem>
+              <ProgressInfo>
+                <ProgressIcon color="#8b5cf6">
+                  <BiBrain />
+                </ProgressIcon>
+                <ProgressDetails>
+                  <ProgressName>Aptitude Tests</ProgressName>
+                </ProgressDetails>
+              </ProgressInfo>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ProgressBar>
+                  <ProgressFill percent={Math.min((userProgress?.aptitude_tests_taken || 0) / 10 * 100, 100)} />
+                </ProgressBar>
+                <ProgressPercent>{Math.round((userProgress?.aptitude_tests_taken || 0) / 10 * 100)}%</ProgressPercent>
+              </div>
+            </ProgressItem>
+
+            <ProgressItem>
+              <ProgressInfo>
+                <ProgressIcon color="#10b981">
+                  <FiAward />
+                </ProgressIcon>
+                <ProgressDetails>
+                  <ProgressName>Resume Score</ProgressName>
+                </ProgressDetails>
+              </ProgressInfo>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ProgressBar>
+                  <ProgressFill percent={userProgress?.resume_score || 0} />
+                </ProgressBar>
+                <ProgressPercent>{userProgress?.resume_score || 0}%</ProgressPercent>
+              </div>
+            </ProgressItem>
+          </ProgressSection>
+        </ContentSection>
+      </MainContent>
+    </DashboardContainer>
   );
 };
 
