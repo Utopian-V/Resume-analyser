@@ -17,6 +17,7 @@ import InterviewPrep from "./components/InterviewPrep";
 import AptitudeTest from "./components/AptitudeTest";
 import AptitudeQuestionManager from "./components/AptitudeQuestionManager";
 import { uploadResume } from "./api";
+import { registerFirebaseUser } from "./api";
 import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
 import LandingPage from "./components/LandingPage";
@@ -243,9 +244,21 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       setIsLoading(false);
+      if (firebaseUser) {
+        try {
+          await registerFirebaseUser({
+            user_id: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName || firebaseUser.email
+          });
+        } catch (err) {
+          // Optionally log or show error
+          console.error('Failed to register user in backend:', err);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
