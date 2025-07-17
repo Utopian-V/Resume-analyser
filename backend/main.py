@@ -14,11 +14,25 @@ from datetime import datetime
 import glob
 import aiosqlite
 import asyncio
+import sqlalchemy
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
 
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama3-8b-8192")
+
+POSTGRES_URL = os.getenv("DATABASE_URL")
+
+# SQLAlchemy async engine for PostgreSQL (Supabase)
+if POSTGRES_URL:
+    engine = create_async_engine(POSTGRES_URL, echo=True, future=True)
+    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+else:
+    engine = None
+    async_session = None
 
 app = FastAPI()
 
@@ -893,20 +907,21 @@ def get_company_logo_url(company_domain):
 
 @app.get("/api/jobs/all")
 async def get_all_company_jobs(
-    category: str = Query(None),
-    company: str = Query(None),
-    experience: str = Query(None),
-    remote: bool = Query(None),
-    government: bool = Query(None),
-    source: str = Query(None),
-    tags: str = Query(None),
-    search: str = Query(None),
-    page: int = Query(1),
-    page_size: int = Query(30)
+    page: int = 1,
+    page_size: int = 30
 ):
-    """Aggregate all jobs from jobs_*.json files and support filtering."""
-    jobs = await query_jobs_from_db(dict(category=category, company=company, experience=experience, remote=remote, government=government, source=source, tags=tags), search, page, page_size)
-    return {"total": len(jobs), "jobs": jobs}
+    offset = (page - 1) * page_size
+    if async_session is None:
+        return {"total": 0, "jobs": []}
+    async with async_session() as session:
+        result = await session.execute(
+            text("SELECT * FROM jobs ORDER BY posted_date DESC LIMIT :limit OFFSET :offset"),
+            {"limit": page_size, "offset": offset}
+        )
+        jobs = [dict(row) for row in result.mappings()]
+        total_result = await session.execute(text("SELECT COUNT(*) FROM jobs"))
+        total = total_result.scalar()
+    return {"total": total, "jobs": jobs}
 
 # --- API Endpoints ---
 import aiosqlite
