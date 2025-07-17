@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiBriefcase as FiJob } from "react-icons/fi";
+import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiBriefcase as FiJob, FiTarget, FiBookOpen, FiUsers, FiCalendar, FiCheckCircle, FiClock, FiStar } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
@@ -145,6 +145,7 @@ const QuickLinks = styled.div`
   margin-bottom: 2rem;
   flex-wrap: wrap;
 `;
+
 const QuickLinkCard = styled.button`
   background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
   color: white;
@@ -164,6 +165,7 @@ const QuickLinkCard = styled.button`
     transform: translateY(-2px) scale(1.05);
   }
 `;
+
 const ProgressBar = styled.div`
   background: #e0e7ff;
   border-radius: 1rem;
@@ -172,6 +174,7 @@ const ProgressBar = styled.div`
   margin: 0.7rem 0 1.2rem 0;
   overflow: hidden;
 `;
+
 const ProgressFill = styled.div`
   background: linear-gradient(90deg, #22c55e 60%, #6366f1 100%);
   height: 100%;
@@ -209,11 +212,194 @@ const Description = styled.p`
   margin: 0;
 `;
 
+// New components for career assistance features
+const CareerPathSection = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  margin-bottom: 1.5rem;
+`;
+
+const PathCard = styled.div`
+  background: linear-gradient(90deg, #f8fafc 60%, #f1f5f9 100%);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-left: 4px solid #6366f1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const PathIcon = styled.div`
+  font-size: 1.5rem;
+  color: #6366f1;
+`;
+
+const PathContent = styled.div`
+  flex: 1;
+`;
+
+const PathTitle = styled.h6`
+  color: #3730a3;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem 0;
+`;
+
+const PathDescription = styled.p`
+  color: #6366f1;
+  font-size: 0.9rem;
+  margin: 0;
+`;
+
+const ApplicationTracker = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  margin-bottom: 1.5rem;
+`;
+
+const ApplicationItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  background: ${props => {
+    switch(props.status) {
+      case 'applied': return '#f0f9ff';
+      case 'interview': return '#fef3c7';
+      case 'offer': return '#dcfce7';
+      default: return '#f8fafc';
+    }
+  }};
+  border-left: 4px solid ${props => {
+    switch(props.status) {
+      case 'applied': return '#6366f1';
+      case 'interview': return '#f59e0b';
+      case 'offer': return '#22c55e';
+      default: return '#94a3b8';
+    }
+  }};
+`;
+
+const ApplicationInfo = styled.div`
+  flex: 1;
+`;
+
+const ApplicationCompany = styled.div`
+  font-weight: 700;
+  color: #3730a3;
+  font-size: 1rem;
+`;
+
+const ApplicationRole = styled.div`
+  color: #6366f1;
+  font-size: 0.9rem;
+`;
+
+const ApplicationStatus = styled.div`
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: ${props => {
+    switch(props.status) {
+      case 'applied': return '#6366f1';
+      case 'interview': return '#f59e0b';
+      case 'offer': return '#22c55e';
+      default: return '#94a3b8';
+    }
+  }};
+  text-transform: uppercase;
+`;
+
+const SkillAssessment = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  margin-bottom: 1.5rem;
+`;
+
+const SkillItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+  background: #f8fafc;
+`;
+
+const SkillName = styled.div`
+  font-weight: 600;
+  color: #3730a3;
+`;
+
+const SkillLevel = styled.div`
+  font-size: 0.9rem;
+  color: #6366f1;
+  font-weight: 600;
+`;
+
 const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
-  // For navigation to other tabs (if using react-router)
   const navigate = useNavigate();
+
+  // Mock data for new features
+  const careerPaths = [
+    {
+      title: "Frontend Developer",
+      description: "Master React, TypeScript, and modern CSS",
+      icon: <FiCode />,
+      progress: 65
+    },
+    {
+      title: "Backend Developer", 
+      description: "Learn Node.js, Python, and database design",
+      icon: <FiBriefcase />,
+      progress: 40
+    },
+    {
+      title: "Full Stack Developer",
+      description: "Combine frontend and backend skills",
+      icon: <FiTarget />,
+      progress: 25
+    }
+  ];
+
+  const applications = [
+    {
+      company: "Tech Corp",
+      role: "Frontend Developer",
+      status: "interview",
+      date: "2024-01-15"
+    },
+    {
+      company: "Startup Inc",
+      role: "Software Engineer", 
+      status: "applied",
+      date: "2024-01-10"
+    },
+    {
+      company: "Big Tech",
+      role: "Full Stack Developer",
+      status: "offer",
+      date: "2024-01-05"
+    }
+  ];
+
+  const skills = [
+    { name: "JavaScript", level: "Advanced" },
+    { name: "React", level: "Intermediate" },
+    { name: "Python", level: "Beginner" },
+    { name: "DSA", level: "Intermediate" },
+    { name: "System Design", level: "Beginner" }
+  ];
 
   const loadUserProgress = async () => {
     if (!userId) return;
@@ -240,31 +426,26 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     }
   };
 
-  // Load user progress when userId changes
   useEffect(() => {
     if (userId) {
       loadUserProgress();
     }
   }, [userId]);
 
-  // Update progress when resume is analyzed
   useEffect(() => {
     if (onResumeAnalyzed && userId) {
       updateProgress(onResumeAnalyzed.score);
     }
   }, [onResumeAnalyzed]);
 
-  // Recent activity
   const lastResume = userProgress?.last_analysis_date ? new Date(userProgress.last_analysis_date).toLocaleString() : 'Never';
   const lastDSA = userProgress?.completed_questions?.length ? userProgress.completed_questions[userProgress.completed_questions.length-1]?.title || 'N/A' : 'None';
   const lastJob = userProgress?.applied_jobs?.length ? userProgress.applied_jobs[userProgress.applied_jobs.length-1]?.title || 'N/A' : 'None';
 
-  // Progress chart
-  const dsaTotal = (userProgress?.completed_questions?.length || 0) + 10; // Example
+  const dsaTotal = (userProgress?.completed_questions?.length || 0) + 10;
   const dsaSolved = userProgress?.completed_questions?.length || 0;
   const dsaPercent = dsaTotal ? Math.round((dsaSolved/dsaTotal)*100) : 0;
 
-  // Personalized greeting
   const greeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -294,11 +475,12 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
     <Container>
       <SectionTitle>
         <FiUser size={24} />
-        {greeting()}, here’s your dashboard
+        {greeting()}, here's your career dashboard
       </SectionTitle>
+
       <QuickLinks>
         <QuickLinkCard onClick={() => navigate('/resume')}>
-          <FiUploadCloud size={22} /> Resume Upload
+          <FiUploadCloud size={22} /> Resume Analysis
         </QuickLinkCard>
         <QuickLinkCard onClick={() => navigate('/dsa')}>
           <FiCode size={22} /> DSA Practice
@@ -306,22 +488,14 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
         <QuickLinkCard onClick={() => navigate('/interview')}>
           <FiMessageSquare size={22} /> Interview Prep
         </QuickLinkCard>
-        <Link to="/aptitude">
-          <Card>
-            <IconContainer>
-              <BiBrain size={24} />
-            </IconContainer>
-            <Title>Aptitude Test</Title>
-            <Description>Take an aptitude assessment to evaluate your analytical and problem-solving skills.</Description>
-          </Card>
-        </Link>
+        <QuickLinkCard onClick={() => navigate('/aptitude')}>
+          <BiBrain size={22} /> Aptitude Test
+        </QuickLinkCard>
+        <QuickLinkCard onClick={() => navigate('/jobs')}>
+          <FiBriefcase size={22} /> Job Opportunities
+        </QuickLinkCard>
       </QuickLinks>
-      <UserInfo>
-        <UserName>Your Progress</UserName>
-        <UserEmail>Last resume upload: {lastResume}</UserEmail>
-        <UserEmail>Last DSA solved: {lastDSA}</UserEmail>
-        <UserEmail>Last job applied: {lastJob}</UserEmail>
-      </UserInfo>
+
       <ProgressGrid>
         <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <ProgressIcon><FiAward /></ProgressIcon>
@@ -339,7 +513,63 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
           <ProgressNumber>{userProgress?.applied_jobs?.length || 0}</ProgressNumber>
           <ProgressLabel>Jobs Applied</ProgressLabel>
         </ProgressCard>
+        <ProgressCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+          <ProgressIcon><FiTarget /></ProgressIcon>
+          <ProgressNumber>{applications.filter(app => app.status === 'interview').length}</ProgressNumber>
+          <ProgressLabel>Interviews Scheduled</ProgressLabel>
+        </ProgressCard>
       </ProgressGrid>
+
+      <CareerPathSection>
+        <SectionTitle>
+          <FiTarget size={20} />
+          Your Career Paths
+        </SectionTitle>
+        {careerPaths.map((path, index) => (
+          <PathCard key={index}>
+            <PathIcon>{path.icon}</PathIcon>
+            <PathContent>
+              <PathTitle>{path.title}</PathTitle>
+              <PathDescription>{path.description}</PathDescription>
+            </PathContent>
+            <div style={{ color: '#6366f1', fontWeight: 600 }}>{path.progress}%</div>
+          </PathCard>
+        ))}
+      </CareerPathSection>
+
+      <ApplicationTracker>
+        <SectionTitle>
+          <FiCalendar size={20} />
+          Application Tracker
+        </SectionTitle>
+        {applications.map((app, index) => (
+          <ApplicationItem key={index} status={app.status}>
+            <ApplicationInfo>
+              <ApplicationCompany>{app.company}</ApplicationCompany>
+              <ApplicationRole>{app.role}</ApplicationRole>
+            </ApplicationInfo>
+            <ApplicationStatus status={app.status}>
+              {app.status === 'applied' && <FiClock size={12} />}
+              {app.status === 'interview' && <FiMessageSquare size={12} />}
+              {app.status === 'offer' && <FiCheckCircle size={12} />}
+              {' '}{app.status}
+            </ApplicationStatus>
+          </ApplicationItem>
+        ))}
+      </ApplicationTracker>
+
+      <SkillAssessment>
+        <SectionTitle>
+          <FiStar size={20} />
+          Skill Assessment
+        </SectionTitle>
+        {skills.map((skill, index) => (
+          <SkillItem key={index}>
+            <SkillName>{skill.name}</SkillName>
+            <SkillLevel>{skill.level}</SkillLevel>
+          </SkillItem>
+        ))}
+      </SkillAssessment>
       
       {loading && (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
