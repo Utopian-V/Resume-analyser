@@ -319,11 +319,12 @@ const Blog = () => {
           <meta property="og:description" content={selectedBlog.summary} />
           <meta property="og:type" content="article" />
           <meta property="og:url" content={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
-          <meta property="og:image" content={selectedBlog.image} />
+          {/* TODO: Replace with dynamic OG image URL (e.g., Vercel OG or Cloudinary) */}
+          <meta property="og:image" content={`https://og.prepnexus.netlify.app/api/og?title=${encodeURIComponent(selectedBlog.title)}&author=${encodeURIComponent(selectedBlog.author.name)}`} />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${selectedBlog.title} – Prep Nexus Blog`} />
           <meta name="twitter:description" content={selectedBlog.summary} />
-          <meta name="twitter:image" content={selectedBlog.image} />
+          <meta name="twitter:image" content={`https://og.prepnexus.netlify.app/api/og?title=${encodeURIComponent(selectedBlog.title)}&author=${encodeURIComponent(selectedBlog.author.name)}`} />
           <link rel="canonical" href={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
           <script type="application/ld+json">{JSON.stringify({
             "@context": "https://schema.org",

@@ -277,6 +277,37 @@ export default function LandingPage() {
             { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" }
           ]
         })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Prep Nexus?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Prep Nexus is an AI-powered platform for resume review, DSA prep, and curated job opportunities." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is Prep Nexus free to use?",
+              "acceptedAnswer": { "@type": "Answer", "text": "All core features are free for early users. Premium features are coming soon." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I get resume feedback?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Upload your resume and get instant, actionable feedback powered by AI." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I contact support?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Email us at hello@resumeai.com." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I suggest new features?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Absolutely! We welcome feedback and suggestions via email or social media." }
+            }
+          ]
+        })}</script>
       </Helmet>
       <Background />
       {/* Animated floating blocks */}
@@ -363,6 +394,21 @@ export default function LandingPage() {
             </article>
           )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No blog posts yet. Check back soon!</div>}
         </div>
+      </section>
+      <section id="faq" style={{ maxWidth: '900px', margin: '3rem auto', padding: '0 1rem' }}>
+        <h2 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Frequently Asked Questions</h2>
+        <dl style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '2rem', color: '#334155' }}>
+          <dt style={{ fontWeight: 700, marginTop: 18 }}>What is Prep Nexus?</dt>
+          <dd style={{ marginLeft: 0, marginBottom: 12 }}>Prep Nexus is an AI-powered platform for resume review, DSA prep, and curated job opportunities.</dd>
+          <dt style={{ fontWeight: 700, marginTop: 18 }}>Is Prep Nexus free to use?</dt>
+          <dd style={{ marginLeft: 0, marginBottom: 12 }}>All core features are free for early users. Premium features are coming soon.</dd>
+          <dt style={{ fontWeight: 700, marginTop: 18 }}>How do I get resume feedback?</dt>
+          <dd style={{ marginLeft: 0, marginBottom: 12 }}>Upload your resume and get instant, actionable feedback powered by AI.</dd>
+          <dt style={{ fontWeight: 700, marginTop: 18 }}>How do I contact support?</dt>
+          <dd style={{ marginLeft: 0, marginBottom: 12 }}>Email us at <a href="mailto:hello@resumeai.com" style={{ color: '#6366f1', textDecoration: 'underline' }}>hello@resumeai.com</a>.</dd>
+          <dt style={{ fontWeight: 700, marginTop: 18 }}>Can I suggest new features?</dt>
+          <dd style={{ marginLeft: 0, marginBottom: 12 }}>Absolutely! We welcome feedback and suggestions via email or social media.</dd>
+        </dl>
       </section>
     </>
   );
