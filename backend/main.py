@@ -2,6 +2,7 @@ import os
 import pdfplumber
 import requests
 import json
+from fastapi import FileResponse
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -1138,13 +1139,5 @@ with open(JOBS_FILE, 'r') as f:
     apple_jobs = json.load(f)
 
 @app.get("/api/apple-jobs")
-def get_apple_jobs(company: str = None):
-    # Return only the jobs list, with logo and credit fields for each job
-    jobs = apple_jobs.get("jobs", [])
-    company_domain = "apple.com"
-    for job in jobs:
-        job["company_logo"] = f"https://logo.clearbit.com/{company_domain}"
-        job["company_credit"] = f"Jobs scraped from {company_domain} career page"
-    if company:
-        jobs = [job for job in jobs if job.get("company", "").lower() == company.lower()]
-    return {"jobs": jobs}
+def get_apple_jobs():
+    return FileResponse("jobs_apple.json", media_type="application/json")
