@@ -18,7 +18,6 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
-from supabase import create_client, Client
 
 load_dotenv()
 
@@ -912,10 +911,6 @@ import json
 import glob
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'jobs.db')
-
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 # --- SQLite DB Setup ---
 async def init_db():
