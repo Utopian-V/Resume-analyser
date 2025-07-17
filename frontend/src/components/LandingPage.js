@@ -377,7 +377,7 @@ export default function LandingPage() {
               <img src={blog.image} alt={blog.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
               <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
               <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span>{blog.author}</span>
+                <span>{blog.author.name}</span>
                 <span>{new Date(blog.date).toLocaleDateString()}</span>
               </div>
               <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
