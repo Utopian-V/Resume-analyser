@@ -5,7 +5,6 @@ import { FiArrowRight, FiCheckCircle, FiMail, FiUser, FiDollarSign } from "react
 import { useNavigate } from "react-router-dom";
 import { blogs } from './Blog';
 import { Link } from 'react-router-dom';
-import { Footer } from './LandingPage';
 import { Helmet } from 'react-helmet-async';
 
 // Animated background blocks
@@ -416,27 +415,15 @@ export default function LandingPage() {
 
 export const Footer = () => (
   <footer style={{ background: 'rgba(24,28,47,0.9)', color: '#c7d2fe', padding: '2.5rem 0 1.5rem 0', marginTop: 40 }}>
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 1rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
-      <div>
-        <div style={{ fontWeight: 900, fontSize: 24, color: '#fff', marginBottom: 8 }}>Prep Nexus</div>
-        <div style={{ fontSize: 15, color: '#a5b4fc', marginBottom: 12 }}>AI-powered career growth, resume feedback, DSA prep, and curated jobs.</div>
-        <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
-          <a href="#" aria-label="Twitter" style={{ color: '#1da1f2', fontSize: 22 }}>Twitter</a>
-          <a href="#" aria-label="LinkedIn" style={{ color: '#0077b5', fontSize: 22 }}>LinkedIn</a>
-          <a href="#" aria-label="Facebook" style={{ color: '#1877f3', fontSize: 22 }}>Facebook</a>
-          <a href="#" aria-label="Instagram" style={{ color: '#e1306c', fontSize: 22 }}>Instagram</a>
-          <a href="#" aria-label="GitHub" style={{ color: '#fff', fontSize: 22 }}>GitHub</a>
-        </div>
-      </div>
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }} aria-label="Footer Navigation">
-        <a href="#pricing" style={{ color: '#c7d2fe', textDecoration: 'none', fontWeight: 600 }}>Pricing</a>
-        <a href="#about" style={{ color: '#c7d2fe', textDecoration: 'none', fontWeight: 600 }}>About</a>
-        <a href="#contact" style={{ color: '#c7d2fe', textDecoration: 'none', fontWeight: 600 }}>Contact</a>
-      </nav>
-      <div style={{ fontSize: 15, color: '#a5b4fc', maxWidth: 320 }}>
-        <b>Contact:</b> <a href="mailto:hello@resumeai.com" style={{ color: '#6366f1', textDecoration: 'underline' }}>hello@resumeai.com</a><br/>
-        <b>Address:</b> <span>123 Placeholder St, City, Country</span><br/>
-        <b>Phone:</b> <span>+1-234-567-8900</span>
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
+      <div style={{ fontWeight: 900, fontSize: 24, color: '#fff', marginBottom: 8 }}>Prep Nexus</div>
+      <div style={{ fontSize: 15, color: '#a5b4fc', marginBottom: 12, textAlign: 'center' }}>AI-powered career growth, resume feedback, DSA prep, and curated jobs.</div>
+      <div style={{ display: 'flex', gap: 20, marginTop: 12, justifyContent: 'center' }}>
+        <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter" style={{ color: '#1da1f2', fontSize: 22 }}>Twitter</a>
+        <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" style={{ color: '#0077b5', fontSize: 22 }}>LinkedIn</a>
+        <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style={{ color: '#1877f3', fontSize: 22 }}>Facebook</a>
+        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style={{ color: '#e1306c', fontSize: 22 }}>Instagram</a>
+        <a href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub" style={{ color: '#fff', fontSize: 22 }}>GitHub</a>
       </div>
     </div>
     <div style={{ textAlign: 'center', color: '#a5b4fc', fontSize: 14, marginTop: 32, opacity: 0.7 }}>
