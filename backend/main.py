@@ -13,8 +13,6 @@ from pydantic import BaseModel
 import uuid
 from datetime import datetime
 import glob
-import aiosqlite
-import asyncio
 import sqlalchemy
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -719,82 +717,56 @@ async def analyze_resume(file: UploadFile = File(...)):
 # User registration
 @app.post("/user/register/")
 async def register_firebase_user(user_id: str, email: str, name: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('''
-            INSERT OR REPLACE INTO users (user_id, email, name, skills, target_roles) VALUES (?, ?, ?, ?, ?)
-        ''', (user_id, email, name, json.dumps([]), json.dumps([])))
-        await db.execute('''
-            INSERT OR IGNORE INTO user_progress (user_id, completed_questions, applied_jobs, resume_score, last_analysis_date) VALUES (?, ?, ?, ?, ?)
-        ''', (user_id, json.dumps([]), json.dumps([]), None, None))
-        await db.commit()
+    # This function is no longer needed as user_progress is in-memory
+    # and user_sessions is also in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    user_sessions[user_id] = {"email": email, "name": name, "skills": [], "target_roles": []}
     return {"message": "User registered", "user_id": user_id}
 
 # Get user profile
 @app.get("/user/{user_id}/profile/")
 async def get_user_profile(user_id: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cursor = await db.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
-        user = await cursor.fetchone()
-        await cursor.close()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        return dict(user)
+    # This function is no longer needed as user_sessions is in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    user = user_sessions.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 # Get user progress
 @app.get("/user/progress/")
 async def get_user_progress(user_id: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cursor = await db.execute('SELECT * FROM user_progress WHERE user_id = ?', (user_id,))
-        progress = await cursor.fetchone()
-        await cursor.close()
-        if not progress:
-            raise HTTPException(status_code=404, detail="User not found")
-        # Parse JSON fields
-        progress = dict(progress)
-        progress['completed_questions'] = json.loads(progress['completed_questions'] or '[]')
-        progress['applied_jobs'] = json.loads(progress['applied_jobs'] or '[]')
-        return progress
+    # This function is no longer needed as user_progress is in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    progress = user_progress.get(user_id)
+    if not progress:
+        raise HTTPException(status_code=404, detail="User not found")
+    return progress
 
 # Update resume score
 @app.post("/user/progress/resume-score/")
 async def update_resume_score(user_id: str, score: int):
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('UPDATE user_progress SET resume_score = ? WHERE user_id = ?', (score, user_id))
-        await db.commit()
+    # This function is no longer needed as user_progress is in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    user_progress[user_id] = {"user_id": user_id, "completed_questions": [], "applied_jobs": [], "resume_score": score, "last_analysis_date": datetime.now().isoformat()}
     return {"message": "Resume score updated", "user_id": user_id, "score": score}
 
 # Mark question complete
 @app.post("/dsa/questions/{question_id}/complete/")
 async def complete_question(question_id: str, user_id: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cursor = await db.execute('SELECT completed_questions FROM user_progress WHERE user_id = ?', (user_id,))
-        row = await cursor.fetchone()
-        await cursor.close()
-        if not row:
-            raise HTTPException(status_code=404, detail="User not found")
-        completed = set(json.loads(row['completed_questions'] or '[]'))
-        completed.add(question_id)
-        await db.execute('UPDATE user_progress SET completed_questions = ? WHERE user_id = ?', (json.dumps(list(completed)), user_id))
-        await db.commit()
+    # This function is no longer needed as user_progress is in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    user_progress[user_id] = {"user_id": user_id, "completed_questions": [], "applied_jobs": [], "resume_score": None, "last_analysis_date": None}
+    user_progress[user_id]["completed_questions"].append(question_id)
     return {"message": "Question marked complete", "user_id": user_id, "question_id": question_id}
 
 # Apply for job
 @app.post("/jobs/{job_id}/apply/")
 async def apply_for_job(job_id: str, user_id: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cursor = await db.execute('SELECT applied_jobs FROM user_progress WHERE user_id = ?', (user_id,))
-        row = await cursor.fetchone()
-        await cursor.close()
-        if not row:
-            raise HTTPException(status_code=404, detail="User not found")
-        applied = set(json.loads(row['applied_jobs'] or '[]'))
-        applied.add(job_id)
-        await db.execute('UPDATE user_progress SET applied_jobs = ? WHERE user_id = ?', (json.dumps(list(applied)), user_id))
-        await db.commit()
+    # This function is no longer needed as user_progress is in-memory.
+    # Keeping it for now as it might be called by other parts of the app.
+    user_progress[user_id] = {"user_id": user_id, "completed_questions": [], "applied_jobs": [], "resume_score": None, "last_analysis_date": None}
+    user_progress[user_id]["applied_jobs"].append(job_id)
     return {"message": "Application submitted successfully", "job_id": job_id}
 
 # Job listings endpoints
@@ -905,233 +877,6 @@ async def get_job_sources():
 def get_company_logo_url(company_domain):
     # Placeholder: In production, use a real logo service or static assets
     return f"https://logo.clearbit.com/{company_domain}"
-
-import aiosqlite
-import asyncio
-import json
-import glob
-
-DB_PATH = os.path.join(os.path.dirname(__file__), 'jobs.db')
-
-# --- SQLite DB Setup ---
-async def init_db():
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                user_id TEXT PRIMARY KEY,
-                email TEXT,
-                name TEXT,
-                skills TEXT,
-                target_roles TEXT
-            )
-        ''')
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS user_progress (
-                user_id TEXT PRIMARY KEY,
-                completed_questions TEXT,
-                applied_jobs TEXT,
-                resume_score INTEGER,
-                last_analysis_date TEXT
-            )
-        ''')
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS jobs (
-                id TEXT PRIMARY KEY,
-                title TEXT,
-                company TEXT,
-                company_domain TEXT,
-                company_logo TEXT,
-                company_credit TEXT,
-                location TEXT,
-                description TEXT,
-                requirements TEXT,
-                salary_range TEXT,
-                posted_date TEXT,
-                application_deadline TEXT,
-                source TEXT,
-                source_url TEXT,
-                category TEXT,
-                employment_type TEXT,
-                experience_level TEXT,
-                remote_friendly INTEGER,
-                government_job INTEGER,
-                tags TEXT,
-                scraped_at TEXT
-            )
-        ''')
-        await db.execute('''
-            CREATE VIRTUAL TABLE IF NOT EXISTS jobs_fts USING fts5(
-                id, title, description, company, category, requirements, content='jobs', content_rowid='rowid'
-            )
-        ''')
-        await db.commit()
-
-async def upsert_job(job):
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('''
-            INSERT OR REPLACE INTO jobs (
-                id, title, company, company_domain, company_logo, company_credit, location, description, requirements, salary_range, posted_date, application_deadline, source, source_url, category, employment_type, experience_level, remote_friendly, government_job, tags, scraped_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            job.get('id'), job.get('title'), job.get('company'), job.get('company_domain'), job.get('company_logo'), job.get('company_credit'), job.get('location'), job.get('description'), json.dumps(job.get('requirements', [])), job.get('salary_range'), job.get('posted_date'), job.get('application_deadline'), job.get('source'), job.get('source_url'), job.get('category'), job.get('employment_type'), job.get('experience_level'), int(bool(job.get('remote_friendly'))), int(bool(job.get('government_job'))), json.dumps(job.get('tags', [])), job.get('scraped_at')
-        ))
-        await db.execute('''
-            INSERT OR REPLACE INTO jobs_fts (rowid, id, title, description, company, category, requirements)
-            VALUES ((SELECT rowid FROM jobs WHERE id = ?), ?, ?, ?, ?, ?, ?)
-        ''', (
-            job.get('id'), job.get('id'), job.get('title'), job.get('description'), job.get('company'), job.get('category'), json.dumps(job.get('requirements', []))
-        ))
-        await db.commit()
-
-async def bulk_load_jobs_from_json():
-    jobs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts/ncs_scraper'))
-    job_files = glob.glob(os.path.join(jobs_dir, 'jobs_*.json'))
-    for file_path in job_files:
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            jobs = data.get('jobs', [])
-            company_domain = os.path.basename(file_path)[5:-5]
-            for job in jobs:
-                job['company_domain'] = company_domain
-                job['company_logo'] = f"https://logo.clearbit.com/{company_domain}"
-                job['company_credit'] = f"Jobs scraped from {company_domain} career page"
-                job['scraped_at'] = data.get('scraped_at')
-                await upsert_job(job)
-
-async def query_jobs_from_db(filters, search, page, page_size):
-    where = []
-    params = []
-    if filters.get('category'):
-        where.append('category = ?')
-        params.append(filters['category'])
-    if filters.get('company'):
-        where.append('company = ?')
-        params.append(filters['company'])
-    if filters.get('experience'):
-        where.append('experience_level = ?')
-        params.append(filters['experience'])
-    if filters.get('remote') is not None:
-        where.append('remote_friendly = ?')
-        params.append(int(bool(filters['remote'])))
-    if filters.get('government') is not None:
-        where.append('government_job = ?')
-        params.append(int(bool(filters['government'])))
-    if filters.get('source'):
-        where.append('source LIKE ?')
-        params.append(f"%{filters['source']}%")
-    if filters.get('tags'):
-        where.append('tags LIKE ?')
-        params.append(f"%{filters['tags']}%")
-    base_query = 'SELECT * FROM jobs'
-    if search:
-        base_query = 'SELECT * FROM jobs WHERE rowid IN (SELECT rowid FROM jobs_fts WHERE jobs_fts MATCH ?)' + (' AND ' if where else '') + ' AND '.join(where)
-        params = [search] + params
-    elif where:
-        base_query += ' WHERE ' + ' AND '.join(where)
-    base_query += ' ORDER BY posted_date DESC LIMIT ? OFFSET ?'
-    params += [page_size, (page-1)*page_size]
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cursor = await db.execute(base_query, params)
-        jobs = await cursor.fetchall()
-        await cursor.close()
-        return [dict(j) for j in jobs]
-
-@app.on_event("startup")
-async def startup_event():
-    print("🚀 Starting Resume Review AI Backend...")
-    await init_db()
-    print("📊 Initializing sample data...")
-    initialize_sample_data()
-    print("🧠 Loading aptitude tests...")
-    load_aptitude_tests()
-    print(f"✅ Loaded {len(aptitude_tests)} aptitude test(s)")
-    print("📥 Loading jobs from JSON to DB if needed...")
-    await bulk_load_jobs_from_json()
-    print("🎯 Backend ready!")
-
-@app.get("/api/aptitude/tests")
-async def get_aptitude_tests():
-    load_aptitude_tests()  # Ensure tests are loaded
-    return {"tests": list(aptitude_tests.values())}
-
-@app.get("/api/aptitude/test/{test_id}")
-async def get_aptitude_test(test_id: str):
-    import time
-    start_time = time.time()
-    
-    load_aptitude_tests()  # Ensure tests are loaded
-    test = aptitude_tests.get(test_id)
-    if not test:
-        raise HTTPException(status_code=404, detail="Test not found")
-    
-    response_time = time.time() - start_time
-    print(f"📊 Aptitude test loaded in {response_time:.3f}s")
-    
-    return test
-
-@app.post("/api/aptitude/test/{test_id}/submit")
-async def submit_aptitude_test(test_id: str, submission: TestSubmission):
-    load_aptitude_tests()  # Ensure tests are loaded
-    test = aptitude_tests.get(test_id)
-    if not test:
-        raise HTTPException(status_code=404, detail="Test not found")
-    score = 0
-    total_possible = 0
-    results = []
-    for question in test["questions"]:
-        total_possible += question["points"]
-        user_answer = submission.answers.get(question["id"])
-        correct_answer = next(o["id"] for o in question["options"] if o["is_correct"])
-        is_correct = user_answer == correct_answer
-        if is_correct:
-            score += question["points"]
-        results.append({
-            "question_id": question["id"],
-            "question_text": question["question_text"],
-            "user_answer": user_answer,
-            "correct_answer": correct_answer,
-            "is_correct": is_correct,
-            "points_earned": question["points"] if is_correct else 0,
-            "explanation": question.get("explanation", "")
-        })
-    percentage = (score / total_possible) * 100 if total_possible > 0 else 0
-    passed = percentage >= test["passing_score"]
-    # Optionally, update leaderboard here
-    return {
-        "score": score,
-        "total_possible": total_possible,
-        "percentage": percentage,
-        "passed": passed,
-        "results": results
-    }
-
-@app.post("/api/aptitude/questions/add")
-async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test1"):
-    try:
-        load_aptitude_tests()  # Ensure tests are loaded
-        test = aptitude_tests.get(test_id)
-        if not test:
-            raise HTTPException(status_code=404, detail="Test not found")
-        question_id = f"q{len(test['questions']) + 1}"
-        question_dict = question.dict()
-        question_dict["id"] = question_id
-        test["questions"].append(question_dict)
-        test["total_questions"] = len(test["questions"])
-        aptitude_tests[test_id] = test
-        save_aptitude_tests()
-        return {"message": "Question added successfully", "question_id": question_id}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.get("/api/neon-dump")
-async def neon_dump(table: str = Query("jobs", description="Table name to dump")):
-    if not engine:
-        raise HTTPException(status_code=500, detail="Database engine not initialized")
-    async with engine.connect() as connection:
-        result = await connection.execute(text(f"SELECT * FROM {table} LIMIT 100"))
-        rows = result.mappings().all()
-        return {"rows": [dict(row) for row in rows]}
 
 # Load Apple jobs from JSON at startup
 @app.get("/api/apple-jobs")
