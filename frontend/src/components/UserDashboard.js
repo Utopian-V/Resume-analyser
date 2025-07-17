@@ -6,6 +6,7 @@ import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
@@ -349,6 +350,28 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [showResumeChart, setShowResumeChart] = useState(false);
+  const [showDSAChart, setShowDSAChart] = useState(false);
+  const [showAssessmentChart, setShowAssessmentChart] = useState(false);
+  const resumeScoreData = [
+    { date: 'Jan', score: 60 },
+    { date: 'Feb', score: 70 },
+    { date: 'Mar', score: 80 },
+    { date: 'Apr', score: 85 },
+    { date: 'May', score: 90 },
+  ];
+  const dsaProgressData = [
+    { topic: 'Arrays', solved: 15, total: 20 },
+    { topic: 'DP', solved: 10, total: 15 },
+    { topic: 'Graphs', solved: 8, total: 12 },
+    { topic: 'Trees', solved: 12, total: 18 },
+  ];
+  const assessmentData = [
+    { type: 'Aptitude', value: 80 },
+    { type: 'DSA', value: 70 },
+    { type: 'Resume', value: 90 },
+  ];
+  const assessmentColors = ['#6366f1', '#22c55e', '#f59e42'];
 
   // Mock data for new features
   const careerPaths = [
@@ -519,6 +542,65 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
           <ProgressLabel>Interviews Scheduled</ProgressLabel>
         </ProgressCard>
       </ProgressGrid>
+
+      <div style={{ margin: '2rem 0' }}>
+        <h3 style={{ color: '#3730a3', fontWeight: 800, marginBottom: 16 }}>Analytics & Progress</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32 }}>
+          {/* Resume Score Over Time */}
+          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
+            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>Resume Score Over Time</div>
+            <button onClick={() => setShowResumeChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
+            {showResumeChart && (
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={resumeScoreData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+          {/* DSA Progress */}
+          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
+            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>DSA Progress</div>
+            <button onClick={() => setShowDSAChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
+            {showDSAChart && (
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={dsaProgressData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="topic" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="solved" fill="#6366f1" />
+                  <Bar dataKey="total" fill="#e0e7ff" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+          {/* Assessment Performance */}
+          <div style={{ flex: 1, minWidth: 320, background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(99,102,241,0.08)', padding: 24 }}>
+            <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 8 }}>Assessment Performance</div>
+            <button onClick={() => setShowAssessmentChart(true)} style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', marginBottom: 12, cursor: 'pointer' }}>Generate</button>
+            {showAssessmentChart && (
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={assessmentData} dataKey="value" nameKey="type" cx="50%" cy="50%" outerRadius={60} fill="#6366f1" label>
+                    {assessmentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={assessmentColors[index % assessmentColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
 
       <CareerPathSection>
         <SectionTitle>

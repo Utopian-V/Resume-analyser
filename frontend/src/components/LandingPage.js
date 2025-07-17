@@ -271,7 +271,7 @@ export default function LandingPage() {
         />
       ))}
       <GlassNavBar>
-        <Logo onClick={() => scrollTo("hero")}>ResumeAI</Logo>
+        <Logo onClick={() => scrollTo("hero")}>Prep Nexus</Logo>
         <NavLinks>
           <NavLink onClick={() => scrollTo("hero")}>Home</NavLink>
           <NavLink onClick={() => scrollTo("pricing")}>Pricing</NavLink>
@@ -311,7 +311,7 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          Why Choose ResumeAI?
+          Why Choose Prep Nexus?
         </motion.h2>
         <FeaturesGrid>
           {features.map((f, i) => (
@@ -335,7 +335,7 @@ export default function LandingPage() {
       <AboutSection id="about">
         <motion.h2 style={{ color: "#fff", fontSize: "2rem", fontWeight: 800, marginBottom: 18 }}>About</motion.h2>
         <FeatureDesc>
-          ResumeAI is built to help you land your dream job with AI-powered resume analysis, DSA prep, and curated job listings. Our mission is to make career growth accessible, actionable, and beautiful.
+          Prep Nexus is built to help you land your dream job with AI-powered resume analysis, DSA prep, and curated job listings. Our mission is to make career growth accessible, actionable, and beautiful.
         </FeatureDesc>
       </AboutSection>
       <ContactSection id="contact">
@@ -345,7 +345,7 @@ export default function LandingPage() {
         </FeatureDesc>
       </ContactSection>
       <Footer>
-        &copy; {new Date().getFullYear()} ResumeAI. All rights reserved.
+        &copy; {new Date().getFullYear()} Prep Nexus. All rights reserved.
       </Footer>
     </>
   );
