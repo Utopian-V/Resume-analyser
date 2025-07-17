@@ -355,6 +355,11 @@ function App() {
   };
 
   const renderTabContent = () => {
+    if (activeTab === 'jobs') {
+      return (
+        <JobListings />
+      );
+    }
     if (!user) {
       return (
         <LoginPrompt>
@@ -418,26 +423,19 @@ function App() {
         );
       case 'dsa':
         return (
-          <EnhancedDSABank userId={user.uid} />
-        );
-      case 'jobs':
-        return (
-          <JobListings 
-            userId={user.uid}
-            userSkills={feedback?.skill_match?.matched_skills || []}
-          />
+          <EnhancedDSABank userId={user?.uid} />
         );
       case 'interview':
         return (
-          <InterviewPrep userId={user.uid} />
+          <InterviewPrep userId={user?.uid} />
         );
       case 'aptitude':
         return (
-          <AptitudeTest userId={user.uid} />
+          <AptitudeTest userId={user?.uid} />
         );
       case 'question-manager':
         return (
-          <AptitudeQuestionManager userId={user.uid} />
+          <AptitudeQuestionManager userId={user?.uid} />
         );
       default:
         return null;
@@ -512,6 +510,7 @@ function App() {
                     <FiBriefcase size={18} />
                     Job Opportunities
                   </Tab>
+                  {user && <>
                   <Tab 
                     active={activeTab === 'interview'} 
                     onClick={() => setActiveTab('interview')}
@@ -533,6 +532,7 @@ function App() {
                     <FiFolder size={18} />
                     Question Manager
                   </Tab>
+                  </>}
                 </TabContainer>
               )}
               <ContentArea>
