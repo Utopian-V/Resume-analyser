@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp, FiBookOpen, FiTarget, FiBarChart3 } from "react-icons/fi";
+import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp, FiBookOpen, FiTarget, FiBarChart2 } from "react-icons/fi";
 import { parseCSV } from "../utils/csv";
 
 const csvUrl = require('../data/dsa_questions.csv');
