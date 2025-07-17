@@ -2,7 +2,7 @@ import os
 import pdfplumber
 import requests
 import json
-from fastapi import FileResponse
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
