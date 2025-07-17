@@ -1136,5 +1136,5 @@ async def neon_dump(table: str = Query("jobs", description="Table name to dump")
 # Load Apple jobs from JSON at startup
 @app.get("/api/apple-jobs")
 def get_apple_jobs():
-    file_path = os.path.join(os.path.dirname(__file__), '../jobs_data/jobs_apple.com.json')
+    file_path = os.path.join(os.path.dirname(__file__), 'jobs_data/jobs_apple.com.json')
     return FileResponse(file_path, media_type="application/json")
