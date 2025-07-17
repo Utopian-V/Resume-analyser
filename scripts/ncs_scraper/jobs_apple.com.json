@@ -1,0 +1,331 @@
+{
+  "source": "Career Page - apple.com",
+  "scraped_at": "2025-07-17T06:17:28.966977",
+  "total_jobs": 15,
+  "jobs": [
+    {
+      "id": "apple.com_568037",
+      "title": "Join us. Be\u00a0you.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "This is where individual imaginations gather together, committing to the values that lead to great work.\u00a0Here, you\u2019ll do more than join something \u2014 you\u2019ll add something.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Senior",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_335093",
+      "title": "Work at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join a team andinspire the work.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_974825",
+      "title": "Life at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join our community andhelp define it.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_171524",
+      "title": "Just a few of the ways you canmake a differenceat Apple.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Job description not available",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_869644",
+      "title": "Our values arepart of everythingbuilt\u00a0here \u2014 including careers.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Technology is most powerful when everyone can make their mark.",
+      "requirements": [
+        "AccessibilityTechnology is most powerful when everyone can make their mark.Learn about accessibilityat Apple",
+        "EducationEducation is the great equalizer and a powerful source of opportunity\u00a0for\u00a0all.Learn about Apple and education",
+        "EnvironmentOur goal is to leave the planet better than we found it.Learn about Apple\u2019s environmental efforts",
+        "Inclusion and DiversityWe\u2019re committed to making Apple\u00a0more inclusive and the world more just.Learn about inclusion and diversity at Apple",
+        "PrivacyWe design Apple products to protect your privacy and give you control over your information.Learn about privacyat Apple"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers",
+      "category": "Frontend Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_568037",
+      "title": "Join us. Be\u00a0you.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "This is where individual imaginations gather together, committing to the values that lead to great work.\u00a0Here, you\u2019ll do more than join something \u2014 you\u2019ll add something.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/jobs",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Senior",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_335093",
+      "title": "Work at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join a team andinspire the work.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/jobs",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_974825",
+      "title": "Life at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join our community andhelp define it.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/jobs",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_171524",
+      "title": "Just a few of the ways you canmake a differenceat Apple.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Job description not available",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/jobs",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_869644",
+      "title": "Our values arepart of everythingbuilt\u00a0here \u2014 including careers.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Technology is most powerful when everyone can make their mark.",
+      "requirements": [
+        "AccessibilityTechnology is most powerful when everyone can make their mark.Learn about accessibilityat Apple",
+        "EducationEducation is the great equalizer and a powerful source of opportunity\u00a0for\u00a0all.Learn about Apple and education",
+        "EnvironmentOur goal is to leave the planet better than we found it.Learn about Apple\u2019s environmental efforts",
+        "Inclusion and DiversityWe\u2019re committed to making Apple\u00a0more inclusive and the world more just.Learn about inclusion and diversity at Apple",
+        "PrivacyWe design Apple products to protect your privacy and give you control over your information.Learn about privacyat Apple"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/jobs",
+      "category": "Frontend Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_568037",
+      "title": "Join us. Be\u00a0you.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "This is where individual imaginations gather together, committing to the values that lead to great work.\u00a0Here, you\u2019ll do more than join something \u2014 you\u2019ll add something.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers/us/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Senior",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_335093",
+      "title": "Work at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join a team andinspire the work.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers/us/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_974825",
+      "title": "Life at Apple",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Join our community andhelp define it.",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers/us/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_171524",
+      "title": "Just a few of the ways you canmake a differenceat Apple.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Job description not available",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers/us/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "apple.com_869644",
+      "title": "Our values arepart of everythingbuilt\u00a0here \u2014 including careers.",
+      "company": "Apple",
+      "location": "Remote/Not specified",
+      "description": "Technology is most powerful when everyone can make their mark.",
+      "requirements": [
+        "AccessibilityTechnology is most powerful when everyone can make their mark.Learn about accessibilityat Apple",
+        "EducationEducation is the great equalizer and a powerful source of opportunity\u00a0for\u00a0all.Learn about Apple and education",
+        "EnvironmentOur goal is to leave the planet better than we found it.Learn about Apple\u2019s environmental efforts",
+        "Inclusion and DiversityWe\u2019re committed to making Apple\u00a0more inclusive and the world more just.Learn about inclusion and diversity at Apple",
+        "PrivacyWe design Apple products to protect your privacy and give you control over your information.Learn about privacyat Apple"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Apple",
+      "source_url": "https://apple.com/careers/us/",
+      "category": "Frontend Development",
+      "employment_type": "Full-time",
+      "experience_level": "Mid-level",
+      "remote_friendly": false,
+      "government_job": false
+    }
+  ]
+}
