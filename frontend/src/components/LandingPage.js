@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiCheckCircle, FiMail, FiUser, FiDollarSign } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import Blog from './Blog';
 
 // Animated background blocks
 const moveBlock = keyframes`
@@ -344,6 +345,23 @@ export default function LandingPage() {
           Have questions or feedback? Email us at <a href="mailto:hello@resumeai.com" style={{ color: "#6366f1", textDecoration: "underline" }}>hello@resumeai.com</a>
         </FeatureDesc>
       </ContactSection>
+      <section id="blog-preview" style={{ maxWidth: '1100px', margin: '3rem auto', padding: '0 1rem' }}>
+        <h2 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Latest from the Prep Nexus Blog</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
+          {Blog.blogs.slice(0, 3).map(blog => (
+            <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+              <img src={blog.image} alt={blog.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+              <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
+              <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span>{blog.author}</span>
+                <span>{new Date(blog.date).toLocaleDateString()}</span>
+              </div>
+              <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
+              <a href="/app#blog" style={{ background: '#2563eb', color: '#fff', padding: '0.5rem 1.2rem', borderRadius: '0.5rem', textDecoration: 'none', fontWeight: 500, alignSelf: 'flex-end', transition: 'background 0.2s' }}>Read More</a>
+            </article>
+          ))}
+        </div>
+      </section>
       <Footer>
         &copy; {new Date().getFullYear()} Prep Nexus. All rights reserved.
       </Footer>

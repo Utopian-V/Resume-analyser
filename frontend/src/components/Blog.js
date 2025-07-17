@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiBookOpen, FiUser, FiCalendar, FiArrowRight } from 'react-icons/fi';
 
-const blogs = [
+export const blogs = [
   {
     id: 1,
     title: 'How to Make Your Resume Stand Out in 2024',
@@ -188,30 +188,48 @@ const Blog = () => {
           Insights, tips, and guides to help you grow your career.
         </p>
       </BlogHeader>
-      <BlogGrid>
-        {blogs.map(blog => (
-          <BlogCard key={blog.id} onClick={() => setSelectedBlog(blog)}>
-            <BlogImage src={blog.image} alt={blog.title} />
-            <BlogCardTitle>{blog.title}</BlogCardTitle>
-            <BlogMeta>
-              <span><FiUser /> {blog.author}</span>
-              <span><FiCalendar /> {new Date(blog.date).toLocaleDateString()}</span>
-            </BlogMeta>
-            <BlogSummary>{blog.summary}</BlogSummary>
-            <ReadMoreBtn>Read More <FiArrowRight /></ReadMoreBtn>
-          </BlogCard>
-        ))}
-      </BlogGrid>
+      <main>
+        <BlogGrid>
+          {blogs.map(blog => (
+            <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting" onClick={() => setSelectedBlog(blog)}>
+              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BlogPosting',
+                headline: blog.title,
+                image: blog.image,
+                author: { '@type': 'Person', name: blog.author },
+                datePublished: blog.date,
+                description: blog.summary,
+                articleBody: blog.content,
+                publisher: { '@type': 'Organization', name: 'Prep Nexus' },
+                mainEntityOfPage: `https://prepnexus.netlify.app/blog/${blog.id}`
+              }) }} />
+              <BlogImage src={blog.image} alt={blog.title} />
+              <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
+              <BlogMeta>
+                <span><FiUser /> {blog.author}</span>
+                <span><FiCalendar /> {new Date(blog.date).toLocaleDateString()}</span>
+              </BlogMeta>
+              <BlogSummary>{blog.summary}</BlogSummary>
+              <ReadMoreBtn>Read More <FiArrowRight /></ReadMoreBtn>
+            </article>
+          ))}
+        </BlogGrid>
+      </main>
       {selectedBlog && (
         <ModalOverlay onClick={() => setSelectedBlog(null)}>
           <ModalContent onClick={e => e.stopPropagation()}>
-            <h2 style={{ color: '#3730a3', fontWeight: 800 }}>{selectedBlog.title}</h2>
-            <BlogMeta>
-              <span><FiUser /> {selectedBlog.author}</span>
-              <span><FiCalendar /> {new Date(selectedBlog.date).toLocaleDateString()}</span>
-            </BlogMeta>
+            <header>
+              <h1 style={{ color: '#3730a3', fontWeight: 800 }}>{selectedBlog.title}</h1>
+              <BlogMeta>
+                <span><FiUser /> {selectedBlog.author}</span>
+                <span><FiCalendar /> {new Date(selectedBlog.date).toLocaleDateString()}</span>
+              </BlogMeta>
+            </header>
             <BlogImage src={selectedBlog.image} alt={selectedBlog.title} style={{ maxHeight: 220 }} />
-            <div style={{ color: '#334155', fontSize: '1.1rem', margin: '1.5rem 0', whiteSpace: 'pre-line' }}>{selectedBlog.content}</div>
+            <main>
+              <div style={{ color: '#334155', fontSize: '1.1rem', margin: '1.5rem 0', whiteSpace: 'pre-line' }}>{selectedBlog.content}</div>
+            </main>
             <CloseBtn onClick={() => setSelectedBlog(null)}>Close</CloseBtn>
           </ModalContent>
         </ModalOverlay>
