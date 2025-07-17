@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut } from "react-icons/fi";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import { FiUploadCloud, FiCheckCircle, FiUser, FiCode, FiBriefcase, FiFolder, FiMessageSquare, FiLogOut, FiSun, FiMoon, FiMessageCircle } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
 import { auth, googleProvider } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
@@ -26,12 +26,41 @@ import Blog, { AuthorPage, TagPage } from './components/Blog';
 import { NotFound } from './components/Blog';
 import { HelmetProvider } from 'react-helmet-async';
 
+const lightTheme = {
+  background: "#f8fafc",
+  card: "#fff",
+  text: "#232946",
+  accent: "#6366f1",
+  accent2: "#a21caf",
+  border: "#e0e7ff",
+  shadow: "rgba(99,102,241,0.10)",
+  tabActive: "#6366f1",
+  tabInactive: "#fff",
+  tabTextActive: "#fff",
+  tabTextInactive: "#6366f1",
+};
+const darkTheme = {
+  background: "#181c2f",
+  card: "#232946",
+  text: "#e0e7ff",
+  accent: "#6366f1",
+  accent2: "#a21caf",
+  border: "#232946",
+  shadow: "rgba(99,102,241,0.18)",
+  tabActive: "#6366f1",
+  tabInactive: "#232946",
+  tabTextActive: "#fff",
+  tabTextInactive: "#a5b4fc",
+};
+
 const GlobalStyle = createGlobalStyle`
   body {
     font-family: 'Inter', 'Poppins', sans-serif;
-    background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+    background: ${({ theme }) => theme.background};
     min-height: 100vh;
     margin: 0;
+    color: ${({ theme }) => theme.text};
+    transition: background 0.3s, color 0.3s;
   }
   * {
     box-sizing: border-box;
@@ -52,10 +81,10 @@ const Header = styled.header`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  background: white;
+  background: ${({ theme }) => theme.card};
   padding: 1.5rem 2rem;
   border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+  box-shadow: 0 4px 24px ${({ theme }) => theme.shadow};
 `;
 
 const HeaderLeft = styled.div`
@@ -64,21 +93,16 @@ const HeaderLeft = styled.div`
   gap: 1rem;
 `;
 
-const Mascot = styled.div`
-  font-size: 2.5rem;
-  filter: drop-shadow(0 2px 8px #e0e7ff);
-`;
-
 const Title = styled.h1`
   font-family: 'Poppins', 'Inter', sans-serif;
   font-size: 2.2rem;
   font-weight: 800;
-  color: #3730a3;
+  color: ${({ theme }) => theme.accent};
   margin: 0;
 `;
 
 const Subtitle = styled.p`
-  color: #6366f1;
+  color: ${({ theme }) => theme.accent2};
   font-weight: 600;
   margin: 0;
 `;
@@ -93,7 +117,7 @@ const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #3730a3;
+  color: ${({ theme }) => theme.text};
   font-weight: 600;
 `;
 
@@ -102,8 +126,8 @@ const AuthButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.8rem 1.5rem;
-  border: 2px solid #6366f1;
-  background: ${props => props.isLoggedIn ? '#ef4444' : '#6366f1'};
+  border: 2px solid ${({ theme }) => theme.accent};
+  background: ${({ isLoggedIn, theme }) => isLoggedIn ? '#ef4444' : theme.accent};
   color: white;
   border-radius: 0.8rem;
   font-weight: 600;
@@ -118,15 +142,28 @@ const AuthButton = styled.button`
   }
 `;
 
+const ThemeToggle = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.accent};
+  font-size: 1.7rem;
+  cursor: pointer;
+  margin-left: 1.2rem;
+  transition: color 0.2s;
+  &:hover {
+    color: ${({ theme }) => theme.accent2};
+  }
+`;
+
 const TabContainer = styled.div`
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
-  background: white;
+  background: ${({ theme }) => theme.card};
   padding: 1rem;
   border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+  box-shadow: 0 2px 12px ${({ theme }) => theme.shadow};
   @media (max-width: 600px) {
     flex-direction: column;
     gap: 0.5rem;
@@ -139,17 +176,16 @@ const Tab = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.8rem 1.5rem;
-  border: 2px solid #6366f1;
-  background: ${props => props.active ? '#6366f1' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#6366f1'};
+  border: 2px solid ${({ theme }) => theme.accent};
+  background: ${({ active, theme }) => active ? theme.tabActive : theme.tabInactive};
+  color: ${({ active, theme }) => active ? theme.tabTextActive : theme.tabTextInactive};
   border-radius: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
   &:hover {
-    background: #6366f1;
-    color: white;
+    background: ${({ theme }) => theme.tabActive};
+    color: #fff;
   }
 `;
 
@@ -236,6 +272,70 @@ const LoginText = styled.p`
   margin-bottom: 2rem;
 `;
 
+const FloatingFAQ = styled.button`
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 200;
+  background: ${({ theme }) => theme.accent};
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 24px ${({ theme }) => theme.shadow};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: ${({ theme }) => theme.accent2};
+  }
+`;
+
+const FAQModalOverlay = styled.div`
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(36,40,62,0.25);
+  z-index: 201;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+`;
+
+const FAQModal = styled.div`
+  background: ${({ theme }) => theme.card};
+  color: ${({ theme }) => theme.text};
+  border-radius: 1.2rem 1.2rem 0 0;
+  box-shadow: 0 2px 32px ${({ theme }) => theme.shadow};
+  width: 350px;
+  max-width: 95vw;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin: 0 2vw 2vw 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const FAQInput = styled.input`
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  border: 1.5px solid ${({ theme }) => theme.border};
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  background: ${({ theme }) => theme.tabInactive};
+  color: ${({ theme }) => theme.text};
+`;
+
+const FAQAnswer = styled.div`
+  color: ${({ theme }) => theme.accent};
+  font-size: 1.08rem;
+  margin-top: 0.5rem;
+  min-height: 40px;
+`;
+
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -245,6 +345,10 @@ function App() {
   const [pdfFile, setPdfFile] = useState(null);
   const [highlighted, setHighlighted] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [faqQuestion, setFaqQuestion] = useState('');
+  const [faqAnswer, setFaqAnswer] = useState('');
+  const [isFAQModalOpen, setIsFAQModalOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -264,6 +368,13 @@ function App() {
       }
     });
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const savedMode = localStorage.getItem('isDarkMode');
+    if (savedMode) {
+      setIsDarkMode(JSON.parse(savedMode));
+    }
   }, []);
 
   const handleGoogleSignIn = async () => {
@@ -357,6 +468,39 @@ function App() {
     setHighlighted(keywords);
   };
 
+  const handleThemeToggle = () => {
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem('isDarkMode', JSON.stringify(!isDarkMode));
+  };
+
+  const handleFAQQuestionSubmit = async (e) => {
+    e.preventDefault();
+    if (!faqQuestion.trim()) return;
+    setLoading(true);
+    try {
+      const answer = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/faq/answer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: faqQuestion }),
+      }).then(res => res.json());
+      setFaqAnswer(answer.answer);
+      setIsFAQModalOpen(true);
+    } catch (err) {
+      setFaqAnswer('Error fetching answer. Please try again.');
+      setIsFAQModalOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFAQClose = () => {
+    setIsFAQModalOpen(false);
+    setFaqQuestion('');
+    setFaqAnswer('');
+  };
+
   const renderTabContent = () => {
     if (activeTab === 'jobs') {
       return (
@@ -447,109 +591,139 @@ function App() {
 
   return (
     <HelmetProvider>
-      <GlobalStyle />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<Blog />} />
-        <Route path="/blog/author/:slug" element={<AuthorPage />} />
-        <Route path="/blog/tag/:tag" element={<TagPage />} />
-        <Route path="*" element={<NotFound />} />
-        <Route path="/app" element={
-          <>
-            <Header>
-              <HeaderLeft>
-                <Mascot>🦉</Mascot>
-                <div>
+      <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+        <GlobalStyle />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<Blog />} />
+          <Route path="/blog/author/:slug" element={<AuthorPage />} />
+          <Route path="/blog/tag/:tag" element={<TagPage />} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/app" element={
+            <>
+              <Header>
+                <HeaderLeft>
                   <Title>AI Resume Reviewer</Title>
                   <Subtitle>Get instant, actionable feedback and prepare for your dream job.</Subtitle>
-                </div>
-              </HeaderLeft>
-              <AuthSection>
-                {isLoading ? (
-                  <div>Loading...</div>
-                ) : user ? (
-                  <>
-                    <UserInfo>
-                      {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
-                      {user.displayName}
-                    </UserInfo>
-                    <AuthButton isLoggedIn={true} onClick={handleSignOut}>
-                      <FiLogOut size={18} />
-                      Sign Out
+                </HeaderLeft>
+                <AuthSection>
+                  {isLoading ? (
+                    <div>Loading...</div>
+                  ) : user ? (
+                    <>
+                      <UserInfo>
+                        {user.photoURL && <img src={user.photoURL} alt={user.displayName} style={{ width: 32, height: 32, borderRadius: '50%' }} />}
+                        {user.displayName}
+                      </UserInfo>
+                      <AuthButton isLoggedIn={true} onClick={handleSignOut}>
+                        <FiLogOut size={18} />
+                        Sign Out
+                      </AuthButton>
+                      <ThemeToggle onClick={handleThemeToggle}>
+                        {isDarkMode ? <FiMoon /> : <FiSun />}
+                      </ThemeToggle>
+                    </>
+                  ) : (
+                    <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
+                      <FiUser size={18} />
+                      Sign in with Google
                     </AuthButton>
-                  </>
-                ) : (
-                  <AuthButton isLoggedIn={false} onClick={handleGoogleSignIn}>
-                    <FiUser size={18} />
-                    Sign in with Google
-                  </AuthButton>
+                  )}
+                </AuthSection>
+              </Header>
+              <MainLayout>
+                {user && (
+                  <TabContainer>
+                    <Tab 
+                      active={activeTab === 'dashboard'} 
+                      onClick={() => setActiveTab('dashboard')}
+                    >
+                      <FiUser size={18} />
+                      Dashboard
+                    </Tab>
+                    <Tab 
+                      active={activeTab === 'resume'} 
+                      onClick={() => setActiveTab('resume')}
+                    >
+                      <FiUploadCloud size={18} />
+                      Resume Analysis
+                    </Tab>
+                    <Tab 
+                      active={activeTab === 'dsa'} 
+                      onClick={() => setActiveTab('dsa')}
+                    >
+                      <FiCode size={18} />
+                      DSA Practice
+                    </Tab>
+                    <Tab 
+                      active={activeTab === 'jobs'} 
+                      onClick={() => setActiveTab('jobs')}
+                    >
+                      <FiBriefcase size={18} />
+                      Job Opportunities
+                    </Tab>
+                    {user && <>
+                    <Tab 
+                      active={activeTab === 'interview'} 
+                      onClick={() => setActiveTab('interview')}
+                    >
+                      <FiMessageSquare size={18} />
+                      Interview Prep
+                    </Tab>
+                    <Tab 
+                      active={activeTab === 'aptitude'} 
+                      onClick={() => setActiveTab('aptitude')}
+                    >
+                      <BiBrain size={18} />
+                      Aptitude Test
+                    </Tab>
+                    <Tab 
+                      active={activeTab === 'question-manager'} 
+                      onClick={() => setActiveTab('question-manager')}
+                    >
+                      <FiFolder size={18} />
+                      Question Manager
+                    </Tab>
+                    </>}
+                  </TabContainer>
                 )}
-              </AuthSection>
-            </Header>
-            <MainLayout>
-              {user && (
-                <TabContainer>
-                  <Tab 
-                    active={activeTab === 'dashboard'} 
-                    onClick={() => setActiveTab('dashboard')}
-                  >
-                    <FiUser size={18} />
-                    Dashboard
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'resume'} 
-                    onClick={() => setActiveTab('resume')}
-                  >
-                    <FiUploadCloud size={18} />
-                    Resume Analysis
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'dsa'} 
-                    onClick={() => setActiveTab('dsa')}
-                  >
-                    <FiCode size={18} />
-                    DSA Practice
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'jobs'} 
-                    onClick={() => setActiveTab('jobs')}
-                  >
-                    <FiBriefcase size={18} />
-                    Job Opportunities
-                  </Tab>
-                  {user && <>
-                  <Tab 
-                    active={activeTab === 'interview'} 
-                    onClick={() => setActiveTab('interview')}
-                  >
-                    <FiMessageSquare size={18} />
-                    Interview Prep
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'aptitude'} 
-                    onClick={() => setActiveTab('aptitude')}
-                  >
-                    <BiBrain size={18} />
-                    Aptitude Test
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'question-manager'} 
-                    onClick={() => setActiveTab('question-manager')}
-                  >
-                    <FiFolder size={18} />
-                    Question Manager
-                  </Tab>
-                  </>}
-                </TabContainer>
+                <ContentArea>
+                  {renderTabContent()}
+                </ContentArea>
+                <FloatingFAQ onClick={() => setIsFAQModalOpen(true)}>
+                  <FiMessageCircle />
+                </FloatingFAQ>
+              </MainLayout>
+              {isFAQModalOpen && (
+                <FAQModalOverlay onClick={handleFAQClose}>
+                  <FAQModal onClick={(e) => e.stopPropagation()}>
+                    <h3>AI Resume Reviewer FAQ</h3>
+                    <form onSubmit={handleFAQQuestionSubmit}>
+                      <FAQInput
+                        type="text"
+                        placeholder="Ask a question about resume review..."
+                        value={faqQuestion}
+                        onChange={(e) => setFaqQuestion(e.target.value)}
+                        disabled={loading}
+                      />
+                      <button type="submit" disabled={loading}>
+                        {loading ? 'Searching...' : 'Ask Question'}
+                      </button>
+                    </form>
+                    {faqAnswer && (
+                      <FAQAnswer>
+                        <strong>Answer:</strong> {faqAnswer}
+                      </FAQAnswer>
+                    )}
+                    <button onClick={handleFAQClose}>Close</button>
+                  </FAQModal>
+                </FAQModalOverlay>
               )}
-              <ContentArea>
-                {renderTabContent()}
-              </ContentArea>
-            </MainLayout>
-          </>
-        } />
-      </Routes>
+            </>
+          } />
+        </Routes>
+      </ThemeProvider>
     </HelmetProvider>
   );
 }
