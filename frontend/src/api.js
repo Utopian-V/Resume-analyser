@@ -141,3 +141,9 @@ export const getAptitudeLeaderboard = async (testId = 'test1') => {
     throw error;
   }
 };
+
+export const getAllCompanyJobs = async (filters = {}) => {
+  const params = { ...filters };
+  const response = await axios.get(`${API_URL}/api/jobs/all`, { params });
+  return response.data;
+};

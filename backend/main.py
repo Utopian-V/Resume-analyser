@@ -2,7 +2,7 @@ import os
 import pdfplumber
 import requests
 import json
-from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
@@ -11,6 +11,7 @@ from typing import List, Dict, Optional
 from pydantic import BaseModel
 import uuid
 from datetime import datetime
+import glob
 
 load_dotenv()
 
@@ -42,6 +43,50 @@ user_progress = {}
 APTITUDE_TESTS_FILE = "aptitude_tests.json"
 aptitude_tests = {}  # {test_id: {...}}
 _aptitude_tests_loaded = False  # Cache flag
+
+# NCS Job Models
+class NCSJob(BaseModel):
+    id: str
+    title: str
+    company: str
+    location: str
+    description: str
+    requirements: List[str]
+    salary_range: str
+    application_deadline: str
+    posted_date: str
+    source: str
+    source_url: str
+    category: str
+    employment_type: str
+    experience_level: str
+    remote_friendly: bool
+    government_job: bool
+
+class BulkJobUpdate(BaseModel):
+    jobs: List[NCSJob]
+    source: str
+
+# NCS Jobs storage
+ncs_jobs = []
+
+def load_ncs_jobs():
+    """Load NCS jobs from JSON file"""
+    global ncs_jobs
+    try:
+        ncs_file_path = os.path.join(os.path.dirname(__file__), '../scripts/ncs_scraper/ncs_jobs_full.json')
+        ncs_file_path = os.path.abspath(ncs_file_path)
+        if os.path.exists(ncs_file_path):
+            with open(ncs_file_path, 'r') as f:
+                data = json.load(f)
+                ncs_jobs = data.get('jobs', [])
+                print(f"Loaded {len(ncs_jobs)} NCS jobs from file")
+        else:
+            print("NCS jobs file not found")
+            ncs_jobs = []
+    except Exception as e:
+        print(f"Error loading NCS jobs: {e}")
+        ncs_jobs = []
 
 # Pydantic models
 class User(BaseModel):
@@ -880,3 +925,131 @@ leaderboard = []  # [{user_id, score, percentage, date}]
 async def get_leaderboard(test_id: str):
     # For now, just return the stub
     return {"leaderboard": leaderboard}
+
+# NCS Jobs API Endpoints
+@app.post("/api/jobs/bulk-update")
+async def bulk_update_jobs(update: BulkJobUpdate):
+    """Update job listings with NCS jobs"""
+    global job_listings, ncs_jobs
+    
+    try:
+        # Convert NCS jobs to standard job format
+        new_jobs = []
+        for ncs_job in update.jobs:
+            job = {
+                "id": ncs_job.id,
+                "title": ncs_job.title,
+                "company": ncs_job.company,
+                "location": ncs_job.location,
+                "description": ncs_job.description,
+                "requirements": ncs_job.requirements,
+                "salary_range": ncs_job.salary_range,
+                "application_deadline": ncs_job.application_deadline,
+                "posted_date": ncs_job.posted_date,
+                "source": ncs_job.source,
+                "source_url": ncs_job.source_url,
+                "category": ncs_job.category,
+                "employment_type": ncs_job.employment_type,
+                "experience_level": ncs_job.experience_level,
+                "remote_friendly": ncs_job.remote_friendly,
+                "government_job": ncs_job.government_job
+            }
+            new_jobs.append(job)
+        
+        # Add to existing job listings
+        job_listings.extend(new_jobs)
+        ncs_jobs = new_jobs
+        
+        return {
+            "message": f"Successfully added {len(new_jobs)} NCS jobs",
+            "total_jobs": len(job_listings),
+            "ncs_jobs": len(ncs_jobs)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating jobs: {str(e)}")
+
+@app.get("/api/jobs/ncs")
+async def get_ncs_jobs():
+    """Get all NCS jobs"""
+    return {
+        "jobs": ncs_jobs,
+        "total": len(ncs_jobs),
+        "source": "National Career Service (NCS)"
+    }
+
+@app.get("/api/jobs/sources")
+async def get_job_sources():
+    """Get available job sources"""
+    sources = {
+        "ncs": {
+            "name": "National Career Service (NCS)",
+            "description": "Government of India job portal",
+            "total_jobs": len(ncs_jobs),
+            "last_updated": datetime.now().isoformat()
+        },
+        "manual": {
+            "name": "Manual Entries",
+            "description": "Manually added job listings",
+            "total_jobs": len([j for j in job_listings if j.get("source") != "National Career Service (NCS)"]),
+            "last_updated": datetime.now().isoformat()
+        }
+    }
+    return sources
+
+def get_company_logo_url(company_domain):
+    # Placeholder: In production, use a real logo service or static assets
+    return f"https://logo.clearbit.com/{company_domain}"
+
+@app.get("/api/jobs/all")
+async def get_all_company_jobs(
+    category: str = Query(None),
+    company: str = Query(None),
+    experience: str = Query(None),
+    remote: bool = Query(None),
+    government: bool = Query(None),
+    source: str = Query(None),
+    search: str = Query(None)
+):
+    """Aggregate all jobs from jobs_*.json files and support filtering."""
+    jobs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts/ncs_scraper'))
+    job_files = glob.glob(os.path.join(jobs_dir, 'jobs_*.json'))
+    all_jobs = []
+    for file_path in job_files:
+        try:
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+                jobs = data.get('jobs', [])
+                # Infer company from filename
+                company_domain = os.path.basename(file_path)[5:-5]
+                for job in jobs:
+                    job['company_domain'] = company_domain
+                    job['company_logo'] = get_company_logo_url(company_domain)
+                    job['company_credit'] = f"Jobs scraped from {company_domain} career page"
+                    all_jobs.append(job)
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+            continue
+    # Filtering
+    def job_filter(job):
+        if category and job.get('category') != category:
+            return False
+        if company and (company.lower() not in job.get('company', '').lower() and company.lower() not in job.get('company_domain', '').lower()):
+            return False
+        if experience and job.get('experience_level') != experience:
+            return False
+        if remote is not None and bool(job.get('remote_friendly')) != remote:
+            return False
+        if government is not None and bool(job.get('government_job')) != government:
+            return False
+        if source and source.lower() not in str(job.get('source', '')).lower():
+            return False
+        if search:
+            s = search.lower()
+            if s not in job.get('title', '').lower() and s not in job.get('description', '').lower():
+                return False
+        return True
+    filtered_jobs = [job for job in all_jobs if job_filter(job)]
+    return {
+        "total": len(filtered_jobs),
+        "jobs": filtered_jobs
+    }
