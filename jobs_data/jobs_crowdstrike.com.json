@@ -1,0 +1,49 @@
+{
+  "source": "Career Page - crowdstrike.com",
+  "scraped_at": "2025-07-17T14:09:32.205923",
+  "total_jobs": 2,
+  "jobs": [
+    {
+      "id": "crowdstrike.com_857647",
+      "title": "Our people",
+      "company": "Crowdstrike",
+      "location": "Remote/Not specified",
+      "description": "\u201cCrowdStrike is a high-trust environment where individuals are given a lot of autonomy, but also the tools they need to get the job done.\"Jenn W.Engineering Manager",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Crowdstrike",
+      "source_url": "https://crowdstrike.com/careers",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Senior",
+      "remote_friendly": false,
+      "government_job": false
+    },
+    {
+      "id": "crowdstrike.com_857647",
+      "title": "Our people",
+      "company": "Crowdstrike",
+      "location": "Remote/Not specified",
+      "description": "\u201cCrowdStrike is a high-trust environment where individuals are given a lot of autonomy, but also the tools they need to get the job done.\"Jenn W.Engineering Manager",
+      "requirements": [
+        "Relevant experience",
+        "Technical skills"
+      ],
+      "salary_range": "Competitive salary",
+      "posted_date": "2025-07-17",
+      "application_deadline": "Not specified",
+      "source": "Career Page - Crowdstrike",
+      "source_url": "https://crowdstrike.com/en-us/careers/",
+      "category": "Software Development",
+      "employment_type": "Full-time",
+      "experience_level": "Senior",
+      "remote_friendly": false,
+      "government_job": false
+    }
+  ]
+}
