@@ -140,13 +140,7 @@ export const getAptitudeLeaderboard = async (testId = 'test1') => {
   }
 };
 
-// Fetch all Apple jobs from the backend
-export const getAllCompanyJobs = async (filters = {}) => {
-  // Build query string from filters
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.append(key, value);
-  });
-  const response = await axios.get(`${API_URL}/api/apple-jobs${params.toString() ? `?${params.toString()}` : ''}`);
+export const getJobsCorpus = async () => {
+  const response = await axios.get(`${API_URL}/api/jobs/corpus`);
   return response.data;
 };

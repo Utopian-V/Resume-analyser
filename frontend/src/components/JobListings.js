@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiZap } from 'react-icons/fi';
-import { getAllCompanyJobs } from '../api';
+import { getJobsCorpus } from '../api';
 import { useRef } from 'react';
+import './JobListings.css';
 
 const Container = styled.div`
   max-width: 1300px;
@@ -366,7 +367,7 @@ const JobListings = () => {
       if (selectedCategories.length) params.category = selectedCategories.join(',');
       if (selectedExperiences.length) params.experience = selectedExperiences.join(',');
       if (selectedTags.length) params.tags = selectedTags.join(',');
-      const response = await getAllCompanyJobs(params);
+      const response = await getJobsCorpus(params);
       setJobs(page === 1 ? (response.jobs || []) : prev => [...prev, ...(response.jobs || [])]);
       setHasMore((response.jobs || []).length === 30);
       // Extract unique companies, categories, experiences, tags
