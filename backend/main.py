@@ -1127,3 +1127,10 @@ async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test
         return {"message": "Question added successfully", "question_id": question_id}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/neon-dump")
+def neon_dump():
+    with engine.connect() as connection:
+        result = connection.execute(text("SELECT * FROM jobs"))
+        jobs = [dict(row) for row in result]
+    return {"jobs": jobs}
