@@ -22,6 +22,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import jsPDF from "jspdf";
 import LandingPage from "./components/LandingPage";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import Blog from './components/Blog';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -360,6 +361,9 @@ function App() {
         <JobListings />
       );
     }
+    if (activeTab === 'blog') {
+      return <Blog />;
+    }
     if (!user) {
       return (
         <LoginPrompt>
@@ -531,6 +535,13 @@ function App() {
                   >
                     <FiFolder size={18} />
                     Question Manager
+                  </Tab>
+                  <Tab 
+                    active={activeTab === 'blog'} 
+                    onClick={() => setActiveTab('blog')}
+                  >
+                    <FiFolder size={18} />
+                    Blog
                   </Tab>
                   </>}
                 </TabContainer>
