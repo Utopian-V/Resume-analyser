@@ -24,9 +24,7 @@ export const getUserProfile = async (userId) => {
 
 // Job listings
 export const getJobs = async (userId = null) => {
-  const params = userId ? { user_id: userId } : {};
-  const response = await axios.get(`${API_URL}/jobs/`, { params });
-  return response.data;
+  // Remove or comment out this function if not needed
 };
 
 export const applyForJob = async (jobId, userId) => {
@@ -142,8 +140,13 @@ export const getAptitudeLeaderboard = async (testId = 'test1') => {
   }
 };
 
+// Fetch all Apple jobs from the backend
 export const getAllCompanyJobs = async (filters = {}) => {
-  const params = { ...filters };
-  const response = await axios.get(`${API_URL}/api/jobs/all`, { params });
+  // Build query string from filters
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.append(key, value);
+  });
+  const response = await axios.get(`${API_URL}/api/apple-jobs${params.toString() ? `?${params.toString()}` : ''}`);
   return response.data;
 };

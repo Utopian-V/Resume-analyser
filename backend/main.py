@@ -1124,8 +1124,27 @@ async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/api/neon-dump")
-def neon_dump():
-    with engine.connect() as connection:
-        result = connection.execute(text("SELECT * FROM jobs"))
-        jobs = [dict(row) for row in result]
+async def neon_dump(table: str = Query("jobs", description="Table name to dump")):
+    if not engine:
+        raise HTTPException(status_code=500, detail="Database engine not initialized")
+    async with engine.connect() as connection:
+        result = await connection.execute(text(f"SELECT * FROM {table} LIMIT 100"))
+        rows = result.mappings().all()
+        return {"rows": [dict(row) for row in rows]}
+
+# Load Apple jobs from JSON at startup
+JOBS_FILE = os.path.join(os.path.dirname(__file__), '../jobs_apple.com.json')
+with open(JOBS_FILE, 'r') as f:
+    apple_jobs = json.load(f)
+
+@app.get("/api/apple-jobs")
+def get_apple_jobs(company: str = None):
+    # Return only the jobs list, with logo and credit fields for each job
+    jobs = apple_jobs.get("jobs", [])
+    company_domain = "apple.com"
+    for job in jobs:
+        job["company_logo"] = f"https://logo.clearbit.com/{company_domain}"
+        job["company_credit"] = f"Jobs scraped from {company_domain} career page"
+    if company:
+        jobs = [job for job in jobs if job.get("company", "").lower() == company.lower()]
     return {"jobs": jobs}
