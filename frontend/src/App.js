@@ -363,9 +363,6 @@ function App() {
         <JobListings />
       );
     }
-    if (activeTab === 'blog') {
-      return <Blog />;
-    }
     if (!user) {
       return (
         <LoginPrompt>
@@ -542,13 +539,6 @@ function App() {
                   >
                     <FiFolder size={18} />
                     Question Manager
-                  </Tab>
-                  <Tab 
-                    active={activeTab === 'blog'} 
-                    onClick={() => setActiveTab('blog')}
-                  >
-                    <FiFolder size={18} />
-                    Blog
                   </Tab>
                   </>}
                 </TabContainer>

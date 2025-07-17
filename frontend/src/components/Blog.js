@@ -243,6 +243,14 @@ const Blog = () => {
           <meta name="twitter:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
           <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
           <link rel="canonical" href="https://prepnexus.netlify.app/blog" />
+          <script type="application/ld+json">{JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
+              { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" }
+            ]
+          })}</script>
         </Helmet>
         <BlogHeader>
           <BlogTitle><FiBookOpen style={{ marginRight: 8 }} /> Prep Nexus Blog</BlogTitle>
@@ -267,7 +275,7 @@ const Blog = () => {
                   mainEntityOfPage: `https://prepnexus.netlify.app/blog/${blog.id}`
                 }) }} />
                 <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} />
+                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
                   <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
                   <BlogMeta>
                     <span><FiUser /> {blog.author.name}</span>
@@ -317,6 +325,15 @@ const Blog = () => {
           <meta name="twitter:description" content={selectedBlog.summary} />
           <meta name="twitter:image" content={selectedBlog.image} />
           <link rel="canonical" href={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
+          <script type="application/ld+json">{JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
+              { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" },
+              { "@type": "ListItem", "position": 3, "name": selectedBlog.title, "item": `https://prepnexus.netlify.app/blog/${selectedBlog.id}` }
+            ]
+          })}</script>
         </Helmet>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
@@ -330,7 +347,7 @@ const Blog = () => {
           publisher: { '@type': 'Organization', name: 'Prep Nexus' },
           mainEntityOfPage: `https://prepnexus.netlify.app/blog/${selectedBlog.id}`
         }) }} />
-        <BlogImage src={selectedBlog.image} alt={selectedBlog.title} style={{ maxHeight: 320 }} />
+        <BlogImage src={selectedBlog.image} alt={selectedBlog.title} loading="lazy" style={{ maxHeight: 320 }} />
         <BlogCardTitle as="h1" style={{ fontSize: '2.2rem', marginTop: 16 }}>{selectedBlog.title}</BlogCardTitle>
         <BlogMeta>
           <span><FiUser /> {selectedBlog.author.name}</span>
@@ -360,7 +377,7 @@ const Blog = () => {
             {blogs.filter(b => b.id !== selectedBlog.id).map(blog => (
               <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting">
                 <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} />
+                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
                   <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
                   <BlogMeta>
                     <span><FiUser /> {blog.author.name}</span>
@@ -379,7 +396,7 @@ const Blog = () => {
             {getRelatedPosts(selectedBlog, 2).map(blog => (
               <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting">
                 <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} />
+                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
                   <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
                   <BlogMeta>
                     <span><FiUser /> {blog.author.name}</span>
@@ -416,9 +433,18 @@ export function AuthorPage() {
         <meta name="twitter:description" content={author ? `Read all posts by ${author.name} on Prep Nexus Blog.` : 'Author not found.'} />
         <meta name="twitter:image" content={author ? author.avatar : 'https://prepnexus.netlify.app/og-image.png'} />
         <link rel="canonical" href={`https://prepnexus.netlify.app/blog/author/${slug}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" },
+            { "@type": "ListItem", "position": 3, "name": author ? author.name : 'Author', "item": `https://prepnexus.netlify.app/blog/author/${slug}` }
+          ]
+        })}</script>
       </Helmet>
       <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
-        <img src={author.avatar} alt={author.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #6366f1' }} />
+        <img src={author.avatar} alt={author.name} loading="lazy" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #6366f1' }} />
         <div>
           <h1 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2.2rem', margin: 0 }}>{author.name}</h1>
           <div style={{ color: '#6366f1', fontWeight: 600 }}>{author.bio}</div>
@@ -429,7 +455,7 @@ export function AuthorPage() {
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <img src={blog.image} alt={blog.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+              <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
               <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
               <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span>{blog.author.name}</span>
@@ -462,13 +488,22 @@ export function TagPage() {
         <meta name="twitter:description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
         <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
         <link rel="canonical" href={`https://prepnexus.netlify.app/blog/tag/${tag}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" },
+            { "@type": "ListItem", "position": 3, "name": tag, "item": `https://prepnexus.netlify.app/blog/tag/${tag}` }
+          ]
+        })}</script>
       </Helmet>
       <h1 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2.2rem', marginBottom: 0 }}>Posts tagged “{tag}”</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginTop: 32 }}>
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <img src={blog.image} alt={blog.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+              <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
               <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
               <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span>{blog.author.name}</span>

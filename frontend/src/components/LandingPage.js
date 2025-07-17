@@ -5,6 +5,7 @@ import { FiArrowRight, FiCheckCircle, FiMail, FiUser, FiDollarSign } from "react
 import { useNavigate } from "react-router-dom";
 import { blogs } from './Blog';
 import { Link } from 'react-router-dom';
+import { Footer } from './LandingPage';
 import { Helmet } from 'react-helmet-async';
 
 // Animated background blocks
@@ -219,14 +220,6 @@ const ContactSection = styled(Section)`
   z-index: 1;
 `;
 
-const Footer = styled.footer`
-  text-align: center;
-  color: #c7d2fe;
-  font-size: 1rem;
-  padding: 2rem 0 1rem 0;
-  opacity: 0.7;
-`;
-
 const blocks = [
   { top: "10%", left: "5%", width: 120, height: 120, color: "#6366f1", delay: 0 },
   { top: "30%", right: "8%", width: 90, height: 90, color: "#a21caf", delay: 0.5 },
@@ -353,28 +346,13 @@ export default function LandingPage() {
           ))}
         </FeaturesGrid>
       </Section>
-      <PricingSection id="pricing">
-        <motion.h2 style={{ color: "#fff", fontSize: "2rem", fontWeight: 800, marginBottom: 18 }}>Pricing</motion.h2>
-        <FeatureDesc>All core features are <b>free</b> for early users. Premium features coming soon!</FeatureDesc>
-      </PricingSection>
-      <AboutSection id="about">
-        <motion.h2 style={{ color: "#fff", fontSize: "2rem", fontWeight: 800, marginBottom: 18 }}>About</motion.h2>
-        <FeatureDesc>
-          Prep Nexus is built to help you land your dream job with AI-powered resume analysis, DSA prep, and curated job listings. Our mission is to make career growth accessible, actionable, and beautiful.
-        </FeatureDesc>
-      </AboutSection>
-      <ContactSection id="contact">
-        <motion.h2 style={{ color: "#fff", fontSize: "2rem", fontWeight: 800, marginBottom: 18 }}>Contact</motion.h2>
-        <FeatureDesc>
-          Have questions or feedback? Email us at <a href="mailto:hello@resumeai.com" style={{ color: "#6366f1", textDecoration: "underline" }}>hello@resumeai.com</a>
-        </FeatureDesc>
-      </ContactSection>
+      <Footer />
       <section id="blog-preview" style={{ maxWidth: '1100px', margin: '3rem auto', padding: '0 1rem' }}>
         <h2 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Latest from the Prep Nexus Blog</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
           {(blogs && blogs.length > 0) ? blogs.slice(0, 3).map(blog => (
             <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <img src={blog.image} alt={blog.title} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+              <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
               <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
               <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span>{blog.author.name}</span>
@@ -386,9 +364,6 @@ export default function LandingPage() {
           )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No blog posts yet. Check back soon!</div>}
         </div>
       </section>
-      <Footer>
-        &copy; {new Date().getFullYear()} Prep Nexus. All rights reserved.
-      </Footer>
     </>
   );
 } 
