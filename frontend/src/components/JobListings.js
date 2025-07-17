@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiBuilding, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiFire } from 'react-icons/fi';
+import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiFire } from 'react-icons/fi';
 import { getAllCompanyJobs } from '../api';
 import { useRef } from 'react';
 
@@ -501,7 +501,7 @@ const JobListings = () => {
                       </Button>
                     </JobHeader>
                     <JobMeta>
-                      <MetaItem><FiBuilding /> {job.company}</MetaItem>
+                      <MetaItem><FiHome /> {job.company}</MetaItem>
                       <MetaItem><FiMapPin /> {job.location}</MetaItem>
                       {job.salary_range && job.salary_range !== "Not specified" && (
                         <MetaItem><FiDollarSign /> {job.salary_range}</MetaItem>
