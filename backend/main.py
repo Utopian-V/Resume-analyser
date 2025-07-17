@@ -106,7 +106,6 @@ class JobListing(BaseModel):
     requirements: List[str]
     salary_range: str
     application_deadline: str
-    posted_date: str
 
 class DSAQuestion(BaseModel):
     id: str
@@ -702,22 +701,86 @@ async def analyze_resume(file: UploadFile = File(...)):
         os.remove(file_location)
 
 # Firebase user management (simplified)
+# User registration
 @app.post("/user/register/")
 async def register_firebase_user(user_id: str, email: str, name: str):
-    users_db[user_id] = {
-        "email": email,
-        "name": name,
-        "skills": [],
-        "target_roles": []
-    }
-    user_progress[user_id] = UserProgress(user_id=user_id).dict()
-    return {"user_id": user_id, "message": "User registered successfully"}
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('''
+            INSERT OR REPLACE INTO users (user_id, email, name, skills, target_roles) VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, email, name, json.dumps([]), json.dumps([])))
+        await db.execute('''
+            INSERT OR IGNORE INTO user_progress (user_id, completed_questions, applied_jobs, resume_score, last_analysis_date) VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, json.dumps([]), json.dumps([]), None, None))
+        await db.commit()
+    return {"message": "User registered", "user_id": user_id}
 
+# Get user profile
 @app.get("/user/{user_id}/profile/")
 async def get_user_profile(user_id: str):
-    if user_id not in users_db:
-        raise HTTPException(status_code=404, detail="User not found")
-    return users_db[user_id]
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
+        user = await cursor.fetchone()
+        await cursor.close()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return dict(user)
+
+# Get user progress
+@app.get("/user/progress/")
+async def get_user_progress(user_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute('SELECT * FROM user_progress WHERE user_id = ?', (user_id,))
+        progress = await cursor.fetchone()
+        await cursor.close()
+        if not progress:
+            raise HTTPException(status_code=404, detail="User not found")
+        # Parse JSON fields
+        progress = dict(progress)
+        progress['completed_questions'] = json.loads(progress['completed_questions'] or '[]')
+        progress['applied_jobs'] = json.loads(progress['applied_jobs'] or '[]')
+        return progress
+
+# Update resume score
+@app.post("/user/progress/resume-score/")
+async def update_resume_score(user_id: str, score: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('UPDATE user_progress SET resume_score = ? WHERE user_id = ?', (score, user_id))
+        await db.commit()
+    return {"message": "Resume score updated", "user_id": user_id, "score": score}
+
+# Mark question complete
+@app.post("/dsa/questions/{question_id}/complete/")
+async def complete_question(question_id: str, user_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute('SELECT completed_questions FROM user_progress WHERE user_id = ?', (user_id,))
+        row = await cursor.fetchone()
+        await cursor.close()
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+        completed = set(json.loads(row['completed_questions'] or '[]'))
+        completed.add(question_id)
+        await db.execute('UPDATE user_progress SET completed_questions = ? WHERE user_id = ?', (json.dumps(list(completed)), user_id))
+        await db.commit()
+    return {"message": "Question marked complete", "user_id": user_id, "question_id": question_id}
+
+# Apply for job
+@app.post("/jobs/{job_id}/apply/")
+async def apply_for_job(job_id: str, user_id: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute('SELECT applied_jobs FROM user_progress WHERE user_id = ?', (user_id,))
+        row = await cursor.fetchone()
+        await cursor.close()
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+        applied = set(json.loads(row['applied_jobs'] or '[]'))
+        applied.add(job_id)
+        await db.execute('UPDATE user_progress SET applied_jobs = ? WHERE user_id = ?', (json.dumps(list(applied)), user_id))
+        await db.commit()
+    return {"message": "Application submitted successfully", "job_id": job_id}
 
 # Job listings endpoints
 @app.get("/jobs/")
@@ -727,19 +790,6 @@ async def get_jobs(user_id: str = None):
         user_data = user_progress[user_id]
         return {"jobs": job_listings, "recommended": job_listings[:3]}
     return {"jobs": job_listings, "recommended": []}
-
-@app.post("/jobs/{job_id}/apply/")
-async def apply_for_job(job_id: str, user_id: str):
-    if user_id not in user_progress:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    if job_id not in [job["id"] for job in job_listings]:
-        raise HTTPException(status_code=404, detail="Job not found")
-    
-    if job_id not in user_progress[user_id]["applied_jobs"]:
-        user_progress[user_id]["applied_jobs"].append(job_id)
-    
-    return {"message": "Application submitted successfully", "job_id": job_id}
 
 # DSA questions endpoints
 @app.get("/dsa/questions/")
@@ -759,81 +809,104 @@ async def get_dsa_questions(user_id: str = None, difficulty: str = None, categor
     
     return {"questions": filtered_questions}
 
-@app.post("/dsa/questions/{question_id}/complete/")
-async def complete_question(question_id: str, user_id: str):
-    if user_id not in user_progress:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    if question_id not in [q["id"] for q in dsa_questions]:
-        raise HTTPException(status_code=404, detail="Question not found")
-    
-    if question_id not in user_progress[user_id]["completed_questions"]:
-        user_progress[user_id]["completed_questions"].append(question_id)
-    
-    return {"message": "Question marked as completed", "question_id": question_id}
+# --- Leaderboard (stub) ---
+leaderboard = []  # [{user_id, score, percentage, date}]
 
-@app.get("/dsa/recommendations/")
-async def get_dsa_recommendations(user_id: str):
-    if user_id not in user_progress:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Get user's completed questions
-    completed = user_progress[user_id].get("completed_questions", [])
-    
-    # Recommend questions based on completion pattern
-    if len(completed) < 3:
-        recommended = [q for q in dsa_questions if q["difficulty"] == "Easy" and q["id"] not in completed][:5]
-    elif len(completed) < 10:
-        recommended = [q for q in dsa_questions if q["difficulty"] == "Medium" and q["id"] not in completed][:5]
-    else:
-        recommended = [q for q in dsa_questions if q["difficulty"] == "Hard" and q["id"] not in completed][:5]
-    
-    return {"recommendations": recommended, "progress": len(completed)}
+@app.get("/api/aptitude/leaderboard/{test_id}")
+async def get_leaderboard(test_id: str):
+    # For now, just return the stub
+    return {"leaderboard": leaderboard}
 
-# User progress endpoints
-@app.get("/user/progress/")
-async def get_user_progress(user_id: str):
-    if user_id not in user_progress:
-        raise HTTPException(status_code=404, detail="User not found")
+# NCS Jobs API Endpoints
+@app.post("/api/jobs/bulk-update")
+async def bulk_update_jobs(update: BulkJobUpdate):
+    """Update job listings with NCS jobs"""
+    global job_listings, ncs_jobs
     
-    progress = user_progress[user_id]
-    applied_jobs = [job for job in job_listings if job["id"] in progress.get("applied_jobs", [])]
-    completed_questions = [q for q in dsa_questions if q["id"] in progress.get("completed_questions", [])]
-    
-    return {
-        "user_id": user_id,
-        "applied_jobs": applied_jobs,
-        "completed_questions": completed_questions,
-        "resume_score": progress.get("resume_score"),
-        "last_analysis_date": progress.get("last_analysis_date")
-    }
-
-@app.post("/user/progress/resume-score/")
-async def update_resume_score(user_id: str, score: int):
-    if user_id not in user_progress:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    user_progress[user_id]["resume_score"] = score
-    user_progress[user_id]["last_analysis_date"] = datetime.now().isoformat()
-    
-    return {"message": "Resume score updated successfully", "score": score}
-
-# Interview chat endpoint
-@app.post("/interview/chat/")
-async def interview_chat(message: InterviewMessage):
     try:
-        # Build conversation context
-        conversation_history = ""  # In production, fetch from database
+        # Convert NCS jobs to standard job format
+        new_jobs = []
+        for ncs_job in update.jobs:
+            job = {
+                "id": ncs_job.id,
+                "title": ncs_job.title,
+                "company": ncs_job.company,
+                "location": ncs_job.location,
+                "description": ncs_job.description,
+                "requirements": ncs_job.requirements,
+                "salary_range": ncs_job.salary_range,
+                "application_deadline": ncs_job.application_deadline,
+                "posted_date": ncs_job.posted_date,
+                "source": ncs_job.source,
+                "source_url": ncs_job.source_url,
+                "category": ncs_job.category,
+                "employment_type": ncs_job.employment_type,
+                "experience_level": ncs_job.experience_level,
+                "remote_friendly": ncs_job.remote_friendly,
+                "government_job": ncs_job.government_job
+            }
+            new_jobs.append(job)
         
-        prompt = build_interview_prompt(message.role, message.message, conversation_history)
-        response = call_groq(prompt)
+        # Add to existing job listings
+        job_listings.extend(new_jobs)
+        ncs_jobs = new_jobs
         
         return {
-            "response": response,
-            "conversation_id": message.conversation_id or str(uuid.uuid4())
+            "message": f"Successfully added {len(new_jobs)} NCS jobs",
+            "total_jobs": len(job_listings),
+            "ncs_jobs": len(ncs_jobs)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Interview chat error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error updating jobs: {str(e)}")
+
+@app.get("/api/jobs/ncs")
+async def get_ncs_jobs():
+    """Get all NCS jobs"""
+    return {
+        "jobs": ncs_jobs,
+        "total": len(ncs_jobs),
+        "source": "National Career Service (NCS)"
+    }
+
+@app.get("/api/jobs/sources")
+async def get_job_sources():
+    """Get available job sources"""
+    sources = {
+        "ncs": {
+            "name": "National Career Service (NCS)",
+            "description": "Government of India job portal",
+            "total_jobs": len(ncs_jobs),
+            "last_updated": datetime.now().isoformat()
+        },
+        "manual": {
+            "name": "Manual Entries",
+            "description": "Manually added job listings",
+            "total_jobs": len([j for j in job_listings if j.get("source") != "National Career Service (NCS)"]),
+            "last_updated": datetime.now().isoformat()
+        }
+    }
+    return sources
+
+def get_company_logo_url(company_domain):
+    # Placeholder: In production, use a real logo service or static assets
+    return f"https://logo.clearbit.com/{company_domain}"
+
+@app.get("/api/jobs/all")
+async def get_all_company_jobs(
+    category: str = Query(None),
+    company: str = Query(None),
+    experience: str = Query(None),
+    remote: bool = Query(None),
+    government: bool = Query(None),
+    source: str = Query(None),
+    tags: str = Query(None),
+    search: str = Query(None),
+    page: int = Query(1),
+    page_size: int = Query(30)
+):
+    """Aggregate all jobs from jobs_*.json files and support filtering."""
+    jobs = await query_jobs_from_db(dict(category=category, company=company, experience=experience, remote=remote, government=government, source=source, tags=tags), search, page, page_size)
+    return {"total": len(jobs), "jobs": jobs}
 
 # --- API Endpoints ---
 import aiosqlite
@@ -846,6 +919,24 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'jobs.db')
 # --- SQLite DB Setup ---
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id TEXT PRIMARY KEY,
+                email TEXT,
+                name TEXT,
+                skills TEXT,
+                target_roles TEXT
+            )
+        ''')
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS user_progress (
+                user_id TEXT PRIMARY KEY,
+                completed_questions TEXT,
+                applied_jobs TEXT,
+                resume_score INTEGER,
+                last_analysis_date TEXT
+            )
+        ''')
         await db.execute('''
             CREATE TABLE IF NOT EXISTS jobs (
                 id TEXT PRIMARY KEY,
@@ -1035,102 +1126,3 @@ async def add_aptitude_question(question: AptitudeQuestion, test_id: str = "test
         return {"message": "Question added successfully", "question_id": question_id}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-# --- Leaderboard (stub) ---
-leaderboard = []  # [{user_id, score, percentage, date}]
-
-@app.get("/api/aptitude/leaderboard/{test_id}")
-async def get_leaderboard(test_id: str):
-    # For now, just return the stub
-    return {"leaderboard": leaderboard}
-
-# NCS Jobs API Endpoints
-@app.post("/api/jobs/bulk-update")
-async def bulk_update_jobs(update: BulkJobUpdate):
-    """Update job listings with NCS jobs"""
-    global job_listings, ncs_jobs
-    
-    try:
-        # Convert NCS jobs to standard job format
-        new_jobs = []
-        for ncs_job in update.jobs:
-            job = {
-                "id": ncs_job.id,
-                "title": ncs_job.title,
-                "company": ncs_job.company,
-                "location": ncs_job.location,
-                "description": ncs_job.description,
-                "requirements": ncs_job.requirements,
-                "salary_range": ncs_job.salary_range,
-                "application_deadline": ncs_job.application_deadline,
-                "posted_date": ncs_job.posted_date,
-                "source": ncs_job.source,
-                "source_url": ncs_job.source_url,
-                "category": ncs_job.category,
-                "employment_type": ncs_job.employment_type,
-                "experience_level": ncs_job.experience_level,
-                "remote_friendly": ncs_job.remote_friendly,
-                "government_job": ncs_job.government_job
-            }
-            new_jobs.append(job)
-        
-        # Add to existing job listings
-        job_listings.extend(new_jobs)
-        ncs_jobs = new_jobs
-        
-        return {
-            "message": f"Successfully added {len(new_jobs)} NCS jobs",
-            "total_jobs": len(job_listings),
-            "ncs_jobs": len(ncs_jobs)
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error updating jobs: {str(e)}")
-
-@app.get("/api/jobs/ncs")
-async def get_ncs_jobs():
-    """Get all NCS jobs"""
-    return {
-        "jobs": ncs_jobs,
-        "total": len(ncs_jobs),
-        "source": "National Career Service (NCS)"
-    }
-
-@app.get("/api/jobs/sources")
-async def get_job_sources():
-    """Get available job sources"""
-    sources = {
-        "ncs": {
-            "name": "National Career Service (NCS)",
-            "description": "Government of India job portal",
-            "total_jobs": len(ncs_jobs),
-            "last_updated": datetime.now().isoformat()
-        },
-        "manual": {
-            "name": "Manual Entries",
-            "description": "Manually added job listings",
-            "total_jobs": len([j for j in job_listings if j.get("source") != "National Career Service (NCS)"]),
-            "last_updated": datetime.now().isoformat()
-        }
-    }
-    return sources
-
-def get_company_logo_url(company_domain):
-    # Placeholder: In production, use a real logo service or static assets
-    return f"https://logo.clearbit.com/{company_domain}"
-
-@app.get("/api/jobs/all")
-async def get_all_company_jobs(
-    category: str = Query(None),
-    company: str = Query(None),
-    experience: str = Query(None),
-    remote: bool = Query(None),
-    government: bool = Query(None),
-    source: str = Query(None),
-    tags: str = Query(None),
-    search: str = Query(None),
-    page: int = Query(1),
-    page_size: int = Query(30)
-):
-    """Aggregate all jobs from jobs_*.json files and support filtering."""
-    jobs = await query_jobs_from_db(dict(category=category, company=company, experience=experience, remote=remote, government=government, source=source, tags=tags), search, page, page_size)
-    return {"total": len(jobs), "jobs": jobs}
