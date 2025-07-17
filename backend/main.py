@@ -18,6 +18,7 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from supabase import create_client, Client
 
 load_dotenv()
 
@@ -905,31 +906,16 @@ def get_company_logo_url(company_domain):
     # Placeholder: In production, use a real logo service or static assets
     return f"https://logo.clearbit.com/{company_domain}"
 
-@app.get("/api/jobs/all")
-async def get_all_company_jobs(
-    page: int = 1,
-    page_size: int = 30
-):
-    offset = (page - 1) * page_size
-    if async_session is None:
-        return {"total": 0, "jobs": []}
-    async with async_session() as session:
-        result = await session.execute(
-            text("SELECT * FROM jobs ORDER BY posted_date DESC LIMIT :limit OFFSET :offset"),
-            {"limit": page_size, "offset": offset}
-        )
-        jobs = [dict(row) for row in result.mappings()]
-        total_result = await session.execute(text("SELECT COUNT(*) FROM jobs"))
-        total = total_result.scalar()
-    return {"total": total, "jobs": jobs}
-
-# --- API Endpoints ---
 import aiosqlite
 import asyncio
 import json
 import glob
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'jobs.db')
+
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 # --- SQLite DB Setup ---
 async def init_db():
