@@ -141,6 +141,6 @@ export const getAptitudeLeaderboard = async (testId = 'test1') => {
 };
 
 export const getJobsCorpus = async () => {
-  const response = await axios.get(`${API_URL}/test`);
+  const response = await axios.get(`${API_URL}/jobs/corpus`);
   return response.data;
 };
