@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiArrowRight, FiCheckCircle, FiUser, FiZap, FiBookOpen, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiArrowRight, FiCheckCircle, FiUser, FiZap, FiBookOpen, FiChevronDown, FiChevronUp, FiBriefcase, FiLayers, FiGlobe, FiTrendingUp } from "react-icons/fi";
+import { FaTwitter, FaLinkedin, FaFacebook, FaInstagram, FaGithub } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 import { blogs } from "./Blog";
 import { Helmet } from "react-helmet-async";
 
-// Animated background gradient
+// --- Styled Components ---
+
 const gradientMove = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -18,6 +20,61 @@ const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+`;
+
+const StickyHeader = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 16px #6366f111;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 4vw 1.2rem 4vw;
+`;
+
+const Logo = styled.div`
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #6366f1;
+  letter-spacing: 2px;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  cursor: pointer;
+`;
+
+const HeaderLinks = styled.div`
+  display: flex;
+  gap: 2.2rem;
+  align-items: center;
+`;
+
+const HeaderLink = styled(Link)`
+  color: #6366f1;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover {
+    color: #a21caf;
+  }
+`;
+
+const HeaderButton = styled.button`
+  background: #6366f1;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 0.7rem 1.7rem;
+  margin-left: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #6366f122;
+  transition: background 0.2s;
+  &:hover {
+    background: #3730a3;
+  }
 `;
 
 const MainContent = styled.main`
@@ -98,6 +155,39 @@ const CTAButton = styled(motion.button)`
   }
 `;
 
+const TrustedBySection = styled.section`
+  max-width: 1200px;
+  margin: 2.5rem auto 0 auto;
+  padding: 0 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const TrustedByTitle = styled.div`
+  color: #6366f1;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  letter-spacing: 1px;
+`;
+
+const LogoBar = styled.div`
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.8;
+`;
+
+const CompanyLogo = styled.img`
+  height: 36px;
+  width: auto;
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.8;
+`;
+
 const FeaturesSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
@@ -133,6 +223,50 @@ const FeatureDesc = styled.p`
   margin: 0;
 `;
 
+const StepsSection = styled.section`
+  max-width: 1100px;
+  margin: 3rem auto 0 auto;
+  padding: 0 2vw;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: center;
+`;
+
+const StepCard = styled.div`
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px #6366f133;
+  border: 1.5px solid #e0e7ff;
+  padding: 2rem 2rem 1.5rem 2rem;
+  min-width: 260px;
+  max-width: 320px;
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+const StepIcon = styled.div`
+  font-size: 2.5rem;
+  color: #6366f1;
+  margin-bottom: 1rem;
+`;
+
+const StepTitle = styled.h4`
+  color: #3730a3;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+`;
+
+const StepDesc = styled.p`
+  color: #6366f1;
+  font-size: 1rem;
+  margin: 0;
+`;
+
 const BlogPreviewSection = styled.section`
   max-width: 1200px;
   margin: 3rem auto 0 auto;
@@ -154,6 +288,10 @@ const BlogCard = styled(motion.article)`
   flex-direction: column;
   position: relative;
   min-height: 340px;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 4px 32px #6366f144;
+  }
 `;
 
 const BlogImage = styled.img`
@@ -195,6 +333,98 @@ const BlogReadMore = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   align-self: flex-end;
+  transition: background 0.2s;
+  &:hover {
+    background: #3730a3;
+  }
+`;
+
+const PricingSection = styled.section`
+  max-width: 1100px;
+  margin: 4rem auto 0 auto;
+  padding: 0 2vw;
+`;
+
+const PricingGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+`;
+
+const PricingCard = styled.div`
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 24px #6366f133;
+  border: 2px solid #e0e7ff;
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  min-height: 380px;
+  transition: box-shadow 0.2s, border 0.2s;
+  &:hover {
+    box-shadow: 0 4px 32px #6366f144;
+    border: 2px solid #6366f1;
+  }
+`;
+
+const PricingBadge = styled.div`
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #6366f1;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 1rem;
+  padding: 0.3rem 1.2rem;
+  box-shadow: 0 2px 8px #6366f122;
+`;
+
+const Price = styled.div`
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #3730a3;
+  margin: 1.2rem 0 0.7rem 0;
+`;
+
+const PricePeriod = styled.span`
+  font-size: 1.1rem;
+  color: #6366f1;
+  font-weight: 600;
+`;
+
+const PricingFeatures = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 1.2rem 0 1.5rem 0;
+  color: #6366f1;
+  font-size: 1.05rem;
+  text-align: left;
+  width: 100%;
+`;
+
+const PricingFeature = styled.li`
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+`;
+
+const PricingCTA = styled.button`
+  background: #6366f1;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 0.8rem 2rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #6366f122;
   transition: background 0.2s;
   &:hover {
     background: #3730a3;
@@ -271,17 +501,23 @@ const FooterContent = styled.div`
 
 const SocialLinks = styled.div`
   display: flex;
-  gap: 20px;
+  gap: 24px;
   margin-top: 12px;
   justify-content: center;
 `;
 
-const socialData = [
-  { label: "Twitter", url: "https://twitter.com/", color: "#1da1f2" },
-  { label: "LinkedIn", url: "https://linkedin.com/", color: "#0077b5" },
-  { label: "Facebook", url: "https://facebook.com/", color: "#1877f3" },
-  { label: "Instagram", url: "https://instagram.com/", color: "#e1306c" },
-  { label: "GitHub", url: "https://github.com/", color: "#fff" },
+// --- Data ---
+
+const companyLogos = [
+  // Replace with your own or real company logos
+  "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/6/6e/Atlassian-logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/6/6a/Slack_Icon.png",
+  "https://upload.wikimedia.org/wikipedia/commons/6/6e/Zoom_Communications_Logo.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/6/6e/Stripe_Logo%2C_revised_2016.svg"
 ];
 
 const features = [
@@ -301,6 +537,68 @@ const features = [
     icon: <FiBookOpen size={32} color="#6366f1" />, title: "Modern, Beautiful UI",
     desc: "Enjoy a seamless, mobile-friendly experience with stunning visuals."
   },
+];
+
+const steps = [
+  {
+    icon: <FiBriefcase size={36} color="#6366f1" />, title: "Upload Resume",
+    desc: "Get instant, AI-powered feedback and actionable suggestions."
+  },
+  {
+    icon: <FiLayers size={36} color="#a21caf" />, title: "Practice DSA & Interviews",
+    desc: "Sharpen your skills with curated questions and mock interviews."
+  },
+  {
+    icon: <FiGlobe size={36} color="#3730a3" />, title: "Explore Jobs",
+    desc: "Browse curated job listings from top companies."
+  },
+  {
+    icon: <FiTrendingUp size={36} color="#6366f1" />, title: "Track Progress",
+    desc: "Visualize your growth and stay motivated on your journey."
+  },
+];
+
+const pricingPlans = [
+  {
+    name: "Starter",
+    price: 0,
+    period: "/mo",
+    features: [
+      "Unlimited resume uploads",
+      "Basic AI feedback",
+      "Access to job board",
+      "Community support"
+    ],
+    cta: "Get Started",
+    highlight: false
+  },
+  {
+    name: "Pro",
+    price: 9,
+    period: "/mo",
+    features: [
+      "Everything in Starter",
+      "Advanced AI feedback",
+      "DSA & Interview analytics",
+      "Priority support",
+      "Personalized job matches"
+    ],
+    cta: "Start Free Trial",
+    highlight: true
+  },
+  {
+    name: "Enterprise",
+    price: 29,
+    period: "/mo",
+    features: [
+      "Everything in Pro",
+      "Team dashboard",
+      "Custom integrations",
+      "Dedicated account manager"
+    ],
+    cta: "Contact Sales",
+    highlight: false
+  }
 ];
 
 const faqs = [
@@ -326,6 +624,16 @@ const faqs = [
   },
 ];
 
+const socialData = [
+  { label: "Twitter", url: "https://twitter.com/", icon: <FaTwitter size={22} />, color: "#1da1f2" },
+  { label: "LinkedIn", url: "https://linkedin.com/", icon: <FaLinkedin size={22} />, color: "#0077b5" },
+  { label: "Facebook", url: "https://facebook.com/", icon: <FaFacebook size={22} />, color: "#1877f3" },
+  { label: "Instagram", url: "https://instagram.com/", icon: <FaInstagram size={22} />, color: "#e1306c" },
+  { label: "GitHub", url: "https://github.com/", icon: <FaGithub size={22} />, color: "#fff" },
+];
+
+// --- Main Component ---
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const [openFAQ, setOpenFAQ] = useState(null);
@@ -346,6 +654,15 @@ export default function LandingPage() {
         <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
         <link rel="canonical" href="https://prepnexus.netlify.app/" />
       </Helmet>
+      <StickyHeader>
+        <Logo onClick={() => navigate("/")}>Prep Nexus</Logo>
+        <HeaderLinks>
+          <HeaderLink to="#features">Features</HeaderLink>
+          <HeaderLink to="#pricing">Pricing</HeaderLink>
+          <HeaderLink to="#blog">Blog</HeaderLink>
+          <HeaderButton onClick={() => navigate("/app")}>Dashboard</HeaderButton>
+        </HeaderLinks>
+      </StickyHeader>
       <MainContent>
         <HeroSection>
           <HeroTitle
@@ -372,7 +689,15 @@ export default function LandingPage() {
             Let's Get Started <FiArrowRight size={22} />
           </CTAButton>
         </HeroSection>
-        <FeaturesSection>
+        <TrustedBySection>
+          <TrustedByTitle>Trusted by students and professionals from</TrustedByTitle>
+          <LogoBar>
+            {companyLogos.map((logo, i) => (
+              <CompanyLogo key={i} src={logo} alt="Company logo" />
+            ))}
+          </LogoBar>
+        </TrustedBySection>
+        <FeaturesSection id="features">
           {features.map((f, i) => (
             <FeatureCard
               key={i}
@@ -386,7 +711,16 @@ export default function LandingPage() {
             </FeatureCard>
           ))}
         </FeaturesSection>
-        <BlogPreviewSection>
+        <StepsSection>
+          {steps.map((step, i) => (
+            <StepCard key={i}>
+              <StepIcon>{step.icon}</StepIcon>
+              <StepTitle>{step.title}</StepTitle>
+              <StepDesc>{step.desc}</StepDesc>
+            </StepCard>
+          ))}
+        </StepsSection>
+        <BlogPreviewSection id="blog">
           <h2 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Latest from the Prep Nexus Blog</h2>
           <BlogGrid>
             {(blogs && blogs.length > 0) ? blogs.slice(0, 3).map(blog => (
@@ -408,6 +742,24 @@ export default function LandingPage() {
             )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No blog posts yet. Check back soon!</div>}
           </BlogGrid>
         </BlogPreviewSection>
+        <PricingSection id="pricing">
+          <h2 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Pricing</h2>
+          <PricingGrid>
+            {pricingPlans.map((plan, i) => (
+              <PricingCard key={i} style={plan.highlight ? { border: '2.5px solid #6366f1', boxShadow: '0 6px 32px #6366f144' } : {}}>
+                {plan.highlight && <PricingBadge>Most Popular</PricingBadge>}
+                <div style={{ fontWeight: 800, fontSize: 1.3 + 'rem', color: '#3730a3', marginBottom: 8 }}>{plan.name}</div>
+                <Price>${plan.price}<PricePeriod>{plan.period}</PricePeriod></Price>
+                <PricingFeatures>
+                  {plan.features.map((f, idx) => (
+                    <PricingFeature key={idx}><FiCheckCircle color="#6366f1" /> {f}</PricingFeature>
+                  ))}
+                </PricingFeatures>
+                <PricingCTA>{plan.cta}</PricingCTA>
+              </PricingCard>
+            ))}
+          </PricingGrid>
+        </PricingSection>
         <FAQSection>
           <FAQTitle>Frequently Asked Questions</FAQTitle>
           <FAQList>
@@ -448,8 +800,8 @@ export default function LandingPage() {
           <div style={{ fontSize: 15, color: '#a5b4fc', marginBottom: 12, textAlign: 'center' }}>AI-powered career growth, resume feedback, DSA prep, and curated jobs.</div>
           <SocialLinks>
             {socialData.map(s => (
-              <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label} style={{ color: s.color, fontSize: 22, fontWeight: 700 }}>
-                {s.label}
+              <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label} style={{ color: s.color }}>
+                {s.icon}
               </a>
             ))}
           </SocialLinks>
