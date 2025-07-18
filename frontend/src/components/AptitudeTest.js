@@ -413,6 +413,12 @@ const AptitudeTest = ({ userId }) => {
       </div>
     );
   }
+  if (!test || !test.questions) {
+    return <div style={{color: 'red', textAlign: 'center', marginTop: 40}}>
+      No test data found. Please check your JSON file and import path.
+    </div>;
+  }
+
   if (!test) return null;
   if (!started) {
     return (
