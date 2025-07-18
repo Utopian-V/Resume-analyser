@@ -72,7 +72,7 @@ const Navbar = ({ onMobileMenuOpen }) => {
         <NavLink href="/">Home</NavLink>
         <NavLink href="/#features">Features</NavLink>
         <NavLink href="/#pricing">Pricing</NavLink>
-        <NavLink href="/#blog">Blog</NavLink>
+        <NavLink href="/blog">Blog</NavLink>
         <NavLink href="/app">Dashboard</NavLink>
       </NavLinks>
       

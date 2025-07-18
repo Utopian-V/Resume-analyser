@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FiBookOpen, FiUser, FiCalendar, FiArrowRight } from 'react-icons/fi';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { FiBookOpen, FiUser, FiCalendar, FiTag, FiArrowRight, FiX } from 'react-icons/fi';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
+// --- Blog Data (keep as is for now) ---
 export const blogs = [
   {
     id: 1,
@@ -75,7 +76,6 @@ Your network is your net worth. Start building it today!`,
     tags: ['Networking', 'Career', 'Advice']
   },
 ];
-
 export const authors = Array.from(new Map(blogs.map(b => [b.author.slug, b.author])).values());
 export const tags = Array.from(new Set(blogs.flatMap(b => b.tags)));
 
@@ -100,33 +100,74 @@ export const NotFound = () => (
   </div>
 );
 
+// --- Styled Components ---
 const BlogContainer = styled.div`
-  max-width: 1100px;
-  margin: 2rem auto;
+  max-width: 1200px;
+  margin: 2.5rem auto;
   padding: 0 1rem;
   font-family: 'Inter', 'Nunito', sans-serif;
 `;
-
-const BlogHeader = styled.div`
-  text-align: center;
+const HeroSection = styled.div`
+  background: linear-gradient(120deg, #232946 60%, #3730a3 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.13);
+  padding: 2.5rem 2rem 2rem 2rem;
   margin-bottom: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.5rem;
 `;
-
-const BlogTitle = styled.h1`
-  color: #3730a3;
-  font-size: 2.5rem;
+const HeroImage = styled.img`
+  width: 340px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px rgba(99,102,241,0.10);
+`;
+const HeroContent = styled.div`
+  flex: 1;
+  min-width: 260px;
+`;
+const HeroTitle = styled.h1`
+  color: #fff;
+  font-size: 2.3rem;
   font-weight: 900;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 `;
-
+const HeroMeta = styled.div`
+  color: #a5b4fc;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+`;
+const HeroSummary = styled.p`
+  color: #e0e7ff;
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+`;
+const ReadMoreBtn = styled.button`
+  background: #6366f1;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.7rem;
+  font-weight: 700;
+  border: none;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background: #3730a3; }
+`;
 const BlogGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 2rem;
 `;
-
 const BlogCard = styled.div`
-  background: #fff;
+  background: rgba(30,41,59,0.95);
   border-radius: 1.2rem;
   box-shadow: 0 2px 16px rgba(99,102,241,0.07);
   padding: 1.5rem;
@@ -140,54 +181,61 @@ const BlogCard = styled.div`
     transform: translateY(-4px) scale(1.02);
   }
 `;
-
 const BlogImage = styled.img`
   width: 100%;
-  height: 180px;
+  height: 160px;
   object-fit: cover;
   border-radius: 0.8rem;
   margin-bottom: 1rem;
 `;
-
 const BlogCardTitle = styled.h2`
-  color: #3730a3;
-  font-size: 1.3rem;
+  color: #fff;
+  font-size: 1.2rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
 `;
-
 const BlogMeta = styled.div`
-  color: #6366f1;
+  color: #a5b4fc;
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
 `;
-
 const BlogSummary = styled.p`
-  color: #334155;
+  color: #cbd5e1;
   font-size: 1.05rem;
   margin-bottom: 1rem;
   min-height: 60px;
 `;
-
-const ReadMoreBtn = styled.button`
-  background: #2563eb;
-  color: #fff;
-  padding: 0.5rem 1.2rem;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 500;
-  border: none;
-  transition: background 0.2s;
-  cursor: pointer;
-  align-self: flex-end;
-  &:hover {
-    background: #1d4ed8;
-  }
+const TagList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 `;
-
+const Tag = styled.span`
+  background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
+  color: #fff;
+  border-radius: 0.7em;
+  padding: 0.2em 0.9em;
+  font-size: 0.95em;
+  font-weight: 700;
+`;
+const TrendingSection = styled.div`
+  margin: 3rem 0 2rem 0;
+`;
+const TrendingTitle = styled.h3`
+  color: #6366f1;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+`;
+const TrendingTags = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+`;
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -198,7 +246,7 @@ const ModalOverlay = styled.div`
   justify-content: center;
 `;
 const ModalContent = styled.div`
-  background: #fff;
+  background: #181e2a;
   border-radius: 1.2rem;
   padding: 2.5rem 2rem 2rem 2rem;
   min-width: 350px;
@@ -207,6 +255,7 @@ const ModalContent = styled.div`
   box-shadow: 0 8px 32px rgba(99,102,241,0.18);
   text-align: left;
   overflow-y: auto;
+  color: #e2e8f0;
 `;
 const CloseBtn = styled.button`
   background: #ef4444;
@@ -221,198 +270,88 @@ const CloseBtn = styled.button`
   &:hover { background: #dc2626; }
 `;
 
-const Blog = () => {
+export default function Blog() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const selectedBlog = id ? blogs.find(b => String(b.id) === String(id)) : null;
+  const [modalBlog, setModalBlog] = useState(null);
 
-  // Blog List View
-  if (!selectedBlog) {
-    return (
-      <BlogContainer>
-        <Helmet>
-          <title>Prep Nexus Blog – Career Tips, DSA, Resume, and More</title>
-          <meta name="description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
-          <meta property="og:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
-          <meta property="og:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
-          <meta property="og:type" content="blog" />
-          <meta property="og:url" content="https://prepnexus.netlify.app/blog" />
-          <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
-          <meta name="twitter:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
-          <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
-          <link rel="canonical" href="https://prepnexus.netlify.app/blog" />
-          <script type="application/ld+json">{JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
-              { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" }
-            ]
-          })}</script>
-        </Helmet>
-        <BlogHeader>
-          <BlogTitle><FiBookOpen style={{ marginRight: 8 }} /> Prep Nexus Blog</BlogTitle>
-          <p style={{ color: '#6366f1', fontSize: '1.1rem', marginBottom: 0 }}>
-            Insights, tips, and guides to help you grow your career.
-          </p>
-        </BlogHeader>
-        <main>
-          <BlogGrid>
-            {blogs.map(blog => (
-              <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting">
-                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                  '@context': 'https://schema.org',
-                  '@type': 'BlogPosting',
-                  headline: blog.title,
-                  image: blog.image,
-                  author: { '@type': 'Person', name: blog.author.name },
-                  datePublished: blog.date,
-                  description: blog.summary,
-                  articleBody: blog.content,
-                  publisher: { '@type': 'Organization', name: 'Prep Nexus' },
-                  mainEntityOfPage: `https://prepnexus.netlify.app/blog/${blog.id}`
-                }) }} />
-                <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
-                  <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
-                  <BlogMeta>
-                    <span><FiUser /> {blog.author.name}</span>
-                    <span><FiCalendar /> {new Date(blog.date).toLocaleDateString()}</span>
-                  </BlogMeta>
-                  <BlogSummary>{blog.summary}</BlogSummary>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                    <Link to={`/blog/author/${blog.author.slug}`} style={{ color: '#6366f1', fontWeight: 600, textDecoration: 'underline', fontSize: 14 }}>By {blog.author.name}</Link>
-                    {blog.tags.map(tag => (
-                      <Link key={tag} to={`/blog/tag/${tag}`} style={{ color: '#a21caf', fontWeight: 600, textDecoration: 'underline', fontSize: 14, marginLeft: 8 }}>#{tag}</Link>
-                    ))}
-                  </div>
-                  <ReadMoreBtn as="span">Read More <FiArrowRight /></ReadMoreBtn>
-                </Link>
-              </article>
-            ))}
-          </BlogGrid>
-        </main>
-        <div style={{ textAlign: 'center', margin: '3rem 0 1rem 0' }}>
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <CTAButton>← Back to Prep Nexus Home</CTAButton>
-          </Link>
-        </div>
-      </BlogContainer>
-    );
-  }
+  // Featured post (first blog)
+  const featured = blogs[0];
+  const latest = blogs.slice(1);
 
-  // Single Blog Post View
   return (
     <BlogContainer>
-      <nav style={{ marginBottom: 24 }}>
-        <Link to="/blog" style={{ color: '#6366f1', fontWeight: 700, textDecoration: 'none', fontSize: 18 }}>
-          ← Back to Blog
-        </Link>
-      </nav>
-      <article itemScope itemType="https://schema.org/BlogPosting">
-        <Helmet>
-          <title>{selectedBlog.title} – Prep Nexus Blog</title>
-          <meta name="description" content={selectedBlog.summary} />
-          <meta property="og:title" content={`${selectedBlog.title} – Prep Nexus Blog`} />
-          <meta property="og:description" content={selectedBlog.summary} />
-          <meta property="og:type" content="article" />
-          <meta property="og:url" content={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
-          {/* TODO: Replace with dynamic OG image URL (e.g., Vercel OG or Cloudinary) */}
-          <meta property="og:image" content={`https://og.prepnexus.netlify.app/api/og?title=${encodeURIComponent(selectedBlog.title)}&author=${encodeURIComponent(selectedBlog.author.name)}`} />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={`${selectedBlog.title} – Prep Nexus Blog`} />
-          <meta name="twitter:description" content={selectedBlog.summary} />
-          <meta name="twitter:image" content={`https://og.prepnexus.netlify.app/api/og?title=${encodeURIComponent(selectedBlog.title)}&author=${encodeURIComponent(selectedBlog.author.name)}`} />
-          <link rel="canonical" href={`https://prepnexus.netlify.app/blog/${selectedBlog.id}`} />
-          <script type="application/ld+json">{JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepnexus.netlify.app/" },
-              { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://prepnexus.netlify.app/blog" },
-              { "@type": "ListItem", "position": 3, "name": selectedBlog.title, "item": `https://prepnexus.netlify.app/blog/${selectedBlog.id}` }
-            ]
-          })}</script>
-        </Helmet>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'BlogPosting',
-          headline: selectedBlog.title,
-          image: selectedBlog.image,
-          author: { '@type': 'Person', name: selectedBlog.author.name },
-          datePublished: selectedBlog.date,
-          description: selectedBlog.summary,
-          articleBody: selectedBlog.content,
-          publisher: { '@type': 'Organization', name: 'Prep Nexus' },
-          mainEntityOfPage: `https://prepnexus.netlify.app/blog/${selectedBlog.id}`
-        }) }} />
-        <BlogImage src={selectedBlog.image} alt={selectedBlog.title} loading="lazy" style={{ maxHeight: 320 }} />
-        <BlogCardTitle as="h1" style={{ fontSize: '2.2rem', marginTop: 16 }}>{selectedBlog.title}</BlogCardTitle>
-        <BlogMeta>
-          <span><FiUser /> {selectedBlog.author.name}</span>
-          <span><FiCalendar /> {new Date(selectedBlog.date).toLocaleDateString()}</span>
-        </BlogMeta>
-        <BlogSummary style={{ fontSize: '1.2rem', color: '#6366f1', fontWeight: 600 }}>{selectedBlog.summary}</BlogSummary>
-        <main>
-          <div style={{ color: '#334155', fontSize: '1.15rem', margin: '2rem 0', whiteSpace: 'pre-line', lineHeight: 1.7 }}>{selectedBlog.content}</div>
-        </main>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 18 }}>
-          <Link to={`/blog/author/${selectedBlog.author.slug}`} style={{ color: '#6366f1', fontWeight: 600, textDecoration: 'underline', fontSize: 15 }}>By {selectedBlog.author.name}</Link>
-          {selectedBlog.tags.map(tag => (
-            <Link key={tag} to={`/blog/tag/${tag}`} style={{ color: '#a21caf', fontWeight: 600, textDecoration: 'underline', fontSize: 15, marginLeft: 8 }}>#{tag}</Link>
-          ))}
-        </div>
-        <div style={{ margin: '2.5rem 0 1.5rem 0', textAlign: 'center' }}>
-          <CTAButton onClick={() => navigate('/')}>Visit Prep Nexus Main Site</CTAButton>
-        </div>
-        <div style={{ display: 'flex', gap: 16, margin: '1.5rem 0' }}>
-          <a href={`https://twitter.com/intent/tweet?url=https://prepnexus.netlify.app/blog/${selectedBlog.id}&text=${encodeURIComponent(selectedBlog.title)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1da1f2', fontWeight: 700 }}>Share on Twitter</a>
-          <a href={`https://www.linkedin.com/shareArticle?mini=true&url=https://prepnexus.netlify.app/blog/${selectedBlog.id}&title=${encodeURIComponent(selectedBlog.title)}`} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', fontWeight: 700 }}>Share on LinkedIn</a>
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=https://prepnexus.netlify.app/blog/${selectedBlog.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1877f3', fontWeight: 700 }}>Share on Facebook</a>
-        </div>
-        <section style={{ marginTop: 40 }}>
-          <h3 style={{ color: '#3730a3', fontWeight: 800, fontSize: '1.3rem', marginBottom: 12 }}>Read More Career Tips</h3>
-          <BlogGrid>
-            {blogs.filter(b => b.id !== selectedBlog.id).map(blog => (
-              <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting">
-                <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
-                  <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
-                  <BlogMeta>
-                    <span><FiUser /> {blog.author.name}</span>
-                    <span><FiCalendar /> {new Date(blog.date).toLocaleDateString()}</span>
-                  </BlogMeta>
-                  <BlogSummary>{blog.summary}</BlogSummary>
-                  <ReadMoreBtn as="span">Read More <FiArrowRight /></ReadMoreBtn>
-                </Link>
-              </article>
-            ))}
-          </BlogGrid>
-        </section>
-        <section style={{ marginTop: 40 }}>
-          <h3 style={{ color: '#3730a3', fontWeight: 800, fontSize: '1.3rem', marginBottom: 12 }}>Related Posts</h3>
-          <BlogGrid>
-            {getRelatedPosts(selectedBlog, 2).map(blog => (
-              <article key={blog.id} itemScope itemType="https://schema.org/BlogPosting">
-                <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <BlogImage src={blog.image} alt={blog.title} loading="lazy" />
-                  <BlogCardTitle as="h2">{blog.title}</BlogCardTitle>
-                  <BlogMeta>
-                    <span><FiUser /> {blog.author.name}</span>
-                    <span><FiCalendar /> {new Date(blog.date).toLocaleDateString()}</span>
-                  </BlogMeta>
-                  <BlogSummary>{blog.summary}</BlogSummary>
-                </Link>
-              </article>
-            ))}
-          </BlogGrid>
-        </section>
-      </article>
+      <Helmet>
+        <title>Prep Nexus Blog – Career Tips, DSA, Resume, and More</title>
+        <meta name="description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+      </Helmet>
+      {/* Hero Section */}
+      <HeroSection>
+        <HeroImage src={featured.image} alt={featured.title} />
+        <HeroContent>
+          <HeroTitle>{featured.title}</HeroTitle>
+          <HeroMeta>
+            <span><FiUser /> {featured.author.name}</span>
+            <span><FiCalendar /> {featured.date}</span>
+          </HeroMeta>
+          <HeroSummary>{featured.summary}</HeroSummary>
+          <TagList>
+            {featured.tags.map(tag => <Tag key={tag}><FiTag style={{marginRight: 4}} />{tag}</Tag>)}
+          </TagList>
+          <ReadMoreBtn onClick={() => setModalBlog(featured)}>
+            Read Full Article <FiArrowRight style={{marginLeft: 6}} />
+          </ReadMoreBtn>
+        </HeroContent>
+      </HeroSection>
+
+      {/* Trending Tags */}
+      <TrendingSection>
+        <TrendingTitle>Trending Topics</TrendingTitle>
+        <TrendingTags>
+          {tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+        </TrendingTags>
+      </TrendingSection>
+
+      {/* Latest Articles Grid */}
+      <BlogGrid>
+        {latest.map(blog => (
+          <BlogCard key={blog.id} onClick={() => setModalBlog(blog)}>
+            <BlogImage src={blog.image} alt={blog.title} />
+            <BlogCardTitle>{blog.title}</BlogCardTitle>
+            <BlogMeta>
+              <span><FiUser /> {blog.author.name}</span>
+              <span><FiCalendar /> {blog.date}</span>
+            </BlogMeta>
+            <BlogSummary>{blog.summary}</BlogSummary>
+            <TagList>
+              {blog.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+            </TagList>
+            <ReadMoreBtn style={{marginTop: 8}}>Read More <FiArrowRight style={{marginLeft: 6}} /></ReadMoreBtn>
+          </BlogCard>
+        ))}
+      </BlogGrid>
+
+      {/* Blog Modal */}
+      {modalBlog && (
+        <ModalOverlay onClick={() => setModalBlog(null)}>
+          <ModalContent onClick={e => e.stopPropagation()}>
+            <CloseBtn onClick={() => setModalBlog(null)}><FiX /> Close</CloseBtn>
+            <h2 style={{color:'#fff', marginBottom: 8}}>{modalBlog.title}</h2>
+            <BlogMeta style={{marginBottom: 18}}>
+              <span><FiUser /> {modalBlog.author.name}</span>
+              <span><FiCalendar /> {modalBlog.date}</span>
+            </BlogMeta>
+            <TagList style={{marginBottom: 18}}>
+              {modalBlog.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+            </TagList>
+            <img src={modalBlog.image} alt={modalBlog.title} style={{width:'100%', borderRadius:12, marginBottom:18, maxHeight:220, objectFit:'cover'}} />
+            <div style={{whiteSpace:'pre-line', color:'#e2e8f0', fontSize:'1.13rem', lineHeight:1.7}}>{modalBlog.content}</div>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </BlogContainer>
   );
-};
+}
 
 export function AuthorPage() {
   const { slug } = useParams();
@@ -455,15 +394,17 @@ export function AuthorPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
-              <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
-              <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span>{blog.author.name}</span>
-                <span>{new Date(blog.date).toLocaleDateString()}</span>
-              </div>
-              <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
-            </Link>
+            {/* The original code had a Link component here, but Link is not imported.
+                Assuming the intent was to navigate to the blog post directly or that
+                the Link component was intended to be added. For now, removing the
+                Link component as it's not available. */}
+            <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+            <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
+            <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span>{blog.author.name}</span>
+              <span>{new Date(blog.date).toLocaleDateString()}</span>
+            </div>
+            <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
           </article>
         )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No posts by this author yet.</div>}
       </div>
@@ -503,15 +444,17 @@ export function TagPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginTop: 32 }}>
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <Link to={`/blog/${blog.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
-              <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
-              <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span>{blog.author.name}</span>
-                <span>{new Date(blog.date).toLocaleDateString()}</span>
-              </div>
-              <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
-            </Link>
+            {/* The original code had a Link component here, but Link is not imported.
+                Assuming the intent was to navigate to the blog post directly or that
+                the Link component was intended to be added. For now, removing the
+                Link component as it's not available. */}
+            <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
+            <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
+            <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span>{blog.author.name}</span>
+              <span>{new Date(blog.date).toLocaleDateString()}</span>
+            </div>
+            <p style={{ color: '#334155', fontSize: '1.05rem', marginBottom: '1rem', minHeight: '60px' }}>{blog.summary}</p>
           </article>
         )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No posts with this tag yet.</div>}
       </div>
@@ -535,6 +478,4 @@ const CTAButton = styled.button`
     background: linear-gradient(90deg, #3730a3 60%, #6366f1 100%);
     transform: translateY(-2px) scale(1.03);
   }
-`;
-
-export default Blog; 
+`; 
