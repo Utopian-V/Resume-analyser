@@ -1,655 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiZap, FiAlertCircle } from 'react-icons/fi';
-import { getJobsCorpus } from '../api';
-import { useRef } from 'react';
-import './JobListings.css';
+import { FiBriefcase, FiSearch } from 'react-icons/fi';
 
 const Container = styled.div`
-  max-width: 1300px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 2.5rem;
-`;
-
-const Title = styled.h1`
+  max-width: 900px;
+  margin: 3rem auto;
+  background: rgba(30,41,59,0.95);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.13);
+  padding: 3rem 2rem;
   color: #e2e8f0;
-  font-size: 2.7rem;
+  text-align: center;
+`;
+
+const Title = styled.h2`
+  font-size: 2.2rem;
   font-weight: 900;
-  margin-bottom: 0.5rem;
+  color: #6366f1;
+  margin-bottom: 1.5rem;
 `;
 
 const Subtitle = styled.p`
-  color: #6366f1;
-  font-size: 1.15rem;
-  margin-bottom: 1.5rem;
-`;
-
-const MainGrid = styled.div`
-  display: flex;
-  gap: 2.5rem;
-  @media (max-width: 900px) {
-    flex-direction: column;
-  }
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(30, 41, 59, 0.85);
-  border-radius: 1rem;
-  padding: 0.75rem 1.5rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.07);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  width: 100%;
-  flex-wrap: wrap;
-  @media (max-width: 900px) {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.75rem 1rem;
-    gap: 0.5rem;
-  }
-`;
-
-const FilterButton = styled.button`
-  background: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 0.7rem;
-  padding: 0.6rem 1.2rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  transition: background 0.2s;
-  &:hover:not(:disabled) {
-    background: #4f46e5;
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  @media (max-width: 900px) {
-    width: 100%;
-    justify-content: center;
-  }
-`;
-
-const FilterChips = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  background: #232946;
-  border-radius: 1.5rem;
-  padding: 0.3rem 0.8rem;
-  margin-left: 1rem;
-  @media (max-width: 900px) {
-    margin-left: 0;
-    width: 100%;
-    justify-content: center;
-  }
-`;
-
-const Chip = styled.span`
-  background: #6366f1;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  &:hover {
-    background: #4f46e5;
-  }
-`;
-
-const FilterDropdown = styled.select`
-  padding: 0.7rem;
-  border: 2px solid #232946;
-  border-radius: 0.7rem;
-  font-size: 1rem;
-  background-color: #1e293b;
-  color: #e2e8f0;
-  cursor: pointer;
-  &:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-  }
-  @media (max-width: 900px) {
-    width: 100%;
-  }
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background: #232946;
-  border-radius: 0.7rem;
-  padding: 0.7rem 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 4px rgba(99,102,241,0.04);
-  flex: 1;
-  @media (max-width: 900px) {
-    width: 100%;
-  }
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  background: transparent;
-  font-size: 1.1rem;
-  flex: 1;
-  color: #e2e8f0;
-  &:focus {
-    outline: none;
-  }
-`;
-
-const JobGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
-  gap: 2rem;
-`;
-
-const JobCard = styled(motion.div)`
-  background: rgba(30, 41, 59, 0.95);
-  border-radius: 1.2rem;
-  padding: 1.7rem 1.5rem 1.2rem 1.5rem;
-  box-shadow: 0 4px 24px rgba(99,102,241,0.13);
-  border-left: 5px solid #6366f1;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 340px;
-  &:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 8px 32px rgba(99,102,241,0.22);
-  }
-`;
-
-const JobHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const CompanyLogo = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 0.7rem;
-  background: #232946;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6366f1;
-  font-weight: 900;
+  color: #a5b4fc;
   font-size: 1.2rem;
+  margin-bottom: 2.5rem;
 `;
 
-const JobTitle = styled.h3`
-  color: #e2e8f0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  margin: 0;
-  flex: 1;
-`;
-
-const CompanyCredit = styled.div`
+const PlaceholderIcon = styled.div`
+  font-size: 4rem;
   color: #6366f1;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-`;
-
-const JobMeta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: #6366f1;
-  font-size: 0.97rem;
-`;
-
-const JobDescription = styled.p`
-  color: #cbd5e1;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const RequirementsList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0;
-`;
-
-const RequirementItem = styled.li`
-  color: #6366f1;
-  font-size: 0.95rem;
-`;
-
-const Button = styled.button`
-  background: ${props => props.variant === 'secondary' ? '#f3f4f6' : '#6366f1'};
-  color: ${props => props.variant === 'secondary' ? '#374151' : 'white'};
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  &:hover:not(:disabled) {
-    background: ${props => props.variant === 'secondary' ? '#e5e7eb' : '#4f46e5'};
-    transform: translateY(-1px);
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const Badge = styled.span`
-  background: ${props => props.bg || '#f0f9ff'};
-  color: ${props => props.color || '#1e40af'};
-  padding: 0.3rem 0.8rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-right: 0.4rem;
-`;
-
-const LoadingSkeleton = styled.div`
-  background: linear-gradient(90deg, #f3f4f6 25%, #e0e7ff 50%, #f3f4f6 75%);
-  background-size: 200% 100%;
-  animation: skeleton 1.2s infinite linear;
-  border-radius: 1rem;
-  height: 180px;
   margin-bottom: 1.5rem;
-  @keyframes skeleton {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #6b7280;
+const Placeholder = styled.div`
+  background: rgba(255,255,255,0.04);
+  border-radius: 1.2rem;
+  padding: 2.5rem 1.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.08);
 `;
 
-const LogoBarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
-  gap: 1.2rem;
-  background: #f3f4f6;
-  border-radius: 1rem;
-  padding: 1rem 0.5rem 1rem 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 12px rgba(99,102,241,0.06);
-  scrollbar-width: thin;
-`;
-const LogoButton = styled.button`
-  background: none;
+const CTA = styled.button`
+  background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
+  color: #fff;
   border: none;
-  outline: none;
+  border-radius: 1.2rem;
+  padding: 1rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 2rem;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  min-width: 60px;
-  opacity: ${props => props.active ? 1 : 0.6};
-  transition: opacity 0.2s;
-  &:hover, &:focus {
-    opacity: 1;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.13);
+  transition: background 0.2s, transform 0.1s;
+  &:hover {
+    background: linear-gradient(90deg, #3730a3 60%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.05);
   }
 `;
-const LogoImg = styled.img`
-  width: 38px;
-  height: 38px;
-  border-radius: 0.7rem;
-  background: #fff;
-  object-fit: contain;
-  border: 1px solid #e5e7eb;
-`;
-const LogoLabel = styled.span`
-  font-size: 0.85rem;
-  color: #3730a3;
-  font-weight: 600;
-  margin-top: 0.2rem;
-`;
 
-// Multi-select dropdown (simple custom)
-const MultiSelect = ({ options, selected, onChange, placeholder }) => (
-  <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
-    <select
-      multiple
-      value={selected}
-      onChange={e => {
-        const vals = Array.from(e.target.selectedOptions).map(o => o.value);
-        onChange(vals);
-      }}
-      style={{ width: '100%', padding: '0.7rem', border: '2px solid #e5e7eb', borderRadius: '0.5rem', fontSize: '1rem', background: 'white', minHeight: 80 }}
-      aria-label={placeholder}
-    >
-      {options.map(opt => (
-        <option key={opt} value={opt}>{opt}</option>
-      ))}
-    </select>
-    <div style={{ fontSize: '0.9rem', color: '#6366f1', marginTop: 2 }}>{placeholder}</div>
-  </div>
-);
-
-const JobListings = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [filters, setFilters] = useState({});
-  const [search, setSearch] = useState('');
-  const [companies, setCompanies] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [experiences, setExperiences] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [selectedCompanies, setSelectedCompanies] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedExperiences, setSelectedExperiences] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [savedJobs, setSavedJobs] = useState(() => JSON.parse(localStorage.getItem('saved_jobs') || '[]'));
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const logoBarRef = useRef();
-
-  useEffect(() => {
-    loadJobs();
-  }, [filters, search, selectedCompanies, selectedCategories, selectedExperiences, selectedTags, page]);
-
-  const loadJobs = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const params = { ...filters, page, page_size: 30 };
-      if (search) params.search = search;
-      if (selectedCompanies.length) params.company = selectedCompanies.join(',');
-      if (selectedCategories.length) params.category = selectedCategories.join(',');
-      if (selectedExperiences.length) params.experience = selectedExperiences.join(',');
-      if (selectedTags.length) params.tags = selectedTags.join(',');
-      const response = await getJobsCorpus(params);
-      setJobs(page === 1 ? (response.jobs || []) : prev => [...prev, ...(response.jobs || [])]);
-      setHasMore((response.jobs || []).length === 30);
-      // Extract unique companies, categories, experiences, tags
-      const all = response.jobs || [];
-      setCompanies([...new Set(all.map(j => j.company))].filter(Boolean));
-      setCategories([...new Set(all.map(j => j.category))].filter(Boolean));
-      setExperiences([...new Set(all.map(j => j.experience_level))].filter(Boolean));
-      setTags([...new Set(all.flatMap(j => j.requirements || []))].filter(Boolean));
-    } catch (e) {
-      setJobs([]);
-      setHasMore(false);
-      setError("Failed to load jobs. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Save/favorite job
-  const toggleSaveJob = (jobId) => {
-    setSavedJobs(prev => {
-      const updated = prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId];
-      localStorage.setItem('saved_jobs', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  // Clear all filters
-  const clearAllFilters = () => {
-    setFilters({});
-    setSearch('');
-    setSelectedCompanies([]);
-    setSelectedCategories([]);
-    setSelectedExperiences([]);
-    setSelectedTags([]);
-    setPage(1);
-  };
-
-  // Infinite scroll
-  const handleScroll = (e) => {
-    if (!hasMore || loading) return;
-    const { scrollTop, scrollHeight, clientHeight } = e.target.scrollingElement || document.documentElement;
-    if (scrollHeight - scrollTop - clientHeight < 200) {
-      setPage(p => p + 1);
-    }
-  };
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, loading]);
-
-  // Logo bar scroll
-  const scrollLogoBar = (dir) => {
-    if (logoBarRef.current) {
-      logoBarRef.current.scrollBy({ left: dir * 120, behavior: 'smooth' });
-    }
-  };
-
-  // UI
+export default function JobListings() {
   return (
-    <Container style={{ background: 'linear-gradient(120deg, #0f172a 0%, #1e293b 100%)', fontFamily: 'Inter, Nunito, sans-serif' }}>
-      <Header>
-        <Title>Job Opportunities</Title>
-        <Subtitle>Discover and apply to jobs from the world’s top companies. Powered by real-time scraping, with direct links and full company credit.</Subtitle>
-      </Header>
-      {/* Horizontal logo bar */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-        <button aria-label="Scroll left" onClick={() => scrollLogoBar(-1)} style={{ background: 'none', border: 'none', fontSize: 24, color: '#6366f1', cursor: 'pointer' }}><FiChevronLeft /></button>
-        <LogoBarContainer ref={logoBarRef} tabIndex={0} aria-label="Company logo filter bar">
-          {companies.map(c => (
-            <LogoButton key={c} active={selectedCompanies.includes(c)} onClick={() => setSelectedCompanies(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])} aria-label={`Filter by ${c}`}>
-              <LogoImg src={`https://logo.clearbit.com/${c.replace(/\s/g, '').toLowerCase()}.com`} alt={c} />
-              <LogoLabel>{c}</LogoLabel>
-            </LogoButton>
-          ))}
-        </LogoBarContainer>
-        <button aria-label="Scroll right" onClick={() => scrollLogoBar(1)} style={{ background: 'none', border: 'none', fontSize: 24, color: '#6366f1', cursor: 'pointer' }}><FiChevronRight /></button>
-      </div>
-      <MainGrid>
-        {/* Filter Bar */}
-        <FilterBar>
-          <FilterButton onClick={clearAllFilters} disabled={Object.keys(filters).length === 0 && search === '' && selectedCompanies.length === 0 && selectedCategories.length === 0 && selectedExperiences.length === 0 && selectedTags.length === 0}>Clear All Filters</FilterButton>
-          <FilterChips>
-            {selectedCompanies.map(c => (
-              <Chip key={c} onClick={() => setSelectedCompanies(prev => prev.filter(x => x !== c))}>
-                {c} <FiX />
-              </Chip>
-            ))}
-            {selectedCategories.map(cat => (
-              <Chip key={cat} onClick={() => setSelectedCategories(prev => prev.filter(x => x !== cat))}>
-                {cat} <FiX />
-              </Chip>
-            ))}
-            {selectedExperiences.map(exp => (
-              <Chip key={exp} onClick={() => setSelectedExperiences(prev => prev.filter(x => x !== exp))}>
-                {exp} <FiX />
-              </Chip>
-            ))}
-            {selectedTags.map(tag => (
-              <Chip key={tag} onClick={() => setSelectedTags(prev => prev.filter(x => x !== tag))}>
-                {tag} <FiX />
-              </Chip>
-            ))}
-          </FilterChips>
-          <SearchBar>
-            <FiSearch style={{ color: '#6366f1', marginRight: 8 }} />
-            <SearchInput
-              placeholder="Search job title, description..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              aria-label="Search jobs"
-            />
-          </SearchBar>
-          <FilterDropdown value={filters.company || ''} onChange={e => setFilters(prev => ({ ...prev, company: e.target.value }))} aria-label="Filter by company">
-            <option value="">All Companies</option>
-            {companies.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </FilterDropdown>
-          <FilterDropdown value={filters.category || ''} onChange={e => setFilters(prev => ({ ...prev, category: e.target.value }))} aria-label="Filter by category">
-            <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </FilterDropdown>
-          <FilterDropdown value={filters.experience_level || ''} onChange={e => setFilters(prev => ({ ...prev, experience_level: e.target.value }))} aria-label="Filter by experience level">
-            <option value="">All Experience Levels</option>
-            {experiences.map(exp => (
-              <option key={exp} value={exp}>{exp}</option>
-            ))}
-          </FilterDropdown>
-          <FilterDropdown value={filters.tags || ''} onChange={e => setFilters(prev => ({ ...prev, tags: e.target.value }))} aria-label="Filter by skills/tags">
-            <option value="">All Skills/Tags</option>
-            {tags.map(tag => (
-              <option key={tag} value={tag}>{tag}</option>
-            ))}
-          </FilterDropdown>
-        </FilterBar>
-        <div style={{ flex: 1 }}>
-          {loading ? (
-            <>
-              {[...Array(6)].map((_, i) => <LoadingSkeleton key={i} />)}
-            </>
-          ) : error ? (
-            <EmptyState>
-              <FiAlertCircle size={48} style={{ marginBottom: '1rem', color: '#ef4444', opacity: 0.7 }} />
-              <h3>Failed to load jobs</h3>
-              <p>{error}</p>
-            </EmptyState>
-          ) : jobs.length === 0 ? (
-            <EmptyState>
-              <FiBriefcase size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-              <h3>No jobs found</h3>
-              <p>Try adjusting your filters or check back later for new opportunities.</p>
-            </EmptyState>
-          ) : (
-            <JobGrid>
-              {jobs.map((job, index) => {
-                const isSaved = savedJobs.includes(job.id);
-                const isNew = job.posted_date && (Date.now() - new Date(job.posted_date).getTime() < 1000*60*60*24*7);
-                const isFeatured = job.salary_range && job.salary_range.toLowerCase().includes('top');
-                const isHot = job.description && job.description.toLowerCase().includes('urgent');
-                return (
-                  <JobCard
-                    key={job.id + index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                    tabIndex={0}
-                    aria-label={`Job: ${job.title} at ${job.company}`}
-                  >
-                    <JobHeader>
-                      <CompanyLogo src={job.company_logo} alt={job.company} onError={e => e.target.style.display='none'} />
-                      <div style={{ flex: 1 }}>
-                        <JobTitle>{job.title}</JobTitle>
-                        <CompanyCredit>
-                          <FiGlobe /> {job.company_credit}
-                        </CompanyCredit>
-                      </div>
-                      <Button variant="secondary" aria-label={isSaved ? 'Unsave job' : 'Save job'} onClick={() => toggleSaveJob(job.id)} style={{ background: 'none', color: isSaved ? '#f43f5e' : '#6366f1', fontSize: 22, boxShadow: 'none', border: 'none', marginLeft: 8 }}>
-                        <FiHeart fill={isSaved ? '#f43f5e' : 'none'} />
-                      </Button>
-                    </JobHeader>
-                    <JobMeta>
-                      <MetaItem><FiHome /> {job.company}</MetaItem>
-                      <MetaItem><FiMapPin /> {job.location}</MetaItem>
-                      {job.salary_range && job.salary_range !== "Not specified" && (
-                        <MetaItem><FiDollarSign /> {job.salary_range}</MetaItem>
-                      )}
-                      {job.posted_date && (
-                        <MetaItem><FiCalendar /> {job.posted_date}</MetaItem>
-                      )}
-                    </JobMeta>
-                    <JobDescription>{job.description}</JobDescription>
-                    {job.requirements && job.requirements.length > 0 && (
-                      <RequirementsList>
-                        {job.requirements.slice(0, 3).map((req, idx) => (
-                          <RequirementItem key={idx}><FiTag style={{ marginRight: 4 }} />{req}</RequirementItem>
-                        ))}
-                        {job.requirements.length > 3 && (
-                          <RequirementItem>+{job.requirements.length - 3} more requirements</RequirementItem>
-                        )}
-                      </RequirementsList>
-                    )}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                      {isFeatured && <Badge bg="#fef9c3" color="#eab308"><FiStar /> Featured</Badge>}
-                      {isHot && <Badge bg="#fee2e2" color="#b91c1c"><FiZap /> Hot</Badge>}
-                      {isNew && <Badge bg="#dbeafe" color="#2563eb">New</Badge>}
-                      {job.government_job && (
-                        <Badge bg="#fef3c7" color="#92400e"><FiAward /> Government</Badge>
-                      )}
-                      {job.remote_friendly && (
-                        <Badge bg="#dcfce7" color="#166534"><FiCheckCircle /> Remote</Badge>
-                      )}
-                      {job.category && (
-                        <Badge>{job.category}</Badge>
-                      )}
-                    </div>
-                    <ButtonGroup>
-                      <Button as="a" href={job.source_url || job.apply_url || '#'} target="_blank" rel="noopener noreferrer">
-                        <FiBriefcase /> Apply Now
-                      </Button>
-                      {job.source_url && (
-                        <Button variant="secondary" as="a" href={job.source_url} target="_blank" rel="noopener noreferrer">
-                          <FiExternalLink /> View Source
-                        </Button>
-                      )}
-                    </ButtonGroup>
-                  </JobCard>
-                );
-              })}
-            </JobGrid>
-          )}
+    <Container>
+      <Title>Job Opportunities</Title>
+      <Subtitle>
+        Discover and apply to jobs from the world’s top companies.<br/>
+        (Real-time job data coming soon!)
+      </Subtitle>
+      <Placeholder>
+        <PlaceholderIcon><FiBriefcase /></PlaceholderIcon>
+        <div style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 12 }}>
+          No jobs available right now
         </div>
-      </MainGrid>
+        <div style={{ color: '#a5b4fc', marginBottom: 18 }}>
+          We’re working hard to bring you real-time job listings.<br/>
+          Please check back soon or connect your own job data source!
+        </div>
+        <CTA onClick={() => window.location.reload()}>
+          <FiSearch style={{ marginRight: 8 }} /> Refresh
+        </CTA>
+      </Placeholder>
     </Container>
   );
-};
-
-export default JobListings; 
+} 
