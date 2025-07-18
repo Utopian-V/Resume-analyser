@@ -386,15 +386,9 @@ const AptitudeTest = ({ userId }) => {
   }
   if (error) {
     return (
-      <Container>
-        <Card>
-          <div style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiAlertCircle />
-            {error}
-          </div>
-          <Button onClick={fetchTest} style={{ marginTop: '1rem' }}>Try Again</Button>
-        </Card>
-      </Container>
+      <div style={{ color: '#ef4444', textAlign: 'center', marginTop: 32 }}>
+        <b>Error:</b> {error}
+      </div>
     );
   }
   if (!test) return null;

@@ -283,6 +283,7 @@ const EmptyIcon = styled.div`
 const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -294,10 +295,11 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
   const loadUserProgress = async () => {
     try {
       setLoading(true);
+      setError("");
       const progress = await getUserProgress(userId);
       setUserProgress(progress);
     } catch (error) {
-      console.error("Error loading user progress:", error);
+      setError("Failed to load user progress. Showing demo data.");
       // Set default progress for demo
       setUserProgress({
         dsa_questions_completed: 45,
@@ -348,6 +350,15 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
           <div>Loading your dashboard...</div>
+        </div>
+      </DashboardContainer>
+    );
+  }
+  if (error) {
+    return (
+      <DashboardContainer>
+        <div style={{ textAlign: 'center', padding: '4rem', color: '#ef4444' }}>
+          <b>Error:</b> {error}
         </div>
       </DashboardContainer>
     );

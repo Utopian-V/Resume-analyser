@@ -1,6 +1,10 @@
 import React, { useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { FiUploadCloud } from "react-icons/fi";
+import { FiUploadCloud, FiLoader, FiAlertCircle } from "react-icons/fi";
+import { uploadResume } from "../api";
+import GraphicalAnalysis from "./GraphicalAnalysis";
+import FeedbackDisplay from "./FeedbackDisplay";
+import ProjectAnalysis from "./ProjectAnalysis";
 
 const bounce = keyframes`
   0% { transform: scale(1); }
@@ -59,14 +63,17 @@ const FileName = styled.div`
 
 const MAX_SIZE_MB = 5;
 
-const FileUpload = ({ onFileSelected }) => {
+const ResumeAnalysis = () => {
   const fileInputRef = useRef();
   const [fileName, setFileName] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     setError("");
+    setAnalysis(null);
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.includes("pdf")) {
@@ -78,7 +85,15 @@ const FileUpload = ({ onFileSelected }) => {
       return;
     }
     setFileName(file.name);
-    onFileSelected(file);
+    setLoading(true);
+    try {
+      const result = await uploadResume(file);
+      setAnalysis(result);
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || "Failed to analyze resume. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDrop = (e) => {
@@ -90,7 +105,7 @@ const FileUpload = ({ onFileSelected }) => {
   };
 
   return (
-    <>
+    <div>
       <UploadBox
         style={dragActive ? { background: "#e0e7ff", borderColor: "#3730a3" } : {}}
         onClick={() => fileInputRef.current.click()}
@@ -109,12 +124,20 @@ const FileUpload = ({ onFileSelected }) => {
         />
         {fileName && <FileName>{fileName}</FileName>}
       </UploadBox>
-      <UploadButton onClick={() => fileInputRef.current.click()} type="button">
+      <UploadButton onClick={() => fileInputRef.current.click()} type="button" disabled={loading}>
         <FiUploadCloud size={20} /> Upload Resume (PDF)
       </UploadButton>
-      {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
-    </>
+      {loading && <div style={{ color: "#6366f1", marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}><FiLoader className="spin" /> Analyzing your resume...</div>}
+      {error && <div style={{ color: "#ef4444", marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}><FiAlertCircle /> {error}</div>}
+      {analysis && (
+        <div style={{ marginTop: 32 }}>
+          <GraphicalAnalysis feedback={analysis} />
+          <FeedbackDisplay feedback={analysis} />
+          <ProjectAnalysis projectAnalysis={analysis.project_analysis} />
+        </div>
+      )}
+    </div>
   );
 };
 
-export default FileUpload; 
+export default ResumeAnalysis;

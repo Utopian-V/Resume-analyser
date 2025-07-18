@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiZap } from 'react-icons/fi';
+import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiExternalLink, FiCheckCircle, FiHome, FiAward, FiSearch, FiFilter, FiGlobe, FiHeart, FiChevronLeft, FiChevronRight, FiTag, FiStar, FiZap, FiAlertCircle } from 'react-icons/fi';
 import { getJobsCorpus } from '../api';
 import { useRef } from 'react';
 import './JobListings.css';
@@ -383,6 +383,7 @@ const MultiSelect = ({ options, selected, onChange, placeholder }) => (
 const JobListings = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filters, setFilters] = useState({});
   const [search, setSearch] = useState('');
   const [companies, setCompanies] = useState([]);
@@ -404,6 +405,7 @@ const JobListings = () => {
 
   const loadJobs = async () => {
     setLoading(true);
+    setError("");
     try {
       const params = { ...filters, page, page_size: 30 };
       if (search) params.search = search;
@@ -423,6 +425,7 @@ const JobListings = () => {
     } catch (e) {
       setJobs([]);
       setHasMore(false);
+      setError("Failed to load jobs. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -470,7 +473,7 @@ const JobListings = () => {
 
   // UI
   return (
-    <Container style={{ background: 'linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%)', fontFamily: 'Inter, Nunito, sans-serif' }}>
+    <Container style={{ background: 'linear-gradient(120deg, #0f172a 0%, #1e293b 100%)', fontFamily: 'Inter, Nunito, sans-serif' }}>
       <Header>
         <Title>Job Opportunities</Title>
         <Subtitle>Discover and apply to jobs from the world’s top companies. Powered by real-time scraping, with direct links and full company credit.</Subtitle>
@@ -553,6 +556,12 @@ const JobListings = () => {
             <>
               {[...Array(6)].map((_, i) => <LoadingSkeleton key={i} />)}
             </>
+          ) : error ? (
+            <EmptyState>
+              <FiAlertCircle size={48} style={{ marginBottom: '1rem', color: '#ef4444', opacity: 0.7 }} />
+              <h3>Failed to load jobs</h3>
+              <p>{error}</p>
+            </EmptyState>
           ) : jobs.length === 0 ? (
             <EmptyState>
               <FiBriefcase size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />

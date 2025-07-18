@@ -220,6 +220,7 @@ const InterviewPrep = ({ userId }) => {
   const [questionFlow, setQuestionFlow] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [csvLoaded, setCsvLoaded] = useState(false);
+  const [error, setError] = useState("");
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -264,6 +265,7 @@ const InterviewPrep = ({ userId }) => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
+    setError("");
     try {
       // If there are more scripted questions, use them
       if (currentQ + 1 < questionFlow.length) {
@@ -290,6 +292,7 @@ const InterviewPrep = ({ userId }) => {
       }
     } catch (error) {
       setIsLoading(false);
+      setError("Sorry, something went wrong. Please try again later.");
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         text: "I apologize, but I'm having trouble processing your response right now. Could you please try again?",
@@ -406,6 +409,7 @@ const InterviewPrep = ({ userId }) => {
                   </MessageContent>
                 </Message>
               )}
+              {error && <div style={{ color: '#ef4444', marginBottom: 16, fontWeight: 600 }}>{error}</div>}
               <div ref={messagesEndRef} />
             </MessagesContainer>
 

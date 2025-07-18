@@ -1,6 +1,6 @@
 import UserDashboard from '../components/UserDashboard';
 import JobListings from '../components/JobListings';
-import FileUpload from '../components/FileUpload';
+import ResumeAnalysis from '../components/FileUpload'; // If you renamed FileUpload.js to ResumeAnalysis.js, update this import!
 import AptitudeTest from '../components/AptitudeTest';
 import EnhancedDSABank from '../components/EnhancedDSABank';
 import InterviewPrep from '../components/InterviewPrep';
@@ -19,7 +19,7 @@ export const dashboardRoutes = [
   },
   {
     path: '/app/resume',
-    component: FileUpload
+    component: ResumeAnalysis
   },
   {
     path: '/app/aptitude',
@@ -49,4 +49,4 @@ export const publicRoutes = [
     path: '/blog/:slug',
     component: Blog
   }
-]; 
+];
