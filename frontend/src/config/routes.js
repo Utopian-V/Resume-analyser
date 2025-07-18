@@ -13,7 +13,7 @@ const DataInterpretation = () => <div style={{padding:'4rem',color:'#6366f1',tex
 const ResumeFeedback = ResumeAnalysis;
 const MockInterview = InterviewPrep;
 const DSAPractice = EnhancedDSABank;
-const AdminPortal = () => <div style={{padding:'4rem',color:'#6366f1',textAlign:'center'}}>Admin Portal Coming Soon!</div>;
+
 
 export const dashboardRoutes = [
   {
