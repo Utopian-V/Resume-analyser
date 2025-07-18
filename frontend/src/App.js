@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiHome, FiUser, FiSettings, FiLogOut, FiMessageSquare } from 'react-icons/fi';
@@ -472,7 +472,7 @@ function App() {
   ];
 
   return (
-    <Router>
+    <>
       <GlobalStyle />
       <AppContainer>
         <Navbar>
@@ -822,7 +822,7 @@ function App() {
           </FAQModalOverlay>
         )}
       </AppContainer>
-    </Router>
+    </>
   );
 }
 
