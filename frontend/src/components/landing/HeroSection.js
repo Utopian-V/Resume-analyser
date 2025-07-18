@@ -2,7 +2,6 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 import Logo from '../Logo';
 
 const gradientMove = keyframes`
@@ -108,8 +107,6 @@ const CTAButton = styled(motion.button)`
 `;
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-
   return (
     <HeroContainer>
       <HeroContent>
@@ -126,7 +123,7 @@ const HeroSection = () => {
           optimize your resume, and land your dream job. Join thousands of successful professionals.
         </HeroSubtitle>
         <CTAButton
-          onClick={() => navigate('/app')}
+          onClick={() => window.location.href = '/app'}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0, y: 20 }}
