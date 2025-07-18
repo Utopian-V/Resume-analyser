@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
-import { blogAuthors } from '../src/components/blogAuthors.js';
+import pkg from '../src/components/blogAuthors.js';
+const { blogAuthors } = pkg;
 // import topics from './blog_topics.json' assert { type: 'json' };
 const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
 
