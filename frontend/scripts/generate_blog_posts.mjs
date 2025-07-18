@@ -3,15 +3,15 @@ import path from 'path';
 import fetch from 'node-fetch';
 import { blogAuthors } from '../src/components/blogAuthors.js';
 import { fileURLToPath } from 'url';
+import pkg from 'pg';
+const { Client } = pkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
-const BLOG_DIR = path.join(__dirname, '../src/generated_blogs');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!fs.existsSync(BLOG_DIR)) fs.mkdirSync(BLOG_DIR, { recursive: true });
+const NEON_DATABASE_URL = process.env.NEON_DATABASE_URL;
 
 function getRandomTopic() {
   return topics[Math.floor(Math.random() * topics.length)];
@@ -27,7 +27,7 @@ async function fetchUnsplashImage(query) {
 }
 
 async function generateBlogPost(author, topic) {
-  // Call Gemini Pro API (pseudo-code, replace with actual API call)
+  // Call Gemini Pro API
   const prompt = getPrompt(author, topic);
   const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY, {
     method: 'POST',
@@ -39,9 +39,21 @@ async function generateBlogPost(author, topic) {
   const image = await fetchUnsplashImage(topic);
   const date = new Date().toISOString().slice(0, 10);
   const slug = `${date}-${author.name.toLowerCase().replace(/\s+/g, '-')}-${topic.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`.slice(0, 60);
-  const meta = `---\ntitle: "${topic}"\nauthor: "${author.name}"\navatar: "${author.avatar}"\ndate: "${date}"\nimage: "${image}"\nslug: "${slug}"\n---\n`;
-  fs.writeFileSync(path.join(BLOG_DIR, slug + '.md'), meta + '\n' + content);
-  console.log(`Blog post generated: ${slug}`);
+
+  // Insert into Neon (Postgres)
+  const client = new Client({
+    connectionString: NEON_DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+  await client.connect();
+  await client.query(
+    `INSERT INTO blogs (title, author, avatar, date, image, slug, content)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (slug) DO NOTHING`,
+    [topic, author.name, author.avatar, date, image, slug, content]
+  );
+  await client.end();
+  console.log(`Blog post saved to Neon: ${slug}`);
 }
 
 (async () => {

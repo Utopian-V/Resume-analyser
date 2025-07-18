@@ -4,6 +4,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from endpoints.jobs import router as jobs_router
+from endpoints.genai import router as genai_router
 
 # =========================
 # App Setup
@@ -28,3 +29,4 @@ async def root():
 # Routers
 # =========================
 app.include_router(jobs_router)
+app.include_router(genai_router)
