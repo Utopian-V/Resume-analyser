@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FiHome, FiBriefcase, FiFileText, FiTarget, FiCode, FiMessageSquare, FiBookOpen } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const SidebarContainer = styled.div`
   position: fixed;
   left: 0;
-  top: 80px;
+  top: 64px;
   bottom: 0;
   width: 280px;
   background: rgba(30, 41, 59, 0.8);
@@ -106,6 +107,7 @@ const menuItems = [
 ];
 
 const Sidebar = ({ currentPath, setCurrentPath }) => {
+  const navigate = useNavigate();
   return (
     <SidebarContainer>
       <SidebarHeader>
@@ -123,7 +125,10 @@ const Sidebar = ({ currentPath, setCurrentPath }) => {
           <MenuItem key={index}>
             <MenuLink 
               className={currentPath === item.path ? 'active' : ''}
-              onClick={() => setCurrentPath(item.path)}
+              onClick={() => {
+                setCurrentPath(item.path);
+                navigate(item.path);
+              }}
             >
               {item.icon}
               {item.label}
