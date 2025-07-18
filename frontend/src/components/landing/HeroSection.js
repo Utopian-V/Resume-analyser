@@ -2,7 +2,6 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
-import Logo from '../Logo';
 
 const gradientMove = keyframes`
   0% { background-position: 0% 50%; }

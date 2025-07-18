@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FiHome, FiUser } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiFileText, FiTarget, FiCode, FiMessageSquare, FiBookOpen } from 'react-icons/fi';
 
 const SidebarContainer = styled.div`
   position: fixed;
