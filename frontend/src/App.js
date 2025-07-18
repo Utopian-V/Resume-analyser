@@ -3,19 +3,19 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 // Styles
-import { GlobalStyle } from './styles/GlobalStyles';
+import { GlobalStyle } from './styles/GlobalStyles.js';
 
 // Layout Components
-import { Navbar, MobileMenu, DashboardLayout } from './components/layout';
+import { Navbar, MobileMenu, DashboardLayout } from './components/layout/index.js';
 
 // Common Components
-import FAQChat from './components/common/FAQChat';
+import FAQChat from './components/common/FAQChat.js';
 
 // Hooks
-import { useFAQ } from './hooks/useFAQ';
+import { useFAQ } from './hooks/useFAQ.js';
 
 // Routes
-import { dashboardRoutes, publicRoutes, adminRoutes } from './config/routes';
+import { dashboardRoutes, publicRoutes, adminRoutes } from './config/routes.js';
 
 const AppContainer = styled.div`
   min-height: 100vh;

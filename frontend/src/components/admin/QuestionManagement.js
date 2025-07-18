@@ -9,7 +9,7 @@ import {
   FiPlus,
   FiFileText,
   FiTag,
-  FiBarChart3
+  FiBarChart2
 } from 'react-icons/fi';
 
 const Container = styled.div`
@@ -400,15 +400,15 @@ export default function QuestionManagement() {
 
             <Stats>
               <Stat>
-                <FiBarChart3 size={14} />
+                <FiBarChart2 size={14} />
                 {question.stats.attempts} attempts
               </Stat>
               <Stat>
-                <FiBarChart3 size={14} />
+                <FiBarChart2 size={14} />
                 {question.stats.successRate} success rate
               </Stat>
               <Stat>
-                <FiBarChart3 size={14} />
+                <FiBarChart2 size={14} />
                 {question.stats.avgTime} avg time
               </Stat>
             </Stats>

@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet-async';
-import HeroSection from './HeroSection';
-import ReviewsSection from '../ReviewsSection';
+import HeroSection from './HeroSection.js';
+import ReviewsSection from '../ReviewsSection.js';
 import { FiGithub, FiTwitter, FiLinkedin } from 'react-icons/fi';
 
 const PageWrapper = styled.div`

@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { FiUploadCloud, FiLoader, FiAlertCircle } from "react-icons/fi";
-import { uploadResume } from "../api";
-import GraphicalAnalysis from "./GraphicalAnalysis";
-import FeedbackDisplay from "./FeedbackDisplay";
-import ProjectAnalysis from "./ProjectAnalysis";
+import { uploadResume } from "../api.js";
+import GraphicalAnalysis from "./GraphicalAnalysis.js";
+import FeedbackDisplay from "./FeedbackDisplay.js";
+import ProjectAnalysis from "./ProjectAnalysis.js";
 import { Helmet } from 'react-helmet-async';
 
 const bounce = keyframes`

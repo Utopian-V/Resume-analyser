@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp, FiBookOpen, FiTarget, FiBarChart2 } from "react-icons/fi";
-import { parseCSV } from "../utils/csv";
+import { parseCSV } from "../utils/csv.js";
 import { Helmet } from 'react-helmet-async';
 
 const csvUrl = require('../data/dsa_questions.csv');

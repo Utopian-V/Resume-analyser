@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp } from "react-icons/fi";
-import { getDSAQuestions, completeQuestion, getDSARecommendations } from "../api";
+import { getDSAQuestions, completeQuestion, getDSARecommendations } from "../api.js";
 
 const Container = styled.div`
   background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);

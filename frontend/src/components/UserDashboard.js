@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiTarget, FiBookOpen, FiUsers, FiCalendar, FiCheckCircle, FiClock, FiStar, FiBarChart2 } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
-import { getUserProgress, updateResumeScore } from "../api";
+import { getUserProgress, updateResumeScore } from "../api.js";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';

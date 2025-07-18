@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import AdminLayout from './AdminLayout';
-import WriterProfile from './WriterProfile';
-import BlogEditor from './BlogEditor';
-import BlogManagement from './BlogManagement';
-import UserManagement from './UserManagement';
-import QuestionManagement from './QuestionManagement';
-import SystemSettings from './SystemSettings';
+import AdminLayout from './AdminLayout.js';
+import WriterProfile from './WriterProfile.js';
+import BlogEditor from './BlogEditor.js';
+import BlogManagement from './BlogManagement.js';
+import UserManagement from './UserManagement.js';
+import QuestionManagement from './QuestionManagement.js';
+import SystemSettings from './SystemSettings.js';
 
 // Mock data for demonstration
 const mockStats = {

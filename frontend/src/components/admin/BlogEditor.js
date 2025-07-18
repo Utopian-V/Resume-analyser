@@ -18,11 +18,7 @@ import {
   FiList,
   FiLink,
   FiCode,
-  FiQuote,
-  FiAlignLeft,
-  FiAlignCenter,
-  FiAlignRight,
-  FiHeading,
+  FiMessageSquare,
   FiType
 } from 'react-icons/fi';
 
@@ -539,7 +535,7 @@ export default function BlogEditor() {
 
         <Toolbar>
           <ToolbarButton onClick={() => formatText('h1')}>
-            <FiHeading />
+            <FiType />
           </ToolbarButton>
           <ToolbarButton onClick={() => formatText('h2')}>
             <FiType />
@@ -557,7 +553,7 @@ export default function BlogEditor() {
             <FiLink />
           </ToolbarButton>
           <ToolbarButton onClick={() => formatText('quote')}>
-            <FiQuote />
+            <FiMessageSquare />
           </ToolbarButton>
           <ToolbarButton onClick={() => formatText('ul')}>
             <FiList />
