@@ -1,13 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
-const { blogAuthors } = require('../src/components/blogAuthors');
-const topics = require('./blog_topics.json');
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import { blogAuthors } from '../src/components/blogAuthors.js';
+// import topics from './blog_topics.json' assert { type: 'json' };
+const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
 
+const BLOG_DIR = path.join(process.cwd(), 'src/generated_blogs');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const BLOG_DIR = path.join(__dirname, '../src/generated_blogs');
 
-if (!fs.existsSync(BLOG_DIR)) fs.mkdirSync(BLOG_DIR);
+if (!fs.existsSync(BLOG_DIR)) fs.mkdirSync(BLOG_DIR, { recursive: true });
 
 function getRandomTopic() {
   return topics[Math.floor(Math.random() * topics.length)];
@@ -23,7 +24,7 @@ async function fetchUnsplashImage(query) {
 }
 
 async function generateBlogPost(author, topic) {
-  // Call Gemini Pro API (pseudo-code, replace with actual API call)
+  // Call Gemini Pro API
   const prompt = getPrompt(author, topic);
   const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY, {
     method: 'POST',
