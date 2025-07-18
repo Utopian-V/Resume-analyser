@@ -97,12 +97,12 @@ const MenuLink = styled.div`
 
 const menuItems = [
   { path: '/app', label: 'Dashboard', icon: <FiHome /> },
-  { path: '/app/jobs', label: 'Job Listings', icon: <FiUser /> },
-  { path: '/app/resume', label: 'Resume Analysis', icon: <FiUser /> },
-  { path: '/app/aptitude', label: 'Aptitude Tests', icon: <FiUser /> },
-  { path: '/app/dsa', label: 'DSA Practice', icon: <FiUser /> },
-  { path: '/app/interview', label: 'Interview Prep', icon: <FiUser /> },
-  { path: '/app/blog', label: 'Blog', icon: <FiUser /> },
+  { path: '/app/jobs', label: 'Job Listings', icon: <FiBriefcase /> },
+  { path: '/app/resume', label: 'Resume Analysis', icon: <FiFileText /> },
+  { path: '/app/aptitude', label: 'Aptitude Tests', icon: <FiTarget /> },
+  { path: '/app/dsa', label: 'DSA Practice', icon: <FiCode /> },
+  { path: '/app/interview', label: 'Interview Prep', icon: <FiMessageSquare /> },
+  { path: '/app/blog', label: 'Blog', icon: <FiBookOpen /> },
 ];
 
 const Sidebar = ({ currentPath, setCurrentPath }) => {

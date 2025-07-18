@@ -66,7 +66,6 @@ const Navbar = ({ onMobileMenuOpen }) => {
     <NavbarContainer>
       <NavLogo>
         <Logo />
-        Prep Nexus
       </NavLogo>
       
       <NavLinks>
