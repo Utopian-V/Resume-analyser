@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiClock, FiCheckCircle, FiX, FiAlertCircle, FiBarChart2 } from 'react-icons/fi';
-import { getAptitudeTest, submitAptitudeTest, getAptitudeLeaderboard } from '../api';
+import aptitudeTests from '../data/aptitude_tests.json';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -310,7 +310,8 @@ const AptitudeTest = ({ userId }) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getAptitudeTest('test1');
+      // Load from local JSON
+      const data = aptitudeTests['test1'];
       if (!data || !data.questions) {
         throw new Error('Invalid test data received');
       }
@@ -352,8 +353,25 @@ const AptitudeTest = ({ userId }) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await submitAptitudeTest('test1', answers, userId);
-      setResults(res);
+      // Simulate result calculation
+      const totalQuestions = test.questions.length;
+      const correctAnswers = test.questions.filter(q => answers[q.id] === q.correct_answer).length;
+      const percentage = (correctAnswers / totalQuestions) * 100;
+      const passed = percentage >= 70; // Example passing criteria
+      setResults({
+        percentage: percentage,
+        passed: passed,
+        score: correctAnswers,
+        total_possible: totalQuestions,
+        results: test.questions.map(q => ({
+          question_id: q.id,
+          question_text: q.question_text,
+          user_answer: answers[q.id] ? answers[q.id].toUpperCase() : '—',
+          correct_answer: q.correct_answer.toUpperCase(),
+          is_correct: answers[q.id] === q.correct_answer,
+          explanation: q.explanation
+        }))
+      });
     } catch (error) {
       setError('Failed to submit test. Please try again.');
     } finally {
@@ -365,8 +383,12 @@ const AptitudeTest = ({ userId }) => {
     setLeaderboardLoading(true);
     setLeaderboardError(null);
     try {
-      const data = await getAptitudeLeaderboard('test1');
-      setLeaderboard(data.leaderboard || []);
+      // Dummy leaderboard
+      setLeaderboard([
+        { user_id: 'user1', user_name: 'User A', score: 100, percentage: 100, date: '2023-10-27T10:00:00Z' },
+        { user_id: 'user2', user_name: 'User B', score: 80, percentage: 80, date: '2023-10-27T11:00:00Z' },
+        { user_id: 'user3', user_name: 'User C', score: 75, percentage: 75, date: '2023-10-27T12:00:00Z' },
+      ]);
     } catch (err) {
       setLeaderboardError('Failed to load leaderboard.');
     } finally {
