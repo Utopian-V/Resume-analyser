@@ -1,0 +1,34 @@
+name: Generate Daily AI Blogs
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 2:00 AM UTC daily (adjust as needed)
+  workflow_dispatch:
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install node-fetch
+
+      - name: Generate AI blog posts
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node frontend/scripts/generate_blog_posts.js
+
+      - name: Commit and push new blogs
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add frontend/src/generated_blogs/
+          git commit -m 'chore: add daily AI-generated blog posts' || echo 'No changes to commit'
+          git push 
