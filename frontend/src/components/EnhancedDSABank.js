@@ -7,7 +7,7 @@ import { parseCSV } from "../utils/csv";
 const csvUrl = require('../data/dsa_questions.csv');
 
 const Container = styled.div`
-  background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
+  background: rgba(30, 41, 59, 0.95);
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px rgba(99,102,241,0.10);
   padding: 2rem;
@@ -26,7 +26,7 @@ const Header = styled.div`
 `;
 
 const Title = styled.h2`
-  color: #3730a3;
+  color: #e2e8f0;
   font-size: 1.8rem;
   font-weight: 800;
   margin: 0;

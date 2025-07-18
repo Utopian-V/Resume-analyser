@@ -103,7 +103,6 @@ const menuItems = [
   { path: '/app/aptitude', label: 'Aptitude Tests', icon: <FiTarget /> },
   { path: '/app/dsa', label: 'DSA Practice', icon: <FiCode /> },
   { path: '/app/interview', label: 'Interview Prep', icon: <FiMessageSquare /> },
-  { path: '/app/blog', label: 'Blog', icon: <FiBookOpen /> },
 ];
 
 const Sidebar = ({ currentPath, setCurrentPath }) => {

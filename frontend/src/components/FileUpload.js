@@ -10,7 +10,7 @@ const bounce = keyframes`
 
 const UploadBox = styled.div`
   border: 2.5px dashed #6366f1;
-  background: linear-gradient(120deg, #f5f7ff 60%, #e0e7ff 100%);
+  background: rgba(30, 41, 59, 0.95);
   border-radius: 1.5rem;
   padding: 3rem 2rem;
   text-align: center;
@@ -23,7 +23,7 @@ const UploadBox = styled.div`
   margin-bottom: 0.7rem;
   &:hover {
     box-shadow: 0 8px 32px rgba(99,102,241,0.13);
-    background: linear-gradient(120deg, #eef2ff 60%, #e0e7ff 100%);
+    background: rgba(30, 41, 59, 0.85);
     animation: ${bounce} 0.3s;
   }
 `;
@@ -50,7 +50,7 @@ const UploadButton = styled.button`
 `;
 
 const FileName = styled.div`
-  color: #3730a3;
+  color: #e2e8f0;
   font-size: 1.05rem;
   margin-top: 0.9rem;
   word-break: break-all;

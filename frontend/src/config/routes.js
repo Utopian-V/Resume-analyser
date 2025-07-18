@@ -32,10 +32,6 @@ export const dashboardRoutes = [
   {
     path: '/app/interview',
     component: InterviewPrep
-  },
-  {
-    path: '/app/blog',
-    component: Blog
   }
 ];
 
@@ -44,5 +40,13 @@ export const publicRoutes = [
     path: '/',
     component: LandingPage,
     exact: true
+  },
+  {
+    path: '/blog',
+    component: Blog
+  },
+  {
+    path: '/blog/:slug',
+    component: Blog
   }
 ]; 

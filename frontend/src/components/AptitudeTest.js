@@ -11,7 +11,7 @@ const Container = styled.div`
 `;
 
 const Card = styled(motion.div)`
-  background: white;
+  background: rgba(30, 41, 59, 0.95);
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 4px 24px rgba(99,102,241,0.15);
@@ -103,7 +103,7 @@ const Button = styled.button`
 `;
 
 const QuestionCard = styled(motion.div)`
-  background: white;
+  background: rgba(30, 41, 59, 0.95);
   padding: 3rem;
   border-radius: 1.2rem;
   margin: 1rem 0;

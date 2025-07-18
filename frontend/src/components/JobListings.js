@@ -18,7 +18,7 @@ const Header = styled.div`
 `;
 
 const Title = styled.h1`
-  color: #3730a3;
+  color: #e2e8f0;
   font-size: 2.7rem;
   font-weight: 900;
   margin-bottom: 0.5rem;
@@ -42,7 +42,7 @@ const FilterBar = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: #f8fafc;
+  background: rgba(30, 41, 59, 0.85);
   border-radius: 1rem;
   padding: 0.75rem 1.5rem;
   box-shadow: 0 2px 12px rgba(99,102,241,0.07);
@@ -89,7 +89,7 @@ const FilterChips = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  background: #e0e7ff;
+  background: #232946;
   border-radius: 1.5rem;
   padding: 0.3rem 0.8rem;
   margin-left: 1rem;
@@ -117,10 +117,11 @@ const Chip = styled.span`
 
 const FilterDropdown = styled.select`
   padding: 0.7rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #232946;
   border-radius: 0.7rem;
   font-size: 1rem;
-  background-color: white;
+  background-color: #1e293b;
+  color: #e2e8f0;
   cursor: pointer;
   &:focus {
     outline: none;
@@ -135,7 +136,7 @@ const FilterDropdown = styled.select`
 const SearchBar = styled.div`
   display: flex;
   align-items: center;
-  background: #f3f4f6;
+  background: #232946;
   border-radius: 0.7rem;
   padding: 0.7rem 1rem;
   margin-bottom: 1.5rem;
@@ -151,7 +152,7 @@ const SearchInput = styled.input`
   background: transparent;
   font-size: 1.1rem;
   flex: 1;
-  color: #3730a3;
+  color: #e2e8f0;
   &:focus {
     outline: none;
   }
@@ -164,7 +165,7 @@ const JobGrid = styled.div`
 `;
 
 const JobCard = styled(motion.div)`
-  background: white;
+  background: rgba(30, 41, 59, 0.95);
   border-radius: 1.2rem;
   padding: 1.7rem 1.5rem 1.2rem 1.5rem;
   box-shadow: 0 4px 24px rgba(99,102,241,0.13);
@@ -187,17 +188,21 @@ const JobHeader = styled.div`
   margin-bottom: 1rem;
 `;
 
-const CompanyLogo = styled.img`
+const CompanyLogo = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 0.7rem;
-  background: #f3f4f6;
-  object-fit: contain;
-  border: 1px solid #e5e7eb;
+  background: #232946;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6366f1;
+  font-weight: 900;
+  font-size: 1.2rem;
 `;
 
 const JobTitle = styled.h3`
-  color: #3730a3;
+  color: #e2e8f0;
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
@@ -230,7 +235,7 @@ const MetaItem = styled.div`
 `;
 
 const JobDescription = styled.p`
-  color: #6b7280;
+  color: #cbd5e1;
   line-height: 1.6;
   margin-bottom: 1rem;
   display: -webkit-box;
@@ -248,15 +253,6 @@ const RequirementsList = styled.ul`
 const RequirementItem = styled.li`
   color: #6366f1;
   font-size: 0.95rem;
-  margin-bottom: 0.3rem;
-  padding-left: 1rem;
-  position: relative;
-  &:before {
-    content: "•";
-    color: #6366f1;
-    position: absolute;
-    left: 0;
-  }
 `;
 
 const Button = styled.button`
