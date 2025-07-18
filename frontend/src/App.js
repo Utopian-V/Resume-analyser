@@ -15,7 +15,7 @@ import FAQChat from './components/common/FAQChat';
 import { useFAQ } from './hooks/useFAQ';
 
 // Routes
-import { dashboardRoutes, publicRoutes } from './config/routes';
+import { dashboardRoutes, publicRoutes, adminRoutes } from './config/routes';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -46,6 +46,16 @@ function App() {
         <Routes>
           {/* Public Routes */}
           {publicRoutes.map(({ path, component: Component, exact }) => (
+            <Route 
+              key={path}
+              path={path} 
+              element={<Component />} 
+              exact={exact}
+            />
+          ))}
+          
+          {/* Admin Routes */}
+          {adminRoutes.map(({ path, component: Component, exact }) => (
             <Route 
               key={path}
               path={path} 

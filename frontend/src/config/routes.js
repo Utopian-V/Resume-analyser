@@ -43,6 +43,18 @@ export const dashboardRoutes = [
   }
 ];
 
+export const adminRoutes = [
+  {
+    path: '/admin',
+    component: AdminPortal,
+    exact: true
+  },
+  {
+    path: '/admin/*',
+    component: AdminPortal
+  }
+];
+
 export const publicRoutes = [
   {
     path: '/',
@@ -76,9 +88,5 @@ export const publicRoutes = [
   {
     path: '/mock-interview',
     component: MockInterview
-  },
-  {
-    path: '/admin',
-    component: AdminPortal
   }
 ];
