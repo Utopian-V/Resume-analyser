@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiBookOpen, FiUser, FiCalendar, FiTag, FiArrowRight, FiX } from 'react-icons/fi';
+import { FiBookOpen, FiUser, FiCalendar, FiTag, FiArrowRight, FiX, FiLoader } from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
-// --- Blog Data (keep as is for now) ---
-export const blogs = [
+// --- Fallback Blog Data (used when API is unavailable) ---
+export const fallbackBlogs = [
   {
     id: 1,
     title: 'How to Make Your Resume Stand Out in 2024',
@@ -16,7 +16,7 @@ export const blogs = [
       avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
     },
     date: '2024-07-18',
-    summary: 'Discover the latest tips and tricks to craft a resume that catches recruiters’ eyes and lands you more interviews.',
+    summary: 'Discover the latest tips and tricks to craft a resume that catches recruiters\' eyes and lands you more interviews.',
     content: `In today’s competitive job market, your resume needs to do more than just list your experience. Here’s how to make it shine:
 
 1. Use a clean, modern format with plenty of white space.
@@ -195,37 +195,23 @@ Remember, rest is productive too!`,
     content: `DSA tests your problem-solving, while system design shows your architectural thinking. Prepare for both to maximize your chances.`,
     image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80',
     tags: ['DSA', 'System Design', 'Interview']
-  },
-  {
-    id: 10,
-    title: 'How to Stay Motivated During a Long Job Search',
-    author: {
-      name: 'Fatima Noor',
-      slug: 'fatima-noor',
-      bio: 'Career counselor and motivational speaker.',
-      avatar: 'https://randomuser.me/api/portraits/women/47.jpg'
-    },
-    date: '2024-05-18',
-    summary: 'Job hunting can be tough. Here’s how to keep your spirits high and your search effective.',
-    content: `Set small goals, celebrate wins, and don’t hesitate to ask for support. Remember, persistence pays off!`,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
-    tags: ['Motivation', 'Job Search', 'Career']
   }
 ];
-export const authors = Array.from(new Map(blogs.map(b => [b.author.slug, b.author])).values());
-export const tags = Array.from(new Set(blogs.flatMap(b => b.tags)));
+// Helper functions that work with dynamic blog data
+export const getAuthors = (blogList) => Array.from(new Map(blogList.map(b => [b.author.slug, b.author])).values());
+export const getTags = (blogList) => Array.from(new Set(blogList.flatMap(b => b.tags)));
 
-export function getPostsByAuthor(slug) {
-  return blogs.filter(b => b.author.slug === slug);
+export function getPostsByAuthor(slug, blogList = fallbackBlogs) {
+  return blogList.filter(b => b.author.slug === slug);
 }
-export function getPostsByTag(tag) {
-  return blogs.filter(b => b.tags.includes(tag));
+export function getPostsByTag(tag, blogList = fallbackBlogs) {
+  return blogList.filter(b => b.tags.includes(tag));
 }
-export function getRelatedPosts(post, count = 2) {
+export function getRelatedPosts(post, blogList = fallbackBlogs, count = 2) {
   // Related by tag, then by author
-  const byTag = blogs.filter(b => b.id !== post.id && b.tags.some(t => post.tags.includes(t)));
+  const byTag = blogList.filter(b => b.id !== post.id && b.tags.some(t => post.tags.includes(t)));
   if (byTag.length >= count) return byTag.slice(0, count);
-  const byAuthor = blogs.filter(b => b.id !== post.id && b.author.slug === post.author.slug);
+  const byAuthor = blogList.filter(b => b.id !== post.id && b.author.slug === post.author.slug);
   const combined = [...byTag, ...byAuthor.filter(b => !byTag.includes(b))];
   return combined.slice(0, count);
 }
@@ -513,14 +499,77 @@ const CloseBtn = styled.button`
   &:hover { background: #dc2626; }
 `;
 
+// API configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 export default function Blog() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [modalBlog, setModalBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/blogs/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Extract blogs array from API response
+        const blogsArray = data.blogs || data;
+        setBlogs(blogsArray);
+      } catch (err) {
+        console.error("Failed to fetch blogs:", err);
+        setError("Failed to load blog posts. Please try again later.");
+        setBlogs(fallbackBlogs); // Fallback to local data on error
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   // Featured post (first blog)
   const featured = blogs[0];
   const latest = blogs.slice(1);
+
+  if (loading && !blogs.length) {
+    return (
+      <BlogContainer>
+        <Helmet>
+          <title>Prep Nexus Blog – Loading...</title>
+          <meta name="description" content="Loading blog posts from Prep Nexus." />
+        </Helmet>
+        <LoadingSpinner>
+          <FiLoader size={50} className="spinner" />
+          <h2>Loading blog posts...</h2>
+        </LoadingSpinner>
+      </BlogContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <BlogContainer>
+        <Helmet>
+          <title>Prep Nexus Blog – Error</title>
+          <meta name="description" content="Error loading blog posts from Prep Nexus." />
+        </Helmet>
+        <div style={{ textAlign: 'center', margin: '4rem 0' }}>
+          <h2>{error}</h2>
+          <p>Please try again later or check your network connection.</p>
+        </div>
+      </BlogContainer>
+    );
+  }
+
+  if (!blogs.length) {
+    return <NotFound />;
+  }
 
   return (
     <BlogContainer>
@@ -614,9 +663,63 @@ export default function Blog() {
 
 export function AuthorPage() {
   const { slug } = useParams();
-  const author = authors.find(a => a.slug === slug);
-  const posts = getPostsByAuthor(slug);
-  if (!author) return <div style={{ color: '#ef4444', textAlign: 'center', margin: '3rem' }}>Author not found.</div>;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+  const [author, setAuthor] = useState(null);
+
+  useEffect(() => {
+    const fetchAuthorBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/blogs/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const blogsArray = data.blogs || data;
+        setBlogs(blogsArray);
+        
+        // Find author from blogs
+        const authorBlog = blogsArray.find(b => b.author.slug === slug);
+        if (authorBlog) {
+          setAuthor(authorBlog.author);
+        }
+      } catch (err) {
+        console.error("Failed to fetch author blogs:", err);
+        setError("Failed to load author posts. Please try again later.");
+        // Fallback to local data
+        const fallbackAuthorBlog = fallbackBlogs.find(b => b.author.slug === slug);
+        if (fallbackAuthorBlog) {
+          setAuthor(fallbackAuthorBlog.author);
+          setBlogs(fallbackBlogs);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAuthorBlogs();
+  }, [slug]);
+
+  const posts = getPostsByAuthor(slug, blogs);
+
+  if (loading) {
+    return (
+      <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', textAlign: 'center' }}>
+        <FiLoader size={50} className="animate-spin text-blue-500" />
+        <h2>Loading author posts...</h2>
+      </div>
+    );
+  }
+
+  if (error || !author) {
+    return (
+      <div style={{ color: '#ef4444', textAlign: 'center', margin: '3rem' }}>
+        {error || 'Author not found.'}
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem' }}>
       <Helmet>
@@ -653,10 +756,6 @@ export function AuthorPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* The original code had a Link component here, but Link is not imported.
-                Assuming the intent was to navigate to the blog post directly or that
-                the Link component was intended to be added. For now, removing the
-                Link component as it's not available. */}
             <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
             <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
             <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -673,20 +772,64 @@ export function AuthorPage() {
 
 export function TagPage() {
   const { tag } = useParams();
-  const posts = getPostsByTag(tag);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    const fetchTagBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/blogs/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const blogsArray = data.blogs || data;
+        setBlogs(blogsArray);
+      } catch (err) {
+        console.error("Failed to fetch tag blogs:", err);
+        setError("Failed to load tag posts. Please try again later.");
+        setBlogs(fallbackBlogs); // Fallback to local data
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTagBlogs();
+  }, [tag]);
+
+  const posts = getPostsByTag(tag, blogs);
+
+  if (loading) {
+    return (
+      <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem', textAlign: 'center' }}>
+        <FiLoader size={50} className="animate-spin text-blue-500" />
+        <h2>Loading tag posts...</h2>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ color: '#ef4444', textAlign: 'center', margin: '3rem' }}>
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: '2rem auto', padding: '0 1rem' }}>
       <Helmet>
-        <title>Posts tagged “{tag}” – Prep Nexus Blog</title>
-        <meta name="description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
-        <meta property="og:title" content={`Posts tagged “${tag}” – Prep Nexus Blog`} />
-        <meta property="og:description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
+        <title>Posts tagged "{tag}" – Prep Nexus Blog</title>
+        <meta name="description" content={`Read all posts tagged "${tag}" on Prep Nexus Blog.`} />
+        <meta property="og:title" content={`Posts tagged "${tag}" – Prep Nexus Blog`} />
+        <meta property="og:description" content={`Read all posts tagged "${tag}" on Prep Nexus Blog.`} />
         <meta property="og:type" content="blog" />
         <meta property="og:url" content={`https://prepnexus.netlify.app/blog/tag/${tag}`} />
         <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`Posts tagged “${tag}” – Prep Nexus Blog`} />
-        <meta name="twitter:description" content={`Read all posts tagged “${tag}” on Prep Nexus Blog.`} />
+        <meta name="twitter:title" content={`Posts tagged "${tag}" – Prep Nexus Blog`} />
+        <meta name="twitter:description" content={`Read all posts tagged "${tag}" on Prep Nexus Blog.`} />
         <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
         <link rel="canonical" href={`https://prepnexus.netlify.app/blog/tag/${tag}`} />
         <script type="application/ld+json">{JSON.stringify({
@@ -699,14 +842,10 @@ export function TagPage() {
           ]
         })}</script>
       </Helmet>
-      <h1 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2.2rem', marginBottom: 0 }}>Posts tagged “{tag}”</h1>
+      <h1 style={{ color: '#3730a3', fontWeight: 900, fontSize: '2.2rem', marginBottom: 0 }}>Posts tagged "{tag}"</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginTop: 32 }}>
         {posts.length > 0 ? posts.map(blog => (
           <article key={blog.id} style={{ background: '#fff', borderRadius: '1.2rem', boxShadow: '0 2px 16px rgba(99,102,241,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* The original code had a Link component here, but Link is not imported.
-                Assuming the intent was to navigate to the blog post directly or that
-                the Link component was intended to be added. For now, removing the
-                Link component as it's not available. */}
             <img src={blog.image} alt={blog.title} loading="lazy" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '0.8rem', marginBottom: '1rem' }} />
             <h3 style={{ color: '#3730a3', fontSize: '1.3rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>{blog.title}</h3>
             <div style={{ color: '#6366f1', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -736,5 +875,30 @@ const CTAButton = styled.button`
   &:hover {
     background: linear-gradient(90deg, #3730a3 60%, #6366f1 100%);
     transform: translateY(-2px) scale(1.03);
+  }
+`;
+
+const LoadingSpinner = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem 0;
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+    color: #6366f1;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  h2 {
+    color: #6366f1;
+    font-weight: 600;
+    margin: 0;
   }
 `; 
