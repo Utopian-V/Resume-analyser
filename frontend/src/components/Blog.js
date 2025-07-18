@@ -350,7 +350,7 @@ const TagList = styled.div`
   gap: 0.5rem;
   margin-bottom: 1rem;
 `;
-const Tag = styled.span`
+const BlogTag = styled.span`
   background: linear-gradient(90deg, #6366f1 60%, #3730a3 100%);
   color: #fff;
   border-radius: 0.7em;
@@ -358,19 +358,126 @@ const Tag = styled.span`
   font-size: 0.95em;
   font-weight: 700;
 `;
+
 const TrendingSection = styled.div`
   margin: 3rem 0 2rem 0;
+  position: relative;
+  overflow: hidden;
 `;
-const TrendingTitle = styled.h3`
-  color: #6366f1;
-  font-size: 1.2rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-`;
+
 const TrendingTags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
+  margin: 3rem 0;
+  position: relative;
+`;
+
+const TagsTitle = styled.h3`
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #6366f1;
+  text-align: center;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+  }
+`;
+
+const TagsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.8rem;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: 2rem;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  backdrop-filter: blur(25px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+    border-radius: 2rem;
+    pointer-events: none;
+  }
+`;
+
+const TrendingTag = styled.button`
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  color: #6366f1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+    color: #fff;
+  }
+  
+  &:active {
+    transform: translateY(-1px) scale(1.02);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
 `;
 const ModalOverlay = styled.div`
   position: fixed;
@@ -432,7 +539,7 @@ export default function Blog() {
           </HeroMeta>
           <HeroSummary>{featured.summary}</HeroSummary>
           <TagList>
-            {featured.tags.map(tag => <Tag key={tag}><FiTag style={{marginRight: 4}} />{tag}</Tag>)}
+            {featured.tags.map(tag => <BlogTag key={tag}><FiTag style={{marginRight: 4}} />{tag}</BlogTag>)}
           </TagList>
           <ReadMoreBtn onClick={() => setModalBlog(featured)}>
             Read Full Article <FiArrowRight style={{marginLeft: 6}} />
@@ -442,9 +549,25 @@ export default function Blog() {
 
       {/* Trending Tags */}
       <TrendingSection>
-        <TrendingTitle>Trending Topics</TrendingTitle>
         <TrendingTags>
-          {tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+          <TagsTitle>Trending Topics</TagsTitle>
+          <TagsContainer>
+            <TrendingTag>AI</TrendingTag>
+            <TrendingTag>ML</TrendingTag>
+            <TrendingTag>DSA</TrendingTag>
+            <TrendingTag>System Design</TrendingTag>
+            <TrendingTag>Behavioral</TrendingTag>
+            <TrendingTag>Resume</TrendingTag>
+            <TrendingTag>Networking</TrendingTag>
+            <TrendingTag>Leadership</TrendingTag>
+            <TrendingTag>Startups</TrendingTag>
+            <TrendingTag>Remote</TrendingTag>
+            <TrendingTag>Career Growth</TrendingTag>
+            <TrendingTag>Tech Trends</TrendingTag>
+            <TrendingTag>Productivity</TrendingTag>
+            <TrendingTag>Branding</TrendingTag>
+            <TrendingTag>Innovation</TrendingTag>
+          </TagsContainer>
         </TrendingTags>
       </TrendingSection>
 
@@ -460,7 +583,7 @@ export default function Blog() {
             </BlogMeta>
             <BlogSummary>{blog.summary}</BlogSummary>
             <TagList>
-              {blog.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+              {blog.tags.map(tag => <BlogTag key={tag}>{tag}</BlogTag>)}
             </TagList>
             <ReadMoreBtn style={{marginTop: 8}}>Read More <FiArrowRight style={{marginLeft: 6}} /></ReadMoreBtn>
           </BlogCard>
@@ -478,7 +601,7 @@ export default function Blog() {
               <span><FiCalendar /> {modalBlog.date}</span>
             </BlogMeta>
             <TagList style={{marginBottom: 18}}>
-              {modalBlog.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
+              {modalBlog.tags.map(tag => <BlogTag key={tag}>{tag}</BlogTag>)}
             </TagList>
             <img src={modalBlog.image} alt={modalBlog.title} style={{width:'100%', borderRadius:12, marginBottom:18, maxHeight:220, objectFit:'cover'}} />
             <div style={{whiteSpace:'pre-line', color:'#e2e8f0', fontSize:'1.13rem', lineHeight:1.7}}>{modalBlog.content}</div>
