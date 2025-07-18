@@ -75,6 +75,142 @@ Your network is your net worth. Start building it today!`,
     image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
     tags: ['Networking', 'Career', 'Advice']
   },
+  {
+    id: 4,
+    title: 'Top 10 Resume Mistakes to Avoid',
+    author: {
+      name: 'Alex Kim',
+      slug: 'alex-kim',
+      bio: 'HR specialist and hiring manager.',
+      avatar: 'https://randomuser.me/api/portraits/men/45.jpg'
+    },
+    date: '2024-07-05',
+    summary: 'Avoid these common pitfalls to ensure your resume gets noticed for the right reasons.',
+    content: `A single typo or a generic objective can cost you an interview. Here are the top mistakes:
+
+1. Typos and grammatical errors
+2. Using the same resume for every job
+3. Listing duties instead of achievements
+4. Overly long or short resumes
+5. Unprofessional email addresses
+
+Proofread, tailor, and keep it professional!`,
+    image: 'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=600&q=80',
+    tags: ['Resume', 'Mistakes', 'Career']
+  },
+  {
+    id: 5,
+    title: 'How to Ace Behavioral Interviews',
+    author: {
+      name: 'Sara Lee',
+      slug: 'sara-lee',
+      bio: 'Behavioral interview coach.',
+      avatar: 'https://randomuser.me/api/portraits/women/68.jpg'
+    },
+    date: '2024-06-28',
+    summary: 'Master the STAR method and answer behavioral questions with confidence.',
+    content: `Behavioral interviews are about storytelling. Use the STAR method:
+
+- Situation: Set the context
+- Task: What was your responsibility?
+- Action: What did you do?
+- Result: What was the outcome?
+
+Practice with real examples from your experience.`,
+    image: 'https://images.unsplash.com/photo-1515168833906-d2a3b82b302b?auto=format&fit=crop&w=600&q=80',
+    tags: ['Interview', 'Behavioral', 'STAR']
+  },
+  {
+    id: 6,
+    title: '5 Tech Trends Shaping the Future of Work',
+    author: {
+      name: 'Priya Singh',
+      slug: 'priya-singh',
+      bio: 'Tech journalist and futurist.',
+      avatar: 'https://randomuser.me/api/portraits/women/22.jpg'
+    },
+    date: '2024-06-20',
+    summary: 'From AI to remote work, here are the trends you need to watch to stay ahead.',
+    content: `The workplace is evolving fast. Key trends:
+
+1. AI-powered productivity tools
+2. Remote and hybrid work
+3. Upskilling and lifelong learning
+4. Automation and new job roles
+5. Focus on mental health and well-being
+
+Stay adaptable and keep learning!`,
+    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80',
+    tags: ['Tech', 'Trends', 'Future']
+  },
+  {
+    id: 7,
+    title: 'Productivity Hacks for Busy Professionals',
+    author: {
+      name: 'David Chen',
+      slug: 'david-chen',
+      bio: 'Productivity coach and author.',
+      avatar: 'https://randomuser.me/api/portraits/men/77.jpg'
+    },
+    date: '2024-06-12',
+    summary: 'Simple strategies to get more done in less time, without burning out.',
+    content: `Try these hacks:
+
+- Time blocking your calendar
+- The 2-minute rule
+- Batch similar tasks
+- Take regular breaks
+- Use productivity tools (but don’t overdo it)
+
+Remember, rest is productive too!`,
+    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80',
+    tags: ['Productivity', 'Hacks', 'Work']
+  },
+  {
+    id: 8,
+    title: 'Building a Personal Brand Online',
+    author: {
+      name: 'Emily Carter',
+      slug: 'emily-carter',
+      bio: 'Personal branding strategist.',
+      avatar: 'https://randomuser.me/api/portraits/women/12.jpg'
+    },
+    date: '2024-06-01',
+    summary: 'Your online presence matters. Here’s how to stand out and attract opportunities.',
+    content: `Start with a strong LinkedIn profile, share your expertise, and engage with your community. Consistency and authenticity are key.`,
+    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
+    tags: ['Branding', 'Online', 'Career']
+  },
+  {
+    id: 9,
+    title: 'DSA vs. System Design: What Matters More?',
+    author: {
+      name: 'Ravi Kumar',
+      slug: 'ravi-kumar',
+      bio: 'Senior software architect.',
+      avatar: 'https://randomuser.me/api/portraits/men/29.jpg'
+    },
+    date: '2024-05-25',
+    summary: 'Understand the difference and why both are important for tech interviews.',
+    content: `DSA tests your problem-solving, while system design shows your architectural thinking. Prepare for both to maximize your chances.`,
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80',
+    tags: ['DSA', 'System Design', 'Interview']
+  },
+  {
+    id: 10,
+    title: 'How to Stay Motivated During a Long Job Search',
+    author: {
+      name: 'Fatima Noor',
+      slug: 'fatima-noor',
+      bio: 'Career counselor and motivational speaker.',
+      avatar: 'https://randomuser.me/api/portraits/women/47.jpg'
+    },
+    date: '2024-05-18',
+    summary: 'Job hunting can be tough. Here’s how to keep your spirits high and your search effective.',
+    content: `Set small goals, celebrate wins, and don’t hesitate to ask for support. Remember, persistence pays off!`,
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    tags: ['Motivation', 'Job Search', 'Career']
+  }
 ];
 export const authors = Array.from(new Map(blogs.map(b => [b.author.slug, b.author])).values());
 export const tags = Array.from(new Set(blogs.flatMap(b => b.tags)));
