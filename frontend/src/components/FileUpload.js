@@ -5,6 +5,7 @@ import { uploadResume } from "../api";
 import GraphicalAnalysis from "./GraphicalAnalysis";
 import FeedbackDisplay from "./FeedbackDisplay";
 import ProjectAnalysis from "./ProjectAnalysis";
+import { Helmet } from 'react-helmet-async';
 
 const bounce = keyframes`
   0% { transform: scale(1); }
@@ -105,7 +106,12 @@ const ResumeAnalysis = () => {
   };
 
   return (
-    <div>
+    <>
+      <Helmet>
+        <title>Resume Feedback Online | Prep Nexus</title>
+        <meta name="description" content="Upload your resume and get instant AI-powered feedback. Optimize your resume for job applications with Prep Nexus." />
+        <link rel="canonical" href="https://prepnexus.netlify.app/resume-feedback" />
+      </Helmet>
       <UploadBox
         style={dragActive ? { background: "#e0e7ff", borderColor: "#3730a3" } : {}}
         onClick={() => fileInputRef.current.click()}
@@ -136,7 +142,7 @@ const ResumeAnalysis = () => {
           <ProjectAnalysis projectAnalysis={analysis.project_analysis} />
         </div>
       )}
-    </div>
+    </>
   );
 };
 

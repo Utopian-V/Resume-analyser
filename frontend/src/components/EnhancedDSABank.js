@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FiCode, FiCheckCircle, FiExternalLink, FiTrendingUp, FiBookOpen, FiTarget, FiBarChart2 } from "react-icons/fi";
 import { parseCSV } from "../utils/csv";
+import { Helmet } from 'react-helmet-async';
 
 const csvUrl = require('../data/dsa_questions.csv');
 
@@ -277,6 +278,11 @@ const EnhancedDSABank = ({ userId }) => {
 
   return (
     <Container>
+      <Helmet>
+        <title>DSA Practice Bank | Prep Nexus</title>
+        <meta name="description" content="Practice data structures and algorithms questions for interviews. Track your progress and prepare for top tech jobs with Prep Nexus." />
+        <link rel="canonical" href="https://prepnexus.netlify.app/dsa-practice" />
+      </Helmet>
       <Header>
         <Title>
           <FiCode size={24} />

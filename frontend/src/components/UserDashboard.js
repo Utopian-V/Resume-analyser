@@ -479,7 +479,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
           
           <QuickActions>
             <ActionButton
-              onClick={() => navigate('/dsa')}
+              onClick={() => navigate('/app/dsa')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -488,7 +488,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
             </ActionButton>
             
             <ActionButton
-              onClick={() => navigate('/aptitude')}
+              onClick={() => navigate('/app/aptitude')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -497,7 +497,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
             </ActionButton>
             
             <ActionButton
-              onClick={() => navigate('/resume')}
+              onClick={() => navigate('/app/resume')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -506,7 +506,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
             </ActionButton>
             
             <ActionButton
-              onClick={() => navigate('/jobs')}
+              onClick={() => navigate('/app/jobs')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

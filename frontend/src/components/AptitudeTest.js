@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import aptitudeTests from '../data/aptitude_tests.json';
+import { Helmet } from 'react-helmet-async';
 
 const Container = styled.div`
   max-width: 600px;
@@ -168,6 +169,11 @@ export default function AptitudeTest() {
 
   return (
     <Container>
+      <Helmet>
+        <title>Free Aptitude Test Online | Prep Nexus</title>
+        <meta name="description" content="Take a free, time-bound aptitude test with instant results. Practice for your next job interview with Prep Nexus." />
+        <link rel="canonical" href="https://prepnexus.netlify.app/aptitude-test" />
+      </Helmet>
       <Title>{test.title}</Title>
       <Question>
         <b>Question {current + 1} of {test.questions.length}:</b>

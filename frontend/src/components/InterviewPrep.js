@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FiMessageSquare } from 'react-icons/fi';
+import { Helmet } from 'react-helmet-async';
 
 const Container = styled.div`
   max-width: 700px;
@@ -61,6 +62,11 @@ const CTA = styled.button`
 export default function InterviewPrep() {
   return (
     <Container>
+      <Helmet>
+        <title>Mock Interview Online | Prep Nexus</title>
+        <meta name="description" content="Simulate real job interviews and get instant feedback. Practice behavioral and technical interview questions with Prep Nexus." />
+        <link rel="canonical" href="https://prepnexus.netlify.app/mock-interview" />
+      </Helmet>
       <Title>Interview Prep</Title>
       <Subtitle>
         Practice mock interviews and get AI-powered feedback.<br/>

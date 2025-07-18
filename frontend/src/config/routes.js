@@ -1,11 +1,19 @@
 import UserDashboard from '../components/UserDashboard';
 import JobListings from '../components/JobListings';
-import ResumeAnalysis from '../components/FileUpload'; // If you renamed FileUpload.js to ResumeAnalysis.js, update this import!
+import ResumeAnalysis from '../components/FileUpload';
 import AptitudeTest from '../components/AptitudeTest';
 import EnhancedDSABank from '../components/EnhancedDSABank';
 import InterviewPrep from '../components/InterviewPrep';
 import Blog from '../components/Blog';
 import LandingPage from '../components/landing/LandingPage';
+import AdminPortal from '../components/AdminPortal';
+
+// Placeholder components for new public routes
+const DataInterpretation = () => <div style={{padding:'4rem',color:'#6366f1',textAlign:'center'}}>Data Interpretation Practice Coming Soon!</div>;
+const ResumeFeedback = ResumeAnalysis;
+const MockInterview = InterviewPrep;
+const DSAPractice = EnhancedDSABank;
+const AdminPortal = () => <div style={{padding:'4rem',color:'#6366f1',textAlign:'center'}}>Admin Portal Coming Soon!</div>;
 
 export const dashboardRoutes = [
   {
@@ -48,5 +56,29 @@ export const publicRoutes = [
   {
     path: '/blog/:slug',
     component: Blog
+  },
+  {
+    path: '/aptitude-test',
+    component: AptitudeTest
+  },
+  {
+    path: '/data-interpretation',
+    component: DataInterpretation
+  },
+  {
+    path: '/dsa-practice',
+    component: DSAPractice
+  },
+  {
+    path: '/resume-feedback',
+    component: ResumeFeedback
+  },
+  {
+    path: '/mock-interview',
+    component: MockInterview
+  },
+  {
+    path: '/admin',
+    component: AdminPortal
   }
 ];
