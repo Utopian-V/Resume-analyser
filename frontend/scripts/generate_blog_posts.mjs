@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
 import { blogAuthors } from '../src/components/blogAuthors.js';
-const topics = require('./blog_topics.json');
+const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BLOG_DIR = path.join(__dirname, '../src/generated_blogs');
