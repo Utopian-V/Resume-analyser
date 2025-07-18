@@ -23,7 +23,9 @@ jobs:
       - name: Generate AI blog posts
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: node frontend/scripts/generate_blog_posts.mjs
+        
 
       - name: Set up Git credentials
         run: |
