@@ -2,12 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import { blogAuthors } from '../src/components/blogAuthors.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BLOG_DIR = path.join(__dirname, '../src/generated_blogs');
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-if (!fs.existsSync(BLOG_DIR)) fs.mkdirSync(BLOG_DIR);
+if (!fs.existsSync(BLOG_DIR)) fs.mkdirSync(BLOG_DIR, { recursive: true });
 
 function getRandomTopic() {
   return topics[Math.floor(Math.random() * topics.length)];
