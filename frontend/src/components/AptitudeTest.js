@@ -365,7 +365,7 @@ const AptitudeTest = ({ userId }) => {
         total_possible: totalQuestions,
         results: test.questions.map(q => ({
           question_id: q.id,
-          question_text: q.question_text,
+          question_text: q.question,
           user_answer: answers[q.id] ? answers[q.id].toUpperCase() : '—',
           correct_answer: q.correct_answer.toUpperCase(),
           is_correct: answers[q.id] === q.correct_answer,
@@ -505,7 +505,7 @@ const AptitudeTest = ({ userId }) => {
           <ul>
             {test.questions.map((q, i) => (
               <li key={q.id} style={{ marginBottom: 10 }}>
-                <b>Q{i+1}:</b> {q.question_text}<br/>
+                <b>Q{i+1}:</b> {q.question}<br/>
                 <span>Selected: <b>{answers[q.id] ? answers[q.id].toUpperCase() : '—'}</b></span>
               </li>
             ))}
@@ -525,7 +525,7 @@ const AptitudeTest = ({ userId }) => {
       <ProgressBar><Progress percent={percent} /></ProgressBar>
       <QuestionCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} key={question.id}>
         <h3>Question {currentQuestion + 1} of {test.questions.length}</h3>
-        <p>{question.question_text}</p>
+        <p>{question.question}</p>
         <div>
           {question.options.map(option => (
             <Option

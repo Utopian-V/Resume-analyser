@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { addAptitudeQuestion } from '../api';
+import aptitudeTests from '../data/aptitude_tests.json';
 
 const Container = styled.div`
   max-width: 1000px;
