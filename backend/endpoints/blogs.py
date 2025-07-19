@@ -117,14 +117,11 @@ async def get_featured_blogs(limit: int = 5):
                 "author": {
                     "name": row['author_name'],
                     "slug": row['slug'],
-                    "bio": row['author_bio'],
-                    "avatar": row['author_avatar']
+                    "avatar": row['avatar']
                 },
                 "date": row['created_at'].strftime('%Y-%m-%d'),
-                "summary": row['summary'],
                 "content": row['content'],
-                "image": row['image_url'],
-                "tags": tags
+                "image": row['image'],
             }
             blogs.append(blog)
         
