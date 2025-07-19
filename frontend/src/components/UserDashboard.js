@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiUser, FiTrendingUp, FiBriefcase, FiCode, FiAward, FiUploadCloud, FiMessageSquare, FiTarget, FiBookOpen, FiUsers, FiCalendar, FiCheckCircle, FiClock, FiStar, FiBarChart2 } from "react-icons/fi";
 import { BiBrain } from 'react-icons/bi';
 import { getUserProgress, updateResumeScore } from "../api.js";
 import { useNavigate } from "react-router-dom";
@@ -385,7 +384,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               <StatLabel>DSA Questions Completed</StatLabel>
             </div>
             <StatIcon color="#6366f1">
-              <FiCode />
+              📚
             </StatIcon>
           </StatHeader>
         </StatCard>
@@ -401,7 +400,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               <StatLabel>Aptitude Tests Taken</StatLabel>
             </div>
             <StatIcon color="#8b5cf6">
-              <BiBrain />
+              🧠
             </StatIcon>
           </StatHeader>
         </StatCard>
@@ -417,7 +416,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               <StatLabel>Resume Score</StatLabel>
             </div>
             <StatIcon color="#10b981">
-              <FiAward />
+              🎓
             </StatIcon>
           </StatHeader>
         </StatCard>
@@ -433,7 +432,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               <StatLabel>Day Streak</StatLabel>
             </div>
             <StatIcon color="#f59e0b">
-              <FiTrendingUp />
+              ⚡
             </StatIcon>
           </StatHeader>
         </StatCard>
@@ -442,7 +441,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
       <MainContent>
         <ContentSection>
           <SectionTitle>
-            <FiBarChart2 />
+            📊
             Weekly Progress
           </SectionTitle>
           
@@ -473,7 +472,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
 
         <ContentSection>
           <SectionTitle>
-            <FiTarget />
+            🎯
             Quick Actions
           </SectionTitle>
           
@@ -483,7 +482,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ActionIcon><FiCode /></ActionIcon>
+              <ActionIcon>💻</ActionIcon>
               DSA Practice
             </ActionButton>
             
@@ -492,7 +491,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ActionIcon><BiBrain /></ActionIcon>
+              <ActionIcon>🧠</ActionIcon>
               Aptitude Test
             </ActionButton>
             
@@ -501,7 +500,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ActionIcon><FiUploadCloud /></ActionIcon>
+              <ActionIcon>📄</ActionIcon>
               Resume Analysis
             </ActionButton>
             
@@ -510,21 +509,21 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ActionIcon><FiBriefcase /></ActionIcon>
+              <ActionIcon>👔</ActionIcon>
               Job Search
             </ActionButton>
           </QuickActions>
 
           <ProgressSection>
             <SectionTitle>
-              <FiTrendingUp />
+              ⚡
               Your Progress
             </SectionTitle>
             
             <ProgressItem>
               <ProgressInfo>
                 <ProgressIcon color="#6366f1">
-                  <FiCode />
+                  💻
                 </ProgressIcon>
                 <ProgressDetails>
                   <ProgressName>DSA Questions</ProgressName>
@@ -541,7 +540,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
             <ProgressItem>
               <ProgressInfo>
                 <ProgressIcon color="#8b5cf6">
-                  <BiBrain />
+                  🧠
                 </ProgressIcon>
                 <ProgressDetails>
                   <ProgressName>Aptitude Tests</ProgressName>
@@ -558,7 +557,7 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
             <ProgressItem>
               <ProgressInfo>
                 <ProgressIcon color="#10b981">
-                  <FiAward />
+                  🎓
                 </ProgressIcon>
                 <ProgressDetails>
                   <ProgressName>Resume Score</ProgressName>

@@ -1,57 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
-  FiSearch, 
-  FiFilter, 
-  FiEdit, 
-  FiTrash2, 
-  FiEye, 
-  FiPlus,
-  FiFileText,
-  FiTag,
-  FiBarChart2
-} from 'react-icons/fi';
 
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  padding: 2rem;
 `;
 
 const Title = styled.h1`
   color: #6366f1;
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0;
-`;
-
-const Button = styled.button`
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  
-  &.primary {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: white;
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-    }
-  }
+  margin-bottom: 2rem;
 `;
 
 const SearchBar = styled.div`
@@ -64,45 +22,27 @@ const SearchBar = styled.div`
   }
 `;
 
-const SearchInput = styled.div`
-  position: relative;
+const SearchInput = styled.input`
   flex: 1;
+  padding: 0.75rem;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
   
-  input {
-    width: 100%;
-    padding: 0.8rem 1rem 0.8rem 3rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 10px;
-    color: #e2e8f0;
-    font-size: 1rem;
-    
-    &:focus {
-      outline: none;
-      border-color: #6366f1;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    &::placeholder {
-      color: #64748b;
-    }
-  }
-  
-  svg {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6366f1;
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
   }
 `;
 
 const FilterSelect = styled.select`
-  padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 10px;
-  color: #e2e8f0;
+  padding: 0.75rem;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #fff;
   font-size: 1rem;
   cursor: pointer;
   
@@ -113,27 +53,20 @@ const FilterSelect = styled.select`
   
   option {
     background: #1e293b;
-    color: #e2e8f0;
+    color: #fff;
   }
 `;
 
 const QuestionGrid = styled.div`
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 `;
 
 const QuestionCard = styled.div`
-  background: rgba(30, 41, 59, 0.95);
-  border-radius: 15px;
+  background: #1e293b;
   padding: 1.5rem;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  transition: all 0.2s;
-  
-  &:hover {
-    border-color: #6366f1;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.1);
-  }
+  border-radius: 8px;
+  border: 1px solid #334155;
 `;
 
 const QuestionHeader = styled.div`
@@ -144,9 +77,7 @@ const QuestionHeader = styled.div`
 `;
 
 const QuestionTitle = styled.h3`
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  font-weight: 700;
+  color: #fff;
   margin: 0;
   flex: 1;
 `;
@@ -157,22 +88,19 @@ const QuestionActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 6px;
+  background: #475569;
+  border: 1px solid #64748b;
+  border-radius: 4px;
   padding: 0.5rem;
-  color: #a5b4fc;
+  color: #fff;
   cursor: pointer;
-  transition: all 0.2s;
   
   &:hover {
-    background: rgba(99, 102, 241, 0.2);
-    color: white;
+    background: #6366f1;
   }
   
   &.danger:hover {
     background: #ef4444;
-    border-color: #ef4444;
   }
 `;
 
@@ -182,13 +110,22 @@ const QuestionMeta = styled.div`
   gap: 1rem;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  color: #a5b4fc;
+  color: #94a3b8;
 `;
 
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+const DifficultyBadge = styled.span`
+  background: ${props => {
+    switch (props.difficulty) {
+      case 'easy': return '#22c55e';
+      case 'medium': return '#f59e0b';
+      case 'hard': return '#ef4444';
+      default: return '#64748b';
+    }
+  }};
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
 `;
 
 const QuestionContent = styled.div`
@@ -206,50 +143,25 @@ const QuestionTags = styled.div`
 `;
 
 const Tag = styled.span`
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #6366f1;
   color: white;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
   font-size: 0.8rem;
-  font-weight: 600;
-`;
-
-const DifficultyBadge = styled.span`
-  background: ${props => {
-    switch (props.difficulty) {
-      case 'easy': return 'rgba(34, 197, 94, 0.2)';
-      case 'medium': return 'rgba(245, 158, 11, 0.2)';
-      case 'hard': return 'rgba(239, 68, 68, 0.2)';
-      default: return 'rgba(156, 163, 175, 0.2)';
-    }
-  }};
-  color: ${props => {
-    switch (props.difficulty) {
-      case 'easy': return '#22c55e';
-      case 'medium': return '#f59e0b';
-      case 'hard': return '#ef4444';
-      default: return '#9ca3af';
-    }
-  }};
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
 `;
 
 const Stats = styled.div`
   display: flex;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(99, 102, 241, 0.2);
+  border-top: 1px solid #334155;
 `;
 
 const Stat = styled.div`
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  color: #a5b4fc;
+  color: #94a3b8;
   font-size: 0.9rem;
 `;
 
@@ -327,24 +239,15 @@ export default function QuestionManagement() {
 
   return (
     <Container>
-      <Header>
-        <Title>Question Management</Title>
-        <Button className="primary">
-          <FiPlus />
-          Add New Question
-        </Button>
-      </Header>
+      <Title>Question Management</Title>
 
       <SearchBar>
-        <SearchInput>
-          <FiSearch />
-          <input
-            type="text"
-            placeholder="Search questions by title or content..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </SearchInput>
+        <SearchInput
+          type="text"
+          placeholder="Search questions by title or content..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <FilterSelect value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
           <option value="all">All Types</option>
           <option value="aptitude">Aptitude</option>
@@ -365,26 +268,20 @@ export default function QuestionManagement() {
               <QuestionTitle>{question.title}</QuestionTitle>
               <QuestionActions>
                 <ActionButton onClick={() => handleView(question.id)}>
-                  <FiEye size={16} />
+                  View
                 </ActionButton>
                 <ActionButton onClick={() => handleEdit(question.id)}>
-                  <FiEdit size={16} />
+                  Edit
                 </ActionButton>
                 <ActionButton className="danger" onClick={() => handleDelete(question.id)}>
-                  <FiTrash2 size={16} />
+                  Delete
                 </ActionButton>
               </QuestionActions>
             </QuestionHeader>
 
             <QuestionMeta>
-              <MetaItem>
-                <FiFileText size={14} />
-                {question.type.toUpperCase()}
-              </MetaItem>
-              <MetaItem>
-                <FiTag size={14} />
-                {question.category}
-              </MetaItem>
+              <span>Type: {question.type.toUpperCase()}</span>
+              <span>Category: {question.category}</span>
               <DifficultyBadge difficulty={question.difficulty}>
                 {question.difficulty}
               </DifficultyBadge>
@@ -400,16 +297,13 @@ export default function QuestionManagement() {
 
             <Stats>
               <Stat>
-                <FiBarChart2 size={14} />
-                {question.stats.attempts} attempts
+                📊 {question.stats.attempts} attempts
               </Stat>
               <Stat>
-                <FiBarChart2 size={14} />
-                {question.stats.successRate} success rate
+                ✅ {question.stats.successRate} success rate
               </Stat>
               <Stat>
-                <FiBarChart2 size={14} />
-                {question.stats.avgTime} avg time
+                ⏱️ {question.stats.avgTime} avg time
               </Stat>
             </Stats>
           </QuestionCard>
