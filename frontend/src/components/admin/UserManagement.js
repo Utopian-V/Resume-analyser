@@ -1,59 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
-  FiSearch, 
-  FiFilter, 
-  FiEdit, 
-  FiTrash2, 
-  FiEye, 
-  FiPlus,
-  FiUser,
-  FiMail,
-  FiCalendar,
-  FiShield,
-  FiMoreVertical
-} from 'react-icons/fi';
 
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  padding: 2rem;
 `;
 
 const Title = styled.h1`
   color: #6366f1;
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0;
-`;
-
-const Button = styled.button`
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  
-  &.primary {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: white;
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-    }
-  }
+  margin-bottom: 2rem;
 `;
 
 const SearchBar = styled.div`
@@ -66,45 +22,27 @@ const SearchBar = styled.div`
   }
 `;
 
-const SearchInput = styled.div`
-  position: relative;
+const SearchInput = styled.input`
   flex: 1;
+  padding: 0.75rem;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
   
-  input {
-    width: 100%;
-    padding: 0.8rem 1rem 0.8rem 3rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 10px;
-    color: #e2e8f0;
-    font-size: 1rem;
-    
-    &:focus {
-      outline: none;
-      border-color: #6366f1;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    &::placeholder {
-      color: #64748b;
-    }
-  }
-  
-  svg {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6366f1;
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
   }
 `;
 
 const FilterSelect = styled.select`
-  padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 10px;
-  color: #e2e8f0;
+  padding: 0.75rem;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #fff;
   font-size: 1rem;
   cursor: pointer;
   
@@ -115,47 +53,27 @@ const FilterSelect = styled.select`
   
   option {
     background: #1e293b;
-    color: #e2e8f0;
+    color: #fff;
   }
 `;
 
 const UserGrid = styled.div`
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 `;
 
 const UserCard = styled.div`
-  background: rgba(30, 41, 59, 0.95);
-  border-radius: 15px;
+  background: #1e293b;
   padding: 1.5rem;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  transition: all 0.2s;
-  
-  &:hover {
-    border-color: #6366f1;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.1);
-  }
+  border-radius: 8px;
+  border: 1px solid #334155;
 `;
 
 const UserHeader = styled.div`
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1rem;
-`;
-
-const UserAvatar = styled.div`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: ${props => props.image ? `url(${props.image}) center/cover` : 'linear-gradient(135deg, #6366f1, #8b5cf6)'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 1.2rem;
 `;
 
 const UserInfo = styled.div`
@@ -163,18 +81,13 @@ const UserInfo = styled.div`
 `;
 
 const UserName = styled.h3`
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.2rem 0;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
 `;
 
 const UserEmail = styled.div`
-  color: #a5b4fc;
+  color: #94a3b8;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
 `;
 
 const UserActions = styled.div`
@@ -183,22 +96,19 @@ const UserActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 6px;
+  background: #475569;
+  border: 1px solid #64748b;
+  border-radius: 4px;
   padding: 0.5rem;
-  color: #a5b4fc;
+  color: #fff;
   cursor: pointer;
-  transition: all 0.2s;
   
   &:hover {
-    background: rgba(99, 102, 241, 0.2);
-    color: white;
+    background: #6366f1;
   }
   
   &.danger:hover {
     background: #ef4444;
-    border-color: #ef4444;
   }
 `;
 
@@ -206,72 +116,22 @@ const UserMeta = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1rem;
   font-size: 0.9rem;
-  color: #a5b4fc;
-`;
-
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+  color: #94a3b8;
 `;
 
 const RoleBadge = styled.span`
   background: ${props => {
     switch (props.role) {
-      case 'admin': return 'rgba(239, 68, 68, 0.2)';
-      case 'blog_writer': return 'rgba(34, 197, 94, 0.2)';
-      case 'moderator': return 'rgba(59, 130, 246, 0.2)';
-      default: return 'rgba(156, 163, 175, 0.2)';
-    }
-  }};
-  color: ${props => {
-    switch (props.role) {
       case 'admin': return '#ef4444';
-      case 'blog_writer': return '#22c55e';
-      case 'moderator': return '#3b82f6';
-      default: return '#9ca3af';
+      case 'writer': return '#6366f1';
+      case 'user': return '#22c55e';
+      default: return '#64748b';
     }
   }};
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-`;
-
-const StatusBadge = styled.span`
-  background: ${props => props.active ? 'rgba(34, 197, 94, 0.2)' : 'rgba(156, 163, 175, 0.2)'};
-  color: ${props => props.active ? '#22c55e' : '#9ca3af'};
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-`;
-
-const UserStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(99, 102, 241, 0.2);
-`;
-
-const Stat = styled.div`
-  text-align: center;
-`;
-
-const StatNumber = styled.div`
-  color: #6366f1;
-  font-size: 1.2rem;
-  font-weight: 700;
-`;
-
-const StatLabel = styled.div`
-  color: #a5b4fc;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
   font-size: 0.8rem;
 `;
 
@@ -281,43 +141,25 @@ export default function UserManagement() {
       id: 1,
       name: 'John Doe',
       email: 'john.doe@example.com',
-      role: 'blog_writer',
-      status: 'active',
-      joinDate: '2024-01-01',
-      avatar: null,
-      stats: {
-        blogs: 15,
-        views: '12.5K',
-        rating: 4.8
-      }
+      role: 'admin',
+      joinDate: '2023-01-15',
+      lastActive: '2024-01-20'
     },
     {
       id: 2,
       name: 'Jane Smith',
       email: 'jane.smith@example.com',
-      role: 'admin',
-      status: 'active',
-      joinDate: '2023-12-15',
-      avatar: null,
-      stats: {
-        blogs: 8,
-        views: '8.2K',
-        rating: 4.9
-      }
+      role: 'writer',
+      joinDate: '2023-03-10',
+      lastActive: '2024-01-19'
     },
     {
       id: 3,
       name: 'Mike Johnson',
       email: 'mike.johnson@example.com',
-      role: 'moderator',
-      status: 'active',
-      joinDate: '2024-01-10',
-      avatar: null,
-      stats: {
-        blogs: 23,
-        views: '18.7K',
-        rating: 4.7
-      }
+      role: 'user',
+      joinDate: '2023-06-22',
+      lastActive: '2024-01-18'
     }
   ]);
 
@@ -347,29 +189,20 @@ export default function UserManagement() {
 
   return (
     <Container>
-      <Header>
-        <Title>User Management</Title>
-        <Button className="primary">
-          <FiPlus />
-          Add New User
-        </Button>
-      </Header>
+      <Title>User Management</Title>
 
       <SearchBar>
-        <SearchInput>
-          <FiSearch />
-          <input
-            type="text"
-            placeholder="Search users by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </SearchInput>
+        <SearchInput
+          type="text"
+          placeholder="Search users by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <FilterSelect value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option value="all">All Roles</option>
           <option value="admin">Admin</option>
-          <option value="blog_writer">Blog Writer</option>
-          <option value="moderator">Moderator</option>
+          <option value="writer">Writer</option>
+          <option value="user">User</option>
         </FilterSelect>
       </SearchBar>
 
@@ -377,56 +210,30 @@ export default function UserManagement() {
         {filteredUsers.map(user => (
           <UserCard key={user.id}>
             <UserHeader>
-              <UserAvatar image={user.avatar}>
-                {!user.avatar && user.name.charAt(0)}
-              </UserAvatar>
               <UserInfo>
                 <UserName>{user.name}</UserName>
-                <UserEmail>
-                  <FiMail size={14} />
-                  {user.email}
-                </UserEmail>
+                <UserEmail>{user.email}</UserEmail>
               </UserInfo>
               <UserActions>
                 <ActionButton onClick={() => handleView(user.id)}>
-                  <FiEye size={16} />
+                  View
                 </ActionButton>
                 <ActionButton onClick={() => handleEdit(user.id)}>
-                  <FiEdit size={16} />
+                  Edit
                 </ActionButton>
                 <ActionButton className="danger" onClick={() => handleDelete(user.id)}>
-                  <FiTrash2 size={16} />
+                  Delete
                 </ActionButton>
               </UserActions>
             </UserHeader>
 
             <UserMeta>
-              <MetaItem>
-                <FiCalendar size={14} />
-                Joined {user.joinDate}
-              </MetaItem>
               <RoleBadge role={user.role}>
-                {user.role.replace('_', ' ')}
+                {user.role}
               </RoleBadge>
-              <StatusBadge active={user.status === 'active'}>
-                {user.status}
-              </StatusBadge>
+              <span>Joined: {user.joinDate}</span>
+              <span>Last Active: {user.lastActive}</span>
             </UserMeta>
-
-            <UserStats>
-              <Stat>
-                <StatNumber>{user.stats.blogs}</StatNumber>
-                <StatLabel>Blogs</StatLabel>
-              </Stat>
-              <Stat>
-                <StatNumber>{user.stats.views}</StatNumber>
-                <StatLabel>Views</StatLabel>
-              </Stat>
-              <Stat>
-                <StatNumber>{user.stats.rating}</StatNumber>
-                <StatLabel>Rating</StatLabel>
-              </Stat>
-            </UserStats>
           </UserCard>
         ))}
       </UserGrid>
