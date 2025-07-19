@@ -28,9 +28,11 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
         conn = await get_db_connection()
         
         # Query to get blogs with pagination, ordered by created_at desc
+
+    
         query = """
-        SELECT id, title, author_name, author_avatar, author_bio, 
-               content, summary, tags, image_url, created_at, slug
+        SELECT id, title, author_name, slug, avatar, 
+               created_at,content,image, date
         FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1 OFFSET $2
@@ -50,14 +52,11 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
                 "author": {
                     "name": row['author_name'],
                     "slug": row['slug'],
-                    "bio": row['author_bio'],
-                    "avatar": row['author_avatar']
+                    "avatar": row['avatar']
                 },
                 "date": row['created_at'].strftime('%Y-%m-%d'),
-                "summary": row['summary'],
                 "content": row['content'],
-                "image": row['image_url'],
-                "tags": tags
+                "image": row['image'],
             }
             blogs.append(blog)
         
@@ -97,8 +96,8 @@ async def get_featured_blogs(limit: int = 5):
         conn = await get_db_connection()
         
         query = """
-        SELECT id, title, author_name, author_avatar, author_bio, 
-               content, summary, tags, image_url, created_at, slug
+        SELECT id, title, author_name, slug, avatar, 
+               created_at,content,image, date
         FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1
