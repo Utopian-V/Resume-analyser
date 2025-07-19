@@ -502,6 +502,45 @@ const CloseBtn = styled.button`
 // API configuration
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+// Markdown formatting function
+function formatMarkdown(content) {
+  if (!content) return '';
+  
+  return content
+    // Headers
+    .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 2rem 0 1rem 0;">$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.8rem; font-weight: 800; color: #1e293b; margin: 2.5rem 0 1rem 0;">$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1 style="font-size: 2.2rem; font-weight: 900; color: #1e293b; margin: 2.5rem 0 1rem 0;">$1</h1>')
+    
+    // Bold and italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>')
+    
+    // Lists
+    .replace(/^\* (.*$)/gim, '<li style="margin: 0.5rem 0;">$1</li>')
+    .replace(/^- (.*$)/gim, '<li style="margin: 0.5rem 0;">$1</li>')
+    .replace(/(<li.*<\/li>)/s, '<ul style="margin: 1.5rem 0; padding-left: 1.5rem;">$1</ul>')
+    
+    // Numbered lists
+    .replace(/^\d+\. (.*$)/gim, '<li style="margin: 0.5rem 0;">$1</li>')
+    .replace(/(<li.*<\/li>)/s, '<ol style="margin: 1.5rem 0; padding-left: 1.5rem;">$1</ol>')
+    
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color: #6366f1; text-decoration: underline;" target="_blank" rel="noopener noreferrer">$1</a>')
+    
+    // Code blocks
+    .replace(/```([\s\S]*?)```/g, '<pre style="background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 1.5rem 0;"><code style="font-family: monospace;">$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code style="background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace;">$1</code>')
+    
+    // Paragraphs
+    .replace(/\n\n/g, '</p><p style="margin: 1rem 0;">')
+    .replace(/^(.+)$/gm, '<p style="margin: 1rem 0;">$1</p>')
+    
+    // Clean up empty paragraphs
+    .replace(/<p style="margin: 1rem 0;"><\/p>/g, '')
+    .replace(/<p style="margin: 1rem 0;"><\/p>/g, '');
+}
+
 export default function Blog() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -659,7 +698,7 @@ export default function Blog() {
       {/* Latest Articles Grid */}
       <BlogGrid>
         {latest.map(blog => (
-          <BlogCard key={blog.id} onClick={() => setModalBlog(blog)}>
+          <BlogCard key={blog.id} onClick={() => navigate(`/blog/${blog.id}`)}>
             <BlogImage src={blog.image} alt={blog.title} />
             <BlogCardTitle>{blog.title}</BlogCardTitle>
             <BlogMeta>
@@ -893,6 +932,170 @@ export function TagPage() {
         )) : <div style={{ color: '#6366f1', textAlign: 'center', gridColumn: '1/-1' }}>No posts with this tag yet.</div>}
       </div>
     </div>
+  );
+}
+
+export function BlogPost() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setBlog(data);
+      } catch (err) {
+        console.error("Failed to fetch blog:", err);
+        setError("Blog post not found.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlog();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <BlogContainer>
+        <Helmet>
+          <title>Loading... - Prep Nexus Blog</title>
+        </Helmet>
+        <LoadingSpinner>
+          <FiLoader size={50} className="spinner" />
+          <h2>Loading blog post...</h2>
+        </LoadingSpinner>
+      </BlogContainer>
+    );
+  }
+
+  if (error || !blog) {
+    return (
+      <BlogContainer>
+        <Helmet>
+          <title>Blog Not Found - Prep Nexus Blog</title>
+        </Helmet>
+        <NotFound />
+      </BlogContainer>
+    );
+  }
+
+  return (
+    <BlogContainer>
+      <Helmet>
+        <title>{blog.title} - Prep Nexus Blog</title>
+        <meta name="description" content={blog.summary || blog.content.substring(0, 160)} />
+        <meta property="og:title" content={blog.title} />
+        <meta property="og:description" content={blog.summary || blog.content.substring(0, 160)} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://prepnexus.netlify.app/blog/${blog.id}`} />
+        <meta property="og:image" content={blog.image} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={blog.title} />
+        <meta name="twitter:description" content={blog.summary || blog.content.substring(0, 160)} />
+        <meta name="twitter:image" content={blog.image} />
+        <link rel="canonical" href={`https://prepnexus.netlify.app/blog/${blog.id}`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": blog.title,
+          "author": {
+            "@type": "Person",
+            "name": blog.author.name
+          },
+          "datePublished": blog.date,
+          "dateModified": blog.date,
+          "description": blog.summary || blog.content.substring(0, 160),
+          "image": blog.image,
+          "url": `https://prepnexus.netlify.app/blog/${blog.id}`,
+          "publisher": {
+            "@type": "Organization",
+            "name": "Prep Nexus",
+            "url": "https://prepnexus.netlify.app"
+          }
+        })}</script>
+      </Helmet>
+
+      {/* Blog Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <button 
+          onClick={() => navigate('/blog')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#6366f1',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '1rem',
+            fontSize: '1rem'
+          }}
+        >
+          <FiArrowRight style={{ transform: 'rotate(180deg)' }} />
+          Back to Blog
+        </button>
+        
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: '900', 
+          color: '#1e293b', 
+          marginBottom: '1rem',
+          lineHeight: '1.2'
+        }}>
+          {blog.title}
+        </h1>
+        
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1rem', 
+          marginBottom: '1.5rem',
+          color: '#64748b'
+        }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <FiUser />
+            {blog.author.name}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <FiCalendar />
+            {blog.date}
+          </span>
+        </div>
+        
+        {blog.image && (
+          <img 
+            src={blog.image} 
+            alt={blog.title}
+            style={{
+              width: '100%',
+              height: '400px',
+              objectFit: 'cover',
+              borderRadius: '12px',
+              marginBottom: '2rem'
+            }}
+          />
+        )}
+      </div>
+
+      {/* Blog Content */}
+      <div 
+        style={{
+          fontSize: '1.1rem',
+          lineHeight: '1.8',
+          color: '#334155',
+          maxWidth: '800px'
+        }}
+        dangerouslySetInnerHTML={{ __html: formatMarkdown(blog.content) }}
+      />
+    </BlogContainer>
   );
 }
 

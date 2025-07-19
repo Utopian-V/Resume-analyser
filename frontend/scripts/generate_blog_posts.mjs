@@ -24,7 +24,63 @@ function getRandomTopic() {
 }
 
 function getPrompt(author, topic) {
-  return `Write a 700-word blog post in the style of ${author.name}, whose niche is: ${author.niche}. Topic: "${topic}". Include SEO keywords: placement, internship, interview, resume, DSA, aptitude. Add a friendly intro, practical tips, and a conclusion. Format as Markdown.`;
+  return `You are ${author.name}, a ${author.niche} expert. Write a 700-word blog post about "${topic}". 
+
+IMPORTANT: Write the content using ONLY HTML tags, NOT markdown.
+
+Use these HTML tags:
+- <h2> for main sections (like "Key Strategies" or "Common Mistakes")
+- <h3> for subsections
+- <p> for paragraphs
+- <ul> and <li> for bullet points
+- <strong> for emphasis
+- <em> for italics
+- <code> for code snippets
+
+Example format:
+<h2>Introduction</h2>
+<p>Start with an engaging introduction...</p>
+
+<h2>Key Strategies</h2>
+<p>Explain the main strategies...</p>
+<ul>
+<li>First strategy</li>
+<li>Second strategy</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>Wrap up with actionable advice...</p>
+
+Include SEO keywords naturally: placement, internship, interview, resume, DSA, aptitude. Make it practical and actionable.`;
+}
+
+// Add markdown-to-HTML conversion as fallback
+function convertMarkdownToHTML(content) {
+  return content
+    // Headers
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    
+    // Bold and italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    
+    // Lists
+    .replace(/^\* (.*$)/gim, '<li>$1</li>')
+    .replace(/^- (.*$)/gim, '<li>$1</li>')
+    .replace(/(<li.*<\/li>)/s, '<ul>$1</ul>')
+    
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+    
+    // Code
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    
+    // Paragraphs
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(.+)$/gm, '<p>$1</p>');
 }
 
 async function fetchUnsplashImage(query) {
@@ -48,9 +104,16 @@ async function generateBlogPost(author, topic) {
       return;
     }
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Blog content could not be generated.';
+    
+    // Convert markdown to HTML if needed (fallback)
+    const formattedContent = content.includes('**') || content.includes('##') 
+      ? convertMarkdownToHTML(content) 
+      : content;
+    
     const image = await fetchUnsplashImage(topic);
     const date = new Date().toISOString().slice(0, 10);
     const slug = `${date}-${author.name.toLowerCase().replace(/\s+/g, '-')}-${topic.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`.slice(0, 60);
+    
     // Insert into Neon (Postgres)
     const client = new Client({
       connectionString: NEON_DATABASE_URL,
@@ -61,7 +124,7 @@ async function generateBlogPost(author, topic) {
       `INSERT INTO blogs (title, author, avatar, date, image, slug, content)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        ON CONFLICT (slug) DO NOTHING`,
-      [topic, author.name, author.avatar, date, image, slug, content]
+      [topic, author.name, author.avatar, date, image, slug, formattedContent]
     );
     await client.end();
     console.log(`Blog post saved to Neon: ${slug}`);

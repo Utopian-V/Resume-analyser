@@ -4,7 +4,7 @@ import ResumeAnalysis from '../components/FileUpload.js';
 import AptitudeTest from '../components/AptitudeTest.js';
 import EnhancedDSABank from '../components/EnhancedDSABank.js';
 import InterviewPrep from '../components/InterviewPrep.js';
-import Blog from '../components/Blog.js';
+import Blog, { BlogPost } from '../components/Blog.js';
 import LandingPage from '../components/landing/LandingPage.js';
 import AdminPortal from '../components/AdminPortal.js';
 
@@ -66,8 +66,8 @@ export const publicRoutes = [
     component: Blog
   },
   {
-    path: '/blog/:slug',
-    component: Blog
+    path: '/blog/:id',
+    component: BlogPost
   },
   {
     path: '/aptitude-test',
