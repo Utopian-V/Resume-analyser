@@ -1,10 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
-import { blogAuthors } from '../src/components/blogAuthors.js';
+
 import { fileURLToPath } from 'url';
 import pkg from 'pg';
 const { Client } = pkg;
+
+import {blogAuthors} from '../src/components/blogAuthors.js';
+
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
