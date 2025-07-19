@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url';
 import pkg from 'pg';
 const { Client } = pkg;
 
-import pkg from '../src/components/blogAuthors.js';
-const {blogAuthors} = pkg;
+import blogAuthorsModule from '../src/components/blogAuthors.js';
+const {blogAuthors} = blogAuthorsModule;
 
 
 
