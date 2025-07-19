@@ -31,8 +31,8 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
 
     
         query = """
-        SELECT id, title, author, slug, avatar, 
-               created_at,content,image, date
+        SELECT id, title, name, slug, avatar, 
+               created_at, content, image, date, tags
         FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1 OFFSET $2
@@ -57,6 +57,7 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
                 "date": row['created_at'].strftime('%Y-%m-%d'),
                 "content": row['content'],
                 "image": row['image'],
+                "tags": []  # Default empty tags for now
             }
             blogs.append(blog)
         
@@ -96,8 +97,8 @@ async def get_featured_blogs(limit: int = 5):
         conn = await get_db_connection()
         
         query = """
-        SELECT id, title, author, slug, avatar, 
-               created_at,content,image, date
+        SELECT id, title, name, slug, avatar, 
+               created_at, content, image, date, tags
         FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1
@@ -108,19 +109,18 @@ async def get_featured_blogs(limit: int = 5):
         
         blogs = []
         for row in rows:
-            tags = json.loads(row['tags']) if row['tags'] else []
-            
             blog = {
                 "id": row['id'],
                 "title": row['title'],
                 "author": {
-                    "name": row['author'],
+                    "name": row['name'],
                     "slug": row['slug'],
                     "avatar": row['avatar']
                 },
                 "date": row['created_at'].strftime('%Y-%m-%d'),
                 "content": row['content'],
                 "image": row['image'],
+                "tags": []  # Default empty tags for now
             }
             blogs.append(blog)
         
