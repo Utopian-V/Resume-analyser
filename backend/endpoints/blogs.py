@@ -31,7 +31,7 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
 
     
         query = """
-        SELECT id, title, name, slug, avatar, 
+        SELECT id, title, author, slug, avatar, 
                created_at, content, image, date, tags
         FROM blogs
         ORDER BY created_at DESC 
@@ -97,7 +97,7 @@ async def get_featured_blogs(limit: int = 5):
         conn = await get_db_connection()
         
         query = """
-        SELECT id, title, name, slug, avatar, 
+        SELECT id, title, author, slug, avatar, 
                created_at, content, image, date, tags
         FROM blogs
         ORDER BY created_at DESC 
@@ -113,7 +113,7 @@ async def get_featured_blogs(limit: int = 5):
                 "id": row['id'],
                 "title": row['title'],
                 "author": {
-                    "name": row['name'],
+                    "name": row['author'],
                     "slug": row['slug'],
                     "avatar": row['avatar']
                 },
