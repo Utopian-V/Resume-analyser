@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import pkg from 'pg';
 const { Client } = pkg;
 
-import blogAuthorsModule from '../src/components/blogAuthors.js';
+import blogAuthorsModule from '../src/components/blogAuthors.mjs';
 const {blogAuthors} = blogAuthorsModule;
 
 
