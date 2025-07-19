@@ -21,7 +21,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "node scripts/generate_sitemap.js && node scripts/generate_rss.js && react-scripts build",
+    "generate-sitemap": "node scripts/generate_sitemap.js",
+    "generate-rss": "node scripts/generate_rss.js",
+    "generate-all": "node scripts/generate_sitemap.js && node scripts/generate_rss.js"
   },
   "browserslist": {
     "production": [

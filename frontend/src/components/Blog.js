@@ -576,6 +576,42 @@ export default function Blog() {
       <Helmet>
         <title>Prep Nexus Blog – Career Tips, DSA, Resume, and More</title>
         <meta name="description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+        <meta name="keywords" content="career tips, DSA, resume writing, interview preparation, job search, tech interviews, coding, programming" />
+        <meta property="og:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
+        <meta property="og:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://prepnexus.netlify.app/blog" />
+        <meta property="og:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Prep Nexus Blog – Career Tips, DSA, Resume, and More" />
+        <meta name="twitter:description" content="Insights, tips, and guides to help you grow your career. Read the latest from Prep Nexus." />
+        <meta name="twitter:image" content="https://prepnexus.netlify.app/og-image.png" />
+        <link rel="canonical" href="https://prepnexus.netlify.app/blog" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "Prep Nexus Blog",
+          "description": "Insights, tips, and guides to help you grow your career",
+          "url": "https://prepnexus.netlify.app/blog",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Prep Nexus",
+            "url": "https://prepnexus.netlify.app"
+          },
+          "blogPost": blogs.map(blog => ({
+            "@type": "BlogPosting",
+            "headline": blog.title,
+            "author": {
+              "@type": "Person",
+              "name": blog.author.name
+            },
+            "datePublished": blog.date,
+            "dateModified": blog.date,
+            "description": blog.summary || blog.content.substring(0, 160),
+            "image": blog.image,
+            "url": `https://prepnexus.netlify.app/blog/${blog.id}`
+          }))
+        })}</script>
       </Helmet>
       {/* Hero Section */}
       <HeroSection>
