@@ -31,7 +31,7 @@ async def get_blogs(limit: Optional[int] = 50, offset: Optional[int] = 0):
         query = """
         SELECT id, title, author_name, author_avatar, author_bio, 
                content, summary, tags, image_url, created_at, slug
-        FROM blog_posts 
+        FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1 OFFSET $2
         """
@@ -79,7 +79,7 @@ async def get_blog_count():
     try:
         conn = await get_db_connection()
         
-        query = "SELECT COUNT(*) as count FROM blog_posts"
+        query = "SELECT COUNT(*) as count FROM blogs"
         result = await conn.fetchval(query)
         await conn.close()
         
@@ -99,7 +99,7 @@ async def get_featured_blogs(limit: int = 5):
         query = """
         SELECT id, title, author_name, author_avatar, author_bio, 
                content, summary, tags, image_url, created_at, slug
-        FROM blog_posts 
+        FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1
         """
