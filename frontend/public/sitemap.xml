@@ -35,4 +35,30 @@
     <lastmod>2025-07-19</lastmod>
     <priority>0.8</priority>
   </url>
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://prepnexus.netlify.app/blog/25</loc>
+    <lastmod>2025-07-19</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://prepnexus.netlify.app/blog/27</loc>
+    <lastmod>2025-07-19</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://prepnexus.netlify.app/blog/28</loc>
+    <lastmod>2025-07-19</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://prepnexus.netlify.app/blog/29</loc>
+    <lastmod>2025-07-19</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://prepnexus.netlify.app/blog/30</loc>
+    <lastmod>2025-07-19</lastmod>
+    <priority>0.7</priority>
+  </url>
 </urlset>
