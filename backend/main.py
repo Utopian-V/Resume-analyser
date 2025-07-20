@@ -21,15 +21,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 # Database connection management
-from backend.core.database import db
+from core.database import db
 
 # Feature-specific endpoint routers
 # Each router handles a specific domain of the application
-from backend.endpoints import blogs, jobs, aptitude, users, dsa, resume, interview
+from endpoints import blogs, jobs, aptitude, users, dsa, resume, interview
 
 # SEO and content management modules
 # These provide sitemap generation and RSS feeds for better SEO
-from backend.modules.seo import sitemap, rss
+from modules.seo import sitemap, rss
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -101,6 +101,12 @@ app.include_router(users.router, prefix="/api")     # User profiles and authenti
 app.include_router(dsa.router, prefix="/api")       # DSA questions and practice
 app.include_router(resume.router, prefix="/api")    # Resume analysis and feedback
 app.include_router(interview.router, prefix="/api") # Interview practice sessions
+
+# Health and Performance Monitoring
+from endpoints import health, performance, redis
+app.include_router(health.router)  # Health monitoring endpoints
+app.include_router(performance.router)  # Performance monitoring endpoints
+app.include_router(redis.router)  # Redis cache management endpoints
 
 # SEO and Content Discovery
 # These routers provide sitemap and RSS feeds for better search engine visibility

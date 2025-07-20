@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import json
 
-from backend.core.database import db
+from core.database import db
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 

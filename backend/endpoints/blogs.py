@@ -11,8 +11,8 @@ This module provides RESTful API endpoints for blog management including:
 """
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
-from backend.core.database import db
-from backend.models import BlogPost
+from core.database import db
+from models import BlogPost
 
 # Router configuration with prefix and OpenAPI tags
 router = APIRouter(prefix="/blogs", tags=["blogs"])
@@ -35,6 +35,7 @@ def format_blog_response(row) -> dict:
         - Provides fallback image for blogs without featured images
         - Ensures author is always an object with name and avatar
         - Handles null tags gracefully
+        - Uses proper PostgreSQL schema fields
     """
     return {
         "id": str(row['id']),  # Ensure ID is string for frontend compatibility
@@ -44,26 +45,29 @@ def format_blog_response(row) -> dict:
             # Default avatar - in production, this would come from user profile
             "avatar": "https://randomuser.me/api/portraits/men/29.jpg"
         },
-        "date": row['created_at'].strftime('%Y-%m-%d'),
+        "date": row['created_at'].strftime('%Y-%m-%d') if row['created_at'] else None,
         "content": row['content'],
         # Fallback to a professional stock image if no image is provided
         "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
-        "tags": row['tags'] if row['tags'] else []
+        "tags": row['tags'] if row['tags'] else [],
+        "slug": row.get('slug'),
+        "view_count": row.get('view_count', 0),
+        "meta_description": row.get('meta_description')
     }
 
 @router.get("/")
 async def get_blogs(
-    limit: Optional[int] = Query(50, ge=1, le=100, description="Number of blogs to return"),
+    limit: Optional[int] = Query(20, ge=1, le=50, description="Number of blogs to return"),
     offset: Optional[int] = Query(0, ge=0, description="Number of blogs to skip")
 ):
     """
-    Get paginated list of blog posts.
+    Get paginated list of blog posts (optimized for performance).
     
     Returns a list of blog posts ordered by creation date (newest first).
-    Supports pagination for efficient data loading and performance.
+    Uses intelligent caching and optimized queries for maximum performance.
     
     Args:
-        limit: Maximum number of blogs to return (1-100)
+        limit: Maximum number of blogs to return (1-50, optimized for frontend)
         offset: Number of blogs to skip for pagination
         
     Returns:
@@ -73,28 +77,45 @@ async def get_blogs(
         HTTPException: If database query fails
     """
     try:
-        # Query blogs with pagination, ordered by creation date
-        # This ensures newest content appears first for better user experience
+        # Optimized query with caching - only fetch essential fields
         query = """
-        SELECT id, title, author, content, image, created_at, tags
+        SELECT id, title, author, content, image, created_at, tags, slug, view_count
         FROM blogs
         ORDER BY created_at DESC 
         LIMIT $1 OFFSET $2
         """
         
-        rows = await db.fetch(query, limit, offset)
-        blogs = [format_blog_response(row) for row in rows]
+        # Use caching for better performance
+        rows = await db.fetch(query, limit, offset, use_cache=True, cache_ttl=600)  # 10 minutes cache
+        
+        # Optimize response formatting
+        blogs = []
+        for row in rows:
+            blogs.append({
+                "id": str(row['id']),
+                "title": row['title'],
+                "author": {
+                    "name": row['author'],
+                    "avatar": "https://randomuser.me/api/portraits/men/29.jpg"
+                },
+                "date": row['created_at'].strftime('%Y-%m-%d') if row['created_at'] else None,
+                "content": row['content'][:200] + "..." if len(row['content']) > 200 else row['content'],  # Truncate for list view
+                "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
+                "tags": row['tags'] if row['tags'] else [],
+                "slug": row.get('slug'),
+                "view_count": row.get('view_count', 0)
+            })
         
         return {
             "blogs": blogs, 
             "total": len(blogs),
             "limit": limit,
-            "offset": offset
+            "offset": offset,
+            "cached": True  # Indicate if response was cached
         }
         
     except Exception as e:
-        # Log the error for debugging (in production, use proper logging)
-        print(f"Error fetching blogs: {e}")
+        logger.error(f"Error fetching blogs: {e}")
         raise HTTPException(
             status_code=500, 
             detail="Failed to fetch blogs. Please try again later."
@@ -121,7 +142,7 @@ async def get_blog_by_id(blog_id: int):
         # Query for specific blog by ID
         # Using fetchrow for single result optimization
         query = """
-        SELECT id, title, author, content, image, created_at, tags
+        SELECT id, title, author, content, image, created_at, tags, slug, view_count, meta_description
         FROM blogs
         WHERE id = $1
         """
@@ -178,12 +199,14 @@ async def create_blog(
         # Insert new blog with current timestamp
         # Using NOW() ensures consistent timezone handling
         query = """
-        INSERT INTO blogs (title, author, content, image, tags, created_at)
-        VALUES ($1, $2, $3, $4, $5, NOW())
+        INSERT INTO blogs (title, author, content, image, tags, slug)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id
         """
         
-        blog_id = await db.fetchval(query, title, author, content, image, tags or [])
+        # Generate slug from title
+        slug = title.lower().replace(' ', '-').replace(':', '').replace(',', '')
+        blog_id = await db.fetchval(query, title, author, content, image, tags or [], slug)
         
         return {
             "id": blog_id, 

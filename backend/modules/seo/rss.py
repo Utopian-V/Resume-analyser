@@ -4,13 +4,13 @@ Handled by: SEO Team
 Responsibilities: Generate dynamic RSS feeds for blog content
 """
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import XMLResponse
+from fastapi import Response
 from datetime import datetime
 from typing import List, Dict
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-from backend.core.database import db
+from core.database import db
 
 router = APIRouter(prefix="/seo", tags=["seo"])
 
@@ -101,6 +101,6 @@ async def get_rss():
     try:
         generator = RSSGenerator()
         rss_content = await generator.generate_rss()
-        return XMLResponse(content=rss_content, media_type="application/rss+xml")
+        return Response(content=rss_content, media_type="application/rss+xml")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RSS generation failed: {str(e)}") 

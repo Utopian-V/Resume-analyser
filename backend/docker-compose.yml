@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: prepnexus_postgres
+    environment:
+      POSTGRES_DB: prepnexus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - prepnexus_network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: prepnexus_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - prepnexus_network
+
+  # Application (optional - can run locally)
+  app:
+    build: .
+    container_name: prepnexus_app
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=prepnexus
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - prepnexus_network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  prepnexus_network:
+    driver: bridge 

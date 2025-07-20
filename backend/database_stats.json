@@ -1,0 +1,1 @@
+{"primary_available": false, "fallback_used": true, "fallback_start_time": "2025-07-20 08:35:49.945511", "fallback_duration": "0:01:19.653193", "data_migrated": 0, "last_migration": null, "errors_count": 2, "last_error": "Multiple exceptions: [Errno 61] Connect call failed ('::1', 5432, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 5432)"}

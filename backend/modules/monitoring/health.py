@@ -9,7 +9,7 @@ from typing import Dict, Any, List
 import asyncio
 import aiohttp
 
-from backend.core.database import db
+from core.database import db
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 

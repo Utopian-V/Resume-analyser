@@ -9,7 +9,7 @@ import json
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from backend.core.database import db
+from core.database import db
 
 class BlogGenerator:
     def __init__(self):

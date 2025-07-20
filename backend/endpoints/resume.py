@@ -1,4 +1,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
+import aiofiles
+import pdfplumber
+import io
+from modules.genai.resume_analyzer import resume_analyzer
 
 router = APIRouter(prefix="/resume", tags=["resume"])
 
@@ -10,43 +14,40 @@ async def analyze_resume(file: UploadFile = File(...)):
         if not file.filename.lower().endswith(('.pdf', '.docx', '.txt')):
             raise HTTPException(status_code=400, detail="Unsupported file type. Please upload PDF, DOCX, or TXT")
         
-        # In a real implementation, you would:
-        # 1. Process the uploaded file
-        # 2. Extract text and parse content
-        # 3. Analyze skills, experience, education
-        # 4. Use NLP/AI to assess competency levels
+        # Read file content
+        content = await file.read()
         
-        # Mock analysis result for demonstration
-        analysis_result = {
-            "skills": [
-                {"name": "JavaScript", "level": "Advanced", "confidence": 0.9},
-                {"name": "React", "level": "Intermediate", "confidence": 0.8},
-                {"name": "Python", "level": "Intermediate", "confidence": 0.7},
-                {"name": "Node.js", "level": "Advanced", "confidence": 0.85},
-                {"name": "MongoDB", "level": "Beginner", "confidence": 0.6}
-            ],
-            "experience": "3-5 years",
-            "education": "Bachelor's in Computer Science",
-            "recommendations": [
-                "Focus on system design skills",
-                "Practice more DSA problems",
-                "Learn cloud technologies (AWS/Azure)",
-                "Improve database design knowledge"
-            ],
-            "overall_score": 75,
-            "strengths": [
-                "Strong frontend development skills",
-                "Good understanding of JavaScript ecosystem"
-            ],
-            "areas_for_improvement": [
-                "System design and architecture",
-                "Advanced algorithms and data structures",
-                "Cloud platform experience"
-            ]
-        }
+        # Extract text based on file type
+        if file.filename.lower().endswith('.pdf'):
+            resume_text = await extract_pdf_text(content)
+        elif file.filename.lower().endswith('.txt'):
+            resume_text = content.decode('utf-8')
+        else:
+            # For now, handle as text (DOCX support can be added later)
+            resume_text = content.decode('utf-8')
+        
+        if not resume_text.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from the uploaded file")
+        
+        # Analyze resume using AI
+        analysis_result = await resume_analyzer.analyze_resume_text(resume_text)
         
         return analysis_result
+        
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Resume analysis failed: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Resume analysis failed: {str(e)}")
+
+async def extract_pdf_text(content: bytes) -> str:
+    """Extract text from PDF content"""
+    try:
+        with pdfplumber.open(io.BytesIO(content)) as pdf:
+            text = ""
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+            return text.strip()
+    except Exception as e:
+        raise Exception(f"Failed to extract text from PDF: {str(e)}") 

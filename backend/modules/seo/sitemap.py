@@ -3,14 +3,13 @@ Sitemap Generation Service
 Handled by: SEO Team
 Responsibilities: Generate dynamic sitemap.xml, ping search engines
 """
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import XMLResponse
+from fastapi import APIRouter, HTTPException, Response
 from datetime import datetime
 from typing import List, Dict
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-from backend.core.database import db
+from core.database import db
 
 router = APIRouter(prefix="/seo", tags=["seo"])
 
@@ -87,7 +86,7 @@ async def get_sitemap():
     try:
         generator = SitemapGenerator()
         sitemap_content = await generator.generate_sitemap()
-        return XMLResponse(content=sitemap_content, media_type="application/xml")
+        return Response(content=sitemap_content, media_type="application/xml")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Sitemap generation failed: {str(e)}")
 
