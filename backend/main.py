@@ -163,3 +163,29 @@ async def health_check():
         "timestamp": "2024-01-01T00:00:00Z",  # TODO: Add actual timestamp
         "version": "1.0.0"
     }
+
+@app.get("/debug/routes")
+async def list_routes():
+    return [route.path for route in app.routes]
+
+@app.get("/debug/connections")
+async def debug_connections():
+    db_ok = False
+    redis_ok = False
+    try:
+        await db.fetchval("SELECT 1")
+        db_ok = True
+    except Exception as e:
+        db_ok = str(e)
+    try:
+        from core.redis_manager import redis_manager
+        await redis_manager._redis.ping()
+        redis_ok = True
+    except Exception as e:
+        redis_ok = str(e)
+    return {"neon": db_ok, "redis": redis_ok}
+
+# Minimal test endpoint for blogs router
+@app.get("/api/blogs/test")
+async def blogs_test():
+    return {"status": "ok", "message": "Blogs router is working"}
