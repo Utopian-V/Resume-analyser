@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { FiUploadCloud, FiLoader, FiAlertCircle } from "react-icons/fi";
-import { uploadResume } from "../api.js";
+import { uploadResume } from '../../../api.js';
 import GraphicalAnalysis from "./GraphicalAnalysis.js";
 import FeedbackDisplay from "./FeedbackDisplay.js";
 import ProjectAnalysis from "./ProjectAnalysis.js";

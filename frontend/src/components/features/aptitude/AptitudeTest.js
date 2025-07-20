@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import aptitudeTests from '../data/aptitude_tests.json';
+import aptitudeTests from '../../../data/aptitude_tests.json';
 import { Helmet } from 'react-helmet-async';
 
 const Container = styled.div`

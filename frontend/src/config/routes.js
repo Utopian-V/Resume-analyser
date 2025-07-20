@@ -1,12 +1,12 @@
-import UserDashboard from '../components/UserDashboard.js';
-import JobListings from '../components/JobListings.js';
-import ResumeAnalysis from '../components/FileUpload.js';
-import AptitudeTest from '../components/AptitudeTest.js';
-import EnhancedDSABank from '../components/EnhancedDSABank.js';
-import InterviewPrep from '../components/InterviewPrep.js';
-import Blog, { BlogPost } from '../components/Blog.js';
-import LandingPage from '../components/landing/LandingPage.js';
-import AdminPortal from '../components/AdminPortal.js';
+import UserDashboard from '../components/features/dashboard/UserDashboard.js';
+import JobListings from '../components/features/jobs/JobListings.js';
+import ResumeAnalysis from '../components/features/resume/FileUpload.js';
+import AptitudeTest from '../components/features/aptitude/AptitudeTest.js';
+import EnhancedDSABank from '../components/features/dsa/EnhancedDSABank.js';
+import InterviewPrep from '../components/features/interview/InterviewPrep.js';
+import Blog, { BlogPost } from '../components/features/blog/Blog.js';
+import LandingPage from '../components/shared/layout/LandingPage.js';
+import AdminPortal from '../components/features/admin/AdminPortal.js';
 
 // Placeholder components for new public routes
 const DataInterpretation = () => <div style={{padding:'4rem',color:'#6366f1',textAlign:'center'}}>Data Interpretation Practice Coming Soon!</div>;

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Sidebar from './Sidebar.js';
-import Logo from '../Logo.js';
+import Logo from '../ui/Logo.js';
 
 const AppContent = styled.div`
   background: #0f172a;

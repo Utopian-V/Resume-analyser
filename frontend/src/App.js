@@ -6,10 +6,10 @@ import styled from 'styled-components';
 import { GlobalStyle } from './styles/GlobalStyles.js';
 
 // Layout Components
-import { Navbar, MobileMenu, DashboardLayout } from './components/layout/index.js';
+import { Navbar, MobileMenu, DashboardLayout } from './components/shared/layout/index.js';
 
 // Common Components
-import FAQChat from './components/common/FAQChat.js';
+import FAQChat from './components/shared/ui/FAQChat.js';
 
 // Hooks
 import { useFAQ } from './hooks/useFAQ.js';

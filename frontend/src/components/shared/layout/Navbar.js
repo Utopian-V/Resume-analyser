@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FiMenu } from 'react-icons/fi';
-import Logo from '../Logo.js';
+import Logo from '../ui/Logo.js';
 
 const NavbarContainer = styled.nav`
   position: fixed;
