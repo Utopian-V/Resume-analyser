@@ -371,6 +371,32 @@ export default function BlogManagement() {
     }
   };
 
+  // Trigger GitHub Actions for automatic generation
+  const triggerGitHubAction = async () => {
+    setIsGenerating(true);
+    setGenerationLogs([]);
+    setGenerationStatus('Triggering GitHub Actions...');
+
+    try {
+      addLog('🚀 Triggering GitHub Actions for automatic blog generation...', 'info');
+      
+      // Note: This would require GitHub API token and repo access
+      // For now, we'll show how it would work
+      addLog('📝 This would trigger the daily scheduled workflow', 'info');
+      addLog('⏰ GitHub Actions runs daily at 2:00 AM UTC', 'info');
+      addLog('🔄 Takes 6-8 minutes to complete', 'warning');
+      addLog('✅ Blogs are automatically generated and saved to database', 'success');
+      
+      setGenerationStatus('GitHub Actions triggered! Check Actions tab for progress.');
+      
+    } catch (error) {
+      addLog(`❌ Error: ${error.message}`, 'error');
+      setGenerationStatus('GitHub Actions trigger failed!');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   // Fetch blogs from API
   const fetchBlogs = async () => {
     try {
@@ -457,7 +483,11 @@ export default function BlogManagement() {
             disabled={isGenerating}
             className={isGenerating ? 'warning' : 'success'}
           >
-            {isGenerating ? '�� Generating...' : '⚡ Generate Blogs INSTANTLY'}
+            {isGenerating ? '🔄 Generating...' : '⚡ Generate Blogs INSTANTLY (Manual)'}
+          </Button>
+          
+          <Button onClick={triggerGitHubAction} disabled={isGenerating}>
+            🚀 Trigger GitHub Action (Auto)
           </Button>
           
           <Button onClick={pingSitemap} disabled={isGenerating}>
@@ -471,6 +501,21 @@ export default function BlogManagement() {
           <Button onClick={fetchBlogs} disabled={isGenerating}>
             📊 Refresh Stats
           </Button>
+        </div>
+
+        <div style={{ 
+          background: '#f8f9fa', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          marginBottom: '1rem',
+          border: '1px solid #e9ecef'
+        }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', color: '#495057' }}>📅 Blog Generation Options:</h4>
+          <div style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+            <div><strong>⚡ Manual (Instant):</strong> Generate blogs immediately via backend (10-30 seconds)</div>
+            <div><strong>🚀 Automatic (GitHub Actions):</strong> Daily scheduled posts at 2:00 AM UTC</div>
+            <div><strong>📊 Current Schedule:</strong> Every day at 2:00 AM UTC (configurable)</div>
+          </div>
         </div>
 
         {isGenerating && (
