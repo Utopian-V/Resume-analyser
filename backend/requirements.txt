@@ -1,36 +1,57 @@
-aiofiles==24.1.0
-annotated-types==0.7.0
-anyio==4.9.0
-asyncpg==0.29.0
-certifi==2025.7.14
-cffi==1.17.1
-charset-normalizer==3.4.2
-click==8.2.1
-cryptography==45.0.5
-distro==1.9.0
+# Core FastAPI Framework and Dependencies
 fastapi==0.116.1
-h11==0.16.0
-httpcore==1.0.9
-httpx==0.28.1
-idna==3.10
-jiter==0.10.0
-openai==1.95.1
-pdfminer.six==20250506
-pdfplumber==0.11.7
-pillow==11.3.0
-pycparser==2.22
+uvicorn==0.35.0
+starlette==0.47.1
 pydantic==2.11.7
 pydantic_core==2.33.2
-pypdfium2==4.30.1
-python-dotenv==1.1.1
-python-multipart==0.0.20
+
+# Database and Async Support
+asyncpg==0.29.0
+aiofiles==24.1.0
+anyio==4.9.0
+
+# HTTP and Network Libraries
+httpx==0.28.1
+httpcore==1.0.9
 requests==2.32.4
-sniffio==1.3.1
-starlette==0.47.1
-tqdm==4.67.1
-typing-inspection==0.4.1
-typing_extensions==4.14.1
-urllib3==2.5.0
-uvicorn==0.35.0
+h11==0.16.0
+
+# PDF Processing and Document Analysis
+pdfplumber==0.11.7
+pdfminer.six==20250506
+pypdfium2==4.30.1
+pillow==11.3.0
+
+# AI and Machine Learning
+openai==1.95.1
+
+# Authentication and Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+cryptography==45.0.5
+cffi==1.17.1
+pycparser==2.22
+
+# File Upload and Multipart Support
+python-multipart==0.0.20
+
+# Environment and Configuration
+python-dotenv==1.1.1
+
+# Data Processing and Utilities
+tqdm==4.67.1
+click==8.2.1
+distro==1.9.0
+
+# Type System and Validation
+annotated-types==0.7.0
+typing-inspection==0.4.1
+typing_extensions==4.14.1
+
+# HTTP and URL Processing
+certifi==2025.7.14
+charset-normalizer==3.4.2
+idna==3.10
+urllib3==2.5.0
+sniffio==1.3.1
+jiter==0.10.0
