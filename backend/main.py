@@ -31,6 +31,8 @@ from endpoints import blogs, jobs, aptitude, users, dsa, resume, interview
 # These provide sitemap generation and RSS feeds for better SEO
 from modules.seo import sitemap, rss
 
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """

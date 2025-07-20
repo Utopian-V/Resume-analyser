@@ -10,7 +10,7 @@
  * The app uses React Router for navigation and styled-components for styling.
  * All routes are organized into three categories: public, admin, and dashboard.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -29,6 +29,9 @@ import { useFAQ } from './hooks/useFAQ.js';
 // Route configurations organized by access level
 import { dashboardRoutes, publicRoutes, adminRoutes } from './config/routes.js';
 
+// API functions for user registration
+import { registerFirebaseUser } from './api.js';
+
 /**
  * Main application container with dark theme background
  * Uses min-height: 100vh to ensure full viewport coverage
@@ -38,18 +41,59 @@ const AppContainer = styled.div`
   background: #0f172a; /* Dark blue background for professional look */
 `;
 
+/**
+ * Generates a default user object for new users.
+ * Uses browser info to create a unique name and email.
+ */
+function generateDefaultUser() {
+  // Use browser info to generate a unique name/email
+  const random = Math.random().toString(36).substring(2, 10);
+  const name = `Guest_${random}`;
+  const email = `guest_${random}@example.com`;
+  return { name, email };
+}
+
 function App() {
-  // Global state management for user session and UI
-  const [userId, setUserId] = useState('user123'); // TODO: Replace with actual auth system
+  // User ID state
+  const [userId, setUserId] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('/app');
   
   // FAQ functionality hook for user support
   const faq = useFAQ();
 
+  // On mount, auto-register user if not present
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    } else {
+      // Register new user
+      const { name, email } = generateDefaultUser();
+      registerFirebaseUser({ name, email })
+        .then(res => {
+          if (res.user_id) {
+            localStorage.setItem('userId', res.user_id);
+            setUserId(res.user_id);
+          }
+        })
+        .catch(() => {
+          // fallback: generate a random local userId
+          const fallbackId = 'guest_' + Math.random().toString(36).substring(2, 12);
+          localStorage.setItem('userId', fallbackId);
+          setUserId(fallbackId);
+        });
+    }
+  }, []);
+
   // Mobile menu handlers for responsive navigation
   const handleMobileMenuOpen = () => setIsMobileMenuOpen(true);
   const handleMobileMenuClose = () => setIsMobileMenuOpen(false);
+
+  if (!userId) {
+    // Show loading until userId is set
+    return <div style={{ color: '#fff', textAlign: 'center', padding: '4rem' }}>Initializing user...</div>;
+  }
 
   return (
     <>

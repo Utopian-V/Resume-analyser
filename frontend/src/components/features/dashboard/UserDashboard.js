@@ -298,15 +298,8 @@ const UserDashboard = ({ userId, setUserId, onResumeAnalyzed }) => {
       const progress = await getUserProgress(userId);
       setUserProgress(progress);
     } catch (error) {
-      setError("Failed to load user progress. Showing demo data.");
-      // Set default progress for demo
-      setUserProgress({
-        dsa_questions_completed: 45,
-        aptitude_tests_taken: 3,
-        resume_score: 75,
-        total_questions_available: 200,
-        streak_days: 7
-      });
+      setError("Failed to load user progress. Please try again later.");
+      setUserProgress(null);
     } finally {
       setLoading(false);
     }

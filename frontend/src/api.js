@@ -35,7 +35,7 @@ export const uploadResume = async (file) => {
     formData.append("file", file);
     
     // Let axios set the Content-Type header automatically for FormData
-    const response = await axios.post(`${API_URL}/resume/analyze`, formData);
+    const response = await axios.post(`${API_URL}/api/resume/analyze`, formData);
     return response.data;
   } catch (error) {
     console.error('Resume upload failed:', error);
@@ -56,7 +56,7 @@ export const uploadResume = async (file) => {
  */
 export const registerFirebaseUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/users/register`, userData);
+    const response = await axios.post(`${API_URL}/api/users/register`, userData);
     return response.data;
   } catch (error) {
     console.error('User registration failed:', error);
@@ -72,7 +72,7 @@ export const registerFirebaseUser = async (userData) => {
  */
 export const getUserProfile = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/users/${userId}/profile`);
+    const response = await axios.get(`${API_URL}/api/users/${userId}/profile`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch user profile:', error);
@@ -88,7 +88,7 @@ export const getUserProfile = async (userId) => {
  */
 export const getUserProgress = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/users/progress`, { 
+    const response = await axios.get(`${API_URL}/api/users/progress`, { 
       params: { user_id: userId } 
     });
     return response.data;
@@ -107,7 +107,7 @@ export const getUserProgress = async (userId) => {
  */
 export const updateResumeScore = async (userId, score) => {
   try {
-    const response = await axios.post(`${API_URL}/users/progress/resume-score`, { 
+    const response = await axios.post(`${API_URL}/api/users/progress/resume-score`, { 
       user_id: userId, 
       score 
     });
@@ -130,7 +130,7 @@ export const updateResumeScore = async (userId, score) => {
  */
 export const getJobsCorpus = async () => {
   try {
-    const response = await axios.get(`${API_URL}/jobs/corpus`);
+    const response = await axios.get(`${API_URL}/api/jobs/corpus`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch jobs corpus:', error);
@@ -147,7 +147,7 @@ export const getJobsCorpus = async () => {
  */
 export const applyForJob = async (jobId, userId) => {
   try {
-    const response = await axios.post(`${API_URL}/jobs/${jobId}/apply`, { 
+    const response = await axios.post(`${API_URL}/api/jobs/${jobId}/apply`, { 
       user_id: userId 
     });
     return response.data;
@@ -177,7 +177,7 @@ export const getDSAQuestions = async (userId = null, difficulty = null, category
     if (difficulty) params.difficulty = difficulty;
     if (category) params.category = category;
     
-    const response = await axios.get(`${API_URL}/dsa/questions`, { params });
+    const response = await axios.get(`${API_URL}/api/dsa/questions`, { params });
     return response.data;
   } catch (error) {
     console.error('Failed to fetch DSA questions:', error);
@@ -194,7 +194,7 @@ export const getDSAQuestions = async (userId = null, difficulty = null, category
  */
 export const completeQuestion = async (questionId, userId) => {
   try {
-    const response = await axios.post(`${API_URL}/dsa/questions/${questionId}/complete`, { 
+    const response = await axios.post(`${API_URL}/api/dsa/questions/${questionId}/complete`, { 
       user_id: userId 
     });
     return response.data;
@@ -212,7 +212,7 @@ export const completeQuestion = async (questionId, userId) => {
  */
 export const getDSARecommendations = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/dsa/recommendations`, { 
+    const response = await axios.get(`${API_URL}/api/dsa/recommendations`, { 
       params: { user_id: userId } 
     });
     return response.data;
@@ -238,7 +238,7 @@ export const getDSARecommendations = async (userId) => {
  */
 export const sendInterviewMessage = async (userId, role, message, conversationId = null) => {
   try {
-    const response = await axios.post(`${API_URL}/interview/chat`, {
+    const response = await axios.post(`${API_URL}/api/interview/chat`, {
       user_id: userId,
       role: role,
       message: message,
@@ -276,7 +276,7 @@ export const getAptitudeTest = async (testId) => {
       return aptitudeTestCache;
     }
     
-    const response = await axios.get(`${API_URL}/aptitude/test/${testId}`);
+    const response = await axios.get(`${API_URL}/api/aptitude/test/${testId}`);
     
     // Update cache with new data
     aptitudeTestCache = response.data;
@@ -299,7 +299,7 @@ export const getAptitudeTest = async (testId) => {
  */
 export const submitAptitudeTest = async (testId, answers, userId) => {
   try {
-    const response = await axios.post(`${API_URL}/aptitude/test/${testId}/submit`, {
+    const response = await axios.post(`${API_URL}/api/aptitude/test/${testId}/submit`, {
       answers,
       user_id: userId
     });
@@ -319,7 +319,7 @@ export const submitAptitudeTest = async (testId, answers, userId) => {
  */
 export const addAptitudeQuestion = async (question, testId = 'test1') => {
   try {
-    const response = await axios.post(`${API_URL}/aptitude/questions/add?test_id=${testId}`, question);
+    const response = await axios.post(`${API_URL}/api/aptitude/questions/add?test_id=${testId}`, question);
     
     // Invalidate cache when new question is added to ensure fresh data
     aptitudeTestCache = null;
@@ -340,7 +340,7 @@ export const addAptitudeQuestion = async (question, testId = 'test1') => {
  */
 export const getAptitudeLeaderboard = async (testId = 'test1') => {
   try {
-    const response = await axios.get(`${API_URL}/aptitude/leaderboard/${testId}`);
+    const response = await axios.get(`${API_URL}/api/aptitude/leaderboard/${testId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching aptitude leaderboard:', error);

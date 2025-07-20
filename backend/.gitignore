@@ -58,8 +58,6 @@ cover/
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -162,12 +160,9 @@ cython_debug/
 #  *.iws
 
 # PrepNexus specific
-# Database files (never commit these)
-*.db
-*.sqlite
-*.sqlite3
-temp_fallback.db
-dev.db
+# Database files (PostgreSQL only - no SQLite)
+# PostgreSQL data directory (if using local PostgreSQL)
+postgres_data/
 
 # Log files
 logs/

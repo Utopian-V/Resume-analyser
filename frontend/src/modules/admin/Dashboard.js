@@ -111,11 +111,11 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch system metrics
-      const metricsResponse = await fetch('https://resume-analyser-o3eu.onrender.com/monitoring/metrics');
+      const metricsResponse = await fetch('https://prepnexus-backend.onrender.com/api/performance/metrics');
       const metrics = await metricsResponse.json();
       
       // Fetch health status
-      const healthResponse = await fetch('https://resume-analyser-o3eu.onrender.com/monitoring/health');
+      const healthResponse = await fetch('https://prepnexus-backend.onrender.com/api/performance/health');
       const health = await healthResponse.json();
       
       setStats({
