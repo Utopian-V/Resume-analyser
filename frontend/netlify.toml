@@ -13,4 +13,4 @@
     Content-Type = "text/plain"
 
 [template.environment]
-  REACT_APP_API_URL = "https://prepnexus-backend.onrender.com" 
+  REACT_APP_API_URL = "https://resume-analyser-o3eu.onrender.com" 
