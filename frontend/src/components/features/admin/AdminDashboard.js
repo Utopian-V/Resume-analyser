@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout.js';
 import WriterProfile from './WriterProfile.js';
@@ -7,6 +7,9 @@ import BlogManagement from './BlogManagement.js';
 import UserManagement from './UserManagement.js';
 import QuestionManagement from './QuestionManagement.js';
 import SystemSettings from './SystemSettings.js';
+
+// API Configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export default function AdminDashboard() {
   return (
@@ -27,6 +30,67 @@ export default function AdminDashboard() {
 
 // Simple Dashboard Home Component
 function DashboardHome() {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalBlogs: 0,
+    totalQuestions: 0,
+    activeWriters: 0
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      // Fetch basic stats (you can implement these endpoints)
+      setStats({
+        totalUsers: 1247,
+        totalBlogs: 89,
+        totalQuestions: 456,
+        activeWriters: 12
+      });
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    }
+  };
+
+  const handleQuickAction = async (action) => {
+    setLoading(true);
+    try {
+      switch (action) {
+        case 'generate_blogs':
+          // Trigger blog generation
+          const response = await fetch(`${API_BASE_URL}/api/blogs/generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            alert(`✅ ${result.message}`);
+            // Refresh stats
+            fetchStats();
+          } else {
+            const error = await response.json();
+            alert(`❌ Failed to generate blogs: ${error.detail || 'Unknown error'}`);
+          }
+          break;
+          
+        default:
+          console.log('Action not implemented:', action);
+      }
+    } catch (error) {
+      console.error('Quick action failed:', error);
+      alert('❌ Action failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1 style={{ color: '#6366f1', marginBottom: '2rem' }}>Admin Dashboard</h1>
@@ -37,10 +101,10 @@ function DashboardHome() {
         gap: '1rem',
         marginBottom: '2rem'
       }}>
-        <StatCard title="Total Users" value="1,247" />
-        <StatCard title="Total Blogs" value="89" />
-        <StatCard title="Total Questions" value="456" />
-        <StatCard title="Active Writers" value="12" />
+        <StatCard title="Total Users" value={stats.totalUsers.toLocaleString()} />
+        <StatCard title="Total Blogs" value={stats.totalBlogs.toLocaleString()} />
+        <StatCard title="Total Questions" value={stats.totalQuestions.toLocaleString()} />
+        <StatCard title="Active Writers" value={stats.activeWriters.toLocaleString()} />
       </div>
 
       <div style={{ 
@@ -48,7 +112,7 @@ function DashboardHome() {
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
         gap: '1rem'
       }}>
-        <QuickActions />
+        <QuickActions onAction={handleQuickAction} loading={loading} />
         <RecentActivity />
       </div>
     </div>
@@ -69,7 +133,7 @@ function StatCard({ title, value }) {
   );
 }
 
-function QuickActions() {
+function QuickActions({ onAction, loading }) {
   return (
     <div style={{
       background: '#1e293b',
@@ -79,6 +143,21 @@ function QuickActions() {
     }}>
       <h3 style={{ color: '#6366f1', marginBottom: '1rem' }}>Quick Actions</h3>
       <div style={{ display: 'grid', gap: '0.5rem' }}>
+        <button 
+          onClick={() => onAction('generate_blogs')}
+          disabled={loading}
+          style={{
+            background: loading ? '#64748b' : '#6366f1',
+            color: 'white',
+            border: 'none',
+            padding: '0.5rem 1rem',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1
+          }}
+        >
+          {loading ? '⏳ Generating...' : '⚡ Generate Blogs'}
+        </button>
         <button 
           onClick={() => window.location.href = '/admin/new-blog'}
           style={{

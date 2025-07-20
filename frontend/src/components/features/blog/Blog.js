@@ -98,6 +98,10 @@ const Button = styled.button`
 const BlogCard = ({ blog, onClick, variant = 'grid' }) => {
   const isHero = variant === 'hero';
   
+  // Handle different author formats
+  const authorName = typeof blog.author === 'string' ? blog.author : blog.author?.name || 'Unknown Author';
+  const authorAvatar = typeof blog.author === 'object' ? blog.author.avatar : null;
+  
   if (isHero) {
     return (
       <div style={{
@@ -114,12 +118,15 @@ const BlogCard = ({ blog, onClick, variant = 'grid' }) => {
           src={blog.image} 
           alt={blog.title}
           style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop";
+          }}
         />
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '1rem', lineHeight: '1.2' }}>
             {blog.title}
           </h1>
-          <BlogMeta author={blog.author.name} date={blog.date} />
+          <BlogMeta author={authorName} date={blog.date} />
           <p style={{ marginBottom: '1rem', lineHeight: '1.6' }}>
             {blog.content.substring(0, 200)}...
           </p>
@@ -150,12 +157,15 @@ const BlogCard = ({ blog, onClick, variant = 'grid' }) => {
         src={blog.image} 
         alt={blog.title}
         style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+        onError={(e) => {
+          e.target.src = "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop";
+        }}
       />
       <div style={{ padding: '1.5rem' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.75rem', lineHeight: '1.3' }}>
           {blog.title}
         </h3>
-        <BlogMeta author={blog.author.name} date={blog.date} />
+        <BlogMeta author={authorName} date={blog.date} />
         <p style={{ color: '#555', lineHeight: '1.5', marginBottom: '1rem' }}>
           {blog.content.substring(0, 150)}...
         </p>
@@ -173,13 +183,25 @@ const useBlogs = () => {
     const fetchBlogs = async () => {
       try {
         setState(prev => ({ ...prev, loading: true }));
-        const response = await fetch(`${API_BASE_URL}/blogs/`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(`${API_BASE_URL}/api/blogs/`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
-        setState({ loading: false, error: null, blogs: data.blogs || data });
+        
+        // Handle both array and object responses
+        const blogs = data.blogs || data || [];
+        
+        setState({ loading: false, error: null, blogs });
       } catch (err) {
         console.error("Failed to fetch blogs:", err);
-        setState({ loading: false, error: "Failed to load blog posts. Please try again later.", blogs: [] });
+        setState({ 
+          loading: false, 
+          error: "Failed to load blog posts. Please try again later.", 
+          blogs: [] 
+        });
       }
     };
     fetchBlogs();
@@ -195,13 +217,24 @@ const useBlog = (id) => {
     const fetchBlog = async () => {
       try {
         setState(prev => ({ ...prev, loading: true }));
-        const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Blog post not found");
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         setState({ loading: false, error: null, blog: data });
       } catch (err) {
         console.error("Failed to fetch blog:", err);
-        setState({ loading: false, error: "Failed to load blog post. Please try again later.", blog: null });
+        setState({ 
+          loading: false, 
+          error: err.message || "Failed to load blog post. Please try again later.", 
+          blog: null 
+        });
       }
     };
     fetchBlog();
@@ -259,6 +292,9 @@ export function BlogPost() {
   if (loading) return <LoadingState title="Loading blog post..." />;
   if (error || !blog) return <ErrorState title="Blog Error" message={error || "Blog post not found"} />;
   
+  // Handle different author formats
+  const authorName = typeof blog.author === 'string' ? blog.author : blog.author?.name || 'Unknown Author';
+  
   return (
     <Container>
       <Helmet>
@@ -277,13 +313,16 @@ export function BlogPost() {
             borderRadius: '12px',
             marginBottom: '2rem'
           }}
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop";
+          }}
         />
         
         <h1 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '1rem' }}>
           {blog.title}
         </h1>
         
-        <BlogMeta author={blog.author.name} date={blog.date} />
+        <BlogMeta author={authorName} date={blog.date} />
         <BlogTags tags={blog.tags} />
         
         <div 

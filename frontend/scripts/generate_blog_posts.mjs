@@ -8,16 +8,22 @@ const { Client } = pkg;
 
 import {blogAuthors} from '../src/components/blogAuthors.mjs';
 
-
-
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const topics = JSON.parse(fs.readFileSync(new URL('./blog_topics.json', import.meta.url), 'utf-8'));
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const NEON_DATABASE_URL = process.env.NEON_DATABASE_URL;
+
+if (!GEMINI_API_KEY) {
+  console.error('❌ GEMINI_API_KEY environment variable is required');
+  process.exit(1);
+}
+
+if (!NEON_DATABASE_URL) {
+  console.error('❌ NEON_DATABASE_URL environment variable is required');
+  process.exit(1);
+}
 
 function getRandomTopic() {
   return topics[Math.floor(Math.random() * topics.length)];
@@ -91,18 +97,25 @@ async function fetchUnsplashImage(query) {
 async function generateBlogPost(author, topic) {
   const prompt = getPrompt(author, topic);
   try {
+    console.log(`🤖 Generating blog post: "${topic}" by ${author.name}...`);
+    
     const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
-    console.log('Fetch status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    }
+    
     const data = await response.json();
-    console.log('Gemini API response:', data);
+    
     if (data.error) {
-      console.error('Gemini API error:', data.error);
+      console.error('❌ Gemini API error:', data.error);
       return;
     }
+    
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Blog content could not be generated.';
     
     // Convert markdown to HTML if needed (fallback)
@@ -119,17 +132,44 @@ async function generateBlogPost(author, topic) {
       connectionString: NEON_DATABASE_URL,
       ssl: { rejectUnauthorized: false }
     });
+    
     await client.connect();
-    await client.query(
-      `INSERT INTO blogs (title, author, avatar, date, image, slug, content)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       ON CONFLICT (slug) DO NOTHING`,
-      [topic, author.name, author.avatar, date, image, slug, formattedContent]
+    
+    // Check if blog already exists
+    const existingBlog = await client.query(
+      'SELECT id FROM blogs WHERE slug = $1',
+      [slug]
     );
+    
+    if (existingBlog.rows.length > 0) {
+      console.log(`⚠️ Blog post already exists: ${slug}`);
+      await client.end();
+      return;
+    }
+    
+    // Insert new blog with updated schema
+    await client.query(
+      `INSERT INTO blogs (title, author, avatar, date, image, slug, content, status, tags)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (slug) DO NOTHING`,
+      [
+        topic, 
+        author.name, 
+        author.avatar, 
+        date, 
+        image, 
+        slug, 
+        formattedContent,
+        'published',
+        ['Career', 'Tips', 'Interview']
+      ]
+    );
+    
     await client.end();
-    console.log(`Blog post saved to Neon: ${slug}`);
+    console.log(`✅ Blog post saved to Neon: ${slug}`);
+    
   } catch (err) {
-    console.error('Error in generateBlogPost:', err);
+    console.error('❌ Error in generateBlogPost:', err);
   }
 }
 
@@ -139,9 +179,20 @@ function randomDelay(minMinutes, maxMinutes) {
 }
 
 (async () => {
+  console.log('🚀 Starting blog generation...');
+  console.log(`📝 Found ${topics.length} topics and ${blogAuthors.length} authors`);
+  
   for (const author of blogAuthors) {
+    console.log(`\n👤 Processing author: ${author.name}`);
+    
     // Random delay between 0 and 60 minutes
+    const delayMinutes = Math.random() * 60;
+    console.log(`⏰ Waiting ${delayMinutes.toFixed(1)} minutes before next post...`);
     await randomDelay(0, 60);
-    await generateBlogPost(author, getRandomTopic());
+    
+    const topic = getRandomTopic();
+    await generateBlogPost(author, topic);
   }
+  
+  console.log('\n🎉 Blog generation completed!');
 })(); 
