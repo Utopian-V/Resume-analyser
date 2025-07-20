@@ -4,9 +4,13 @@ import os
 import requests
 from datetime import datetime
 
-BLOG_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../frontend/src/generated_blogs'))
-if not os.path.exists(BLOG_DIR):
-    os.makedirs(BLOG_DIR)
+# Use a safe, writable directory for blog generation
+BLOG_DIR = os.path.join(os.path.dirname(__file__), '../generated_blogs')
+
+try:
+    os.makedirs(BLOG_DIR, exist_ok=True)
+except Exception as e:
+    print(f"Warning: Could not create BLOG_DIR {BLOG_DIR}: {e}")
 
 router = APIRouter(prefix='/api/genai', tags=['genai'])
 
