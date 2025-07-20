@@ -45,7 +45,6 @@ click==8.2.1
 distro==1.9.0
 psutil==6.1.0
 redis==5.0.1
-redis-py-cluster==2.1.3
 
 # Type System and Validation
 annotated-types==0.7.0
