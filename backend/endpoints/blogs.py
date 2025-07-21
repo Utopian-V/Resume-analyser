@@ -121,6 +121,8 @@ async def get_blogs(
             detail="Failed to fetch blogs. Please try again later."
         )
 
+
+
 @router.get("/{blog_id}")
 async def get_blog_by_id(blog_id: int):
     """
