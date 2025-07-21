@@ -21,7 +21,7 @@ import EnhancedDSABank from '../components/features/dsa/EnhancedDSABank.js';
 import InterviewPrep from '../components/features/interview/InterviewPrep.js';
 
 // Content Components - Blog and marketing
-import Blog, { BlogPost } from '../components/features/blog/Blog.js';
+import Blog  from '../components/features/blog/Blog.js';
 import LandingPage from '../components/shared/layout/LandingPage.js';
 
 // Admin Components - Administrative functions
@@ -120,10 +120,7 @@ export const publicRoutes = [
     path: '/blog',
     component: Blog
   },
-  {
-    path: '/blog/:id',
-    component: BlogPost
-  },
+  
   {
     path: '/aptitude-test',
     component: AptitudeTest

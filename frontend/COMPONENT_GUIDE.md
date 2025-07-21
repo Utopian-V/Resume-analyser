@@ -264,13 +264,13 @@ import UserDashboard from '../features/dashboard/UserDashboard';
 
 **Usage**:
 ```javascript
-import Blog, { BlogPost } from '../features/blog/Blog';
+import Blog,  from '../features/blog/Blog';
 
 // Blog listing
 <Blog />
 
 // Individual blog post
-<BlogPost id="blog-123" />
+// <BlogPost id="blog-123" />
 ```
 
 **Features**:
