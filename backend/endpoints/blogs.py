@@ -52,7 +52,7 @@ def format_blog_response(row) -> dict:
             "avatar": row.get('avatar') or "https://randomuser.me/api/portraits/men/29.jpg"
         },
         "date": date_str,
-        "content": row['content'],
+        "content": row['content'][:100] + "...",
         "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
         "tags": row['tags'] if row['tags'] else [],
         "slug": row.get('slug'),
