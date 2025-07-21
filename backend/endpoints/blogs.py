@@ -14,6 +14,7 @@ from typing import List, Optional
 import logging
 from core.database import db
 from models import BlogPost
+from datetime import datetime
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -27,14 +28,21 @@ def format_blog_response(row) -> dict:
     Handles both datetime and string for date fields.
     """
     date_value = row.get('date', row['created_at'])
+    date_str = None
     if date_value:
-        if hasattr(date_value, 'strftime'):
+        if isinstance(date_value, str):
+            try:
+                # Try parsing the string to a datetime object
+                parsed_date = datetime.fromisoformat(date_value)
+                date_str = parsed_date.strftime('%Y-%m-%d')
+            except ValueError:
+                # Fallback: assume it's already a date string like 'YYYY-MM-DD...'
+                date_str = date_value[:10]
+        elif hasattr(date_value, 'strftime'):
             date_str = date_value.strftime('%Y-%m-%d')
         else:
-            # Assume it's already a string, or convert if possible
-            date_str = str(date_value)[:10]  # crude YYYY-MM-DD fallback
-    else:
-        date_str = None
+            date_str = str(date_value)[:10]   # crude YYYY-MM-DD fallback
+    
 
     return {
         "id": str(row['id']),
