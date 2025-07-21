@@ -15,7 +15,7 @@ import axios from "axios";
 
 // API base URL from environment variables
 // Falls back to localhost for development if not set
-const API_URL = process.env.REACT_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_API_URL;
 
 /**
  * Resume Analysis API

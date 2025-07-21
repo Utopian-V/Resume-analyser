@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 // Configuration
-const API_BASE_URL = process.env.REACT_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_API_URL;
 
 const Container = styled.div`
   max-width: 1200px;
@@ -296,7 +296,7 @@ export default function BlogManagement() {
     lastGenerated: null
   });
 
-  const API_BASE_URL = process.env.REACT_API_URL || 'http://localhost:8000';
+  const API_BASE_URL = process.env.REACT_API_URL;
 
   // Add log message
   const addLog = (message, type = 'info') => {

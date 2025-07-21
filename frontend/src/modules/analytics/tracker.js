@@ -4,7 +4,7 @@
  * Responsibilities: User behavior tracking, event monitoring
  */
 
-const API_BASE_URL = process.env.REACT_API_URL || 'https://resume-analyser-o3eu.onrender.com';
+const API_BASE_URL = process.env.REACT_API_URL;
 
 class AnalyticsTracker {
   constructor() {
