@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+// Configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;

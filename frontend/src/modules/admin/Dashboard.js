@@ -142,7 +142,8 @@ const AdminDashboard = () => {
       case 'generate_blogs':
         // Trigger blog generation
         try {
-          const response = await fetch('https://resume-analyser-o3eu.onrender.com/blogs/generate', {
+          const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+          const response = await fetch(`${API_BASE_URL}/api/blogs/generate`, {
             method: 'POST'
           });
           if (response.ok) {
@@ -157,7 +158,8 @@ const AdminDashboard = () => {
       case 'ping_sitemap':
         // Ping sitemap
         try {
-          const response = await fetch('https://resume-analyser-o3eu.onrender.com/seo/ping-sitemap', {
+          const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+          const response = await fetch(`${API_BASE_URL}/api/seo/ping-sitemap`, {
             method: 'POST'
           });
           if (response.ok) {
