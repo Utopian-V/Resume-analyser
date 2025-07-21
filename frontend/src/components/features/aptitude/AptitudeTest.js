@@ -385,7 +385,7 @@ export default function AptitudeTest() {
         <Helmet>
           <title>Free Aptitude Test Online | Prep Nexus</title>
           <meta name="description" content="Take a free, time-bound aptitude test with instant results. Practice for your next job interview with Prep Nexus." />
-          <link rel="canonical" href="https://prepnexus.netlify.app/aptitude-test" />
+          <link rel="canonical" href="https://resume-review-ai.netlify.app/aptitude-test" />
         </Helmet>
         
         <Title>🎯 Aptitude Assessment</Title>

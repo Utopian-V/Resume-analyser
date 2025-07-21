@@ -34,7 +34,7 @@ const MetaTags = ({
       <meta property="og:image" content={fullImage} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="PrepNexus" />
+              <meta property="og:site_name" content="PrepNexus" />
       
       {/* Twitter Cards */}
       <meta name="twitter:card" content="summary_large_image" />

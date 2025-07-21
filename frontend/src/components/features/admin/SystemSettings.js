@@ -146,9 +146,9 @@ const Button = styled.button`
 export default function SystemSettings() {
   const [settings, setSettings] = useState({
     site: {
-      name: 'PrepNexus',
+      name: 'Resume Review AI',
       description: 'Your comprehensive platform for interview preparation',
-      url: 'https://prepnexus.com',
+      url: 'https://resume-review-ai.netlify.app',
       maintenance: false
     },
     email: {

@@ -65,7 +65,7 @@ export default function InterviewPrep() {
       <Helmet>
         <title>Mock Interview Online | Prep Nexus</title>
         <meta name="description" content="Simulate real job interviews and get instant feedback. Practice behavioral and technical interview questions with Prep Nexus." />
-        <link rel="canonical" href="https://prepnexus.netlify.app/mock-interview" />
+        <link rel="canonical" href="https://resume-review-ai.netlify.app/mock-interview" />
       </Helmet>
       <Title>Interview Prep</Title>
       <Subtitle>

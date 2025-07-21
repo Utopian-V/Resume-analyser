@@ -110,7 +110,7 @@ const ResumeAnalysis = () => {
       <Helmet>
         <title>Resume Feedback Online | Prep Nexus</title>
         <meta name="description" content="Upload your resume and get instant AI-powered feedback. Optimize your resume for job applications with Prep Nexus." />
-        <link rel="canonical" href="https://prepnexus.netlify.app/resume-feedback" />
+        <link rel="canonical" href="https://resume-review-ai.netlify.app/resume-feedback" />
       </Helmet>
       <UploadBox
         style={dragActive ? { background: "#e0e7ff", borderColor: "#3730a3" } : {}}

@@ -281,7 +281,7 @@ const EnhancedDSABank = ({ userId }) => {
       <Helmet>
         <title>DSA Practice Bank | Prep Nexus</title>
         <meta name="description" content="Practice data structures and algorithms questions for interviews. Track your progress and prepare for top tech jobs with Prep Nexus." />
-        <link rel="canonical" href="https://prepnexus.netlify.app/dsa-practice" />
+        <link rel="canonical" href="https://resume-review-ai.netlify.app/dsa-practice" />
       </Helmet>
       <Header>
         <Title>
