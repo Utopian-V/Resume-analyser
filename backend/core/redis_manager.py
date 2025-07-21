@@ -16,6 +16,7 @@ import os
 import logging
 import time
 from typing import Optional, Any, Dict, List
+from datetime import datetime, date
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -23,6 +24,13 @@ load_dotenv()
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle datetime objects"""
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 class RedisManager:
     def __init__(self):
@@ -108,7 +116,8 @@ class RedisManager:
             return False
         
         try:
-            serialized_value = json.dumps(value)
+            # Use custom encoder to handle datetime objects
+            serialized_value = json.dumps(value, cls=DateTimeEncoder)
             await self._redis.setex(key, ttl, serialized_value)
             self._cache_stats["sets"] += 1
             return True

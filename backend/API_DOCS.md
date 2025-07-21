@@ -2,7 +2,7 @@
 
 ## 🚀 Base URL
 ```
-Production: https://prepnexus-backend.onrender.com
+Production: https://resume-analyser-o3eu.onrender.com
 Development: http://localhost:8000
 ```
 

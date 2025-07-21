@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS blogs (
     status VARCHAR(20) DEFAULT 'draft',
     slug VARCHAR(255) UNIQUE,
     meta_description TEXT,
-    view_count INTEGER DEFAULT 0
+    view_count INTEGER DEFAULT 0,
+    avatar VARCHAR(500),
+    date DATE DEFAULT CURRENT_DATE
 );
 
 -- Create users table
