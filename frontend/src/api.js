@@ -6,7 +6,7 @@
  * between the frontend and backend services.
  * 
  * Configuration:
- * - Set REACT_APP_API_URL in your .env file to your backend's public URL
+ * - Set REACT_API_URL in your .env file to your backend's public URL
  * - Uses axios for HTTP requests with automatic error handling
  * - Implements caching for frequently accessed data
  * - Provides consistent error handling across all API calls
@@ -15,7 +15,7 @@ import axios from "axios";
 
 // API base URL from environment variables
 // Falls back to localhost for development if not set
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_API_URL || 'http://localhost:8000';
 
 /**
  * Resume Analysis API

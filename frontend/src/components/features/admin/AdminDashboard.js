@@ -9,7 +9,7 @@ import QuestionManagement from './QuestionManagement.js';
 import SystemSettings from './SystemSettings.js';
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_API_URL || 'http://localhost:8000';
 
 export default function AdminDashboard() {
   return (
