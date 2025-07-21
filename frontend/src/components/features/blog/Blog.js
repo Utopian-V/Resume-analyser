@@ -52,7 +52,7 @@ const BlogMeta = ({ author, date }) => (
 );
 
 const BlogTags = ({ tags, variant = 'default' }) => {
-  if (!tags || tags.length === 0) return null;
+  if (!Array.isArray(tags) || tags.length === 0) return null;
   
   const tagStyle = variant === 'hero' 
     ? { background: 'rgba(255, 255, 255, 0.2)', color: 'white' }
@@ -184,22 +184,32 @@ const useBlogs = () => {
       try {
         setState(prev => ({ ...prev, loading: true }));
         const response = await fetch(`${API_BASE_URL}/api/blogs/`);
-        
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Try to parse error message from backend
+          let errorMsg = `HTTP error! status: ${response.status}`;
+          try {
+            const errData = await response.json();
+            errorMsg = errData.detail || errData.error || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
         }
-        
         const data = await response.json();
-        
-        // Handle both array and object responses
-        const blogs = data.blogs || data || [];
-        
+        // If data.blogs is an array, use it. If data is an array, use it. Otherwise, error.
+        let blogs = [];
+        if (Array.isArray(data)) {
+          blogs = data;
+        } else if (Array.isArray(data.blogs)) {
+          blogs = data.blogs;
+        } else {
+          // If backend returns error object
+          throw new Error(data.detail || data.error || 'Unexpected response from server');
+        }
         setState({ loading: false, error: null, blogs });
       } catch (err) {
         console.error("Failed to fetch blogs:", err);
         setState({ 
           loading: false, 
-          error: "Failed to load blog posts. Please try again later.", 
+          error: err.message || "Failed to load blog posts. Please try again later.", 
           blogs: [] 
         });
       }
@@ -250,7 +260,30 @@ export default function Blog() {
   
   if (loading) return <LoadingState title="Prep Nexus Blog – Loading..." />;
   if (error) return <ErrorState title="Prep Nexus Blog – Error" message={error} />;
-  if (!blogs.length) return <ErrorState title="Prep Nexus Blog" message="No blog posts found" />;
+  if (!Array.isArray(blogs) || !blogs.length) return <ErrorState title="Prep Nexus Blog" message="No blog posts found" />;
+  
+  // After fetching blogs, ensure tags is always an array
+  if (Array.isArray(blogs)) {
+    blogs = blogs.map(blog => {
+      let tags = blog.tags;
+      if (typeof tags === 'string') {
+        try {
+          tags = JSON.parse(tags);
+        } catch {
+          console.error('Failed to parse tags for blog:', blog);
+          tags = [];
+        }
+      }
+      // Ensure author is always a string for display
+      let authorName = 'Unknown Author';
+      if (typeof blog.author === 'string') {
+        authorName = blog.author;
+      } else if (blog.author && typeof blog.author.name === 'string') {
+        authorName = blog.author.name;
+      }
+      return { ...blog, tags: Array.isArray(tags) ? tags : [], author: authorName };
+    });
+  }
   
   const [featured, ...latest] = blogs;
   
