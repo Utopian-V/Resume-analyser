@@ -24,35 +24,27 @@ router = APIRouter(prefix="/blogs", tags=["blogs"])
 def format_blog_response(row) -> dict:
     """
     Format database row into standardized blog response.
-    
-    This function ensures consistent data structure between database
-    and API responses, handling data type conversions and defaults.
-    
-    Args:
-        row: Database row containing blog data
-        
-    Returns:
-        dict: Formatted blog object with consistent structure
-        
-    Note:
-        - Converts database ID to string for frontend compatibility
-        - Provides fallback image for blogs without featured images
-        - Ensures author is always an object with name and avatar
-        - Handles null tags gracefully
-        - Uses proper PostgreSQL schema fields
-        - Handles missing columns gracefully
+    Handles both datetime and string for date fields.
     """
+    date_value = row.get('date', row['created_at'])
+    if date_value:
+        if hasattr(date_value, 'strftime'):
+            date_str = date_value.strftime('%Y-%m-%d')
+        else:
+            # Assume it's already a string, or convert if possible
+            date_str = str(date_value)[:10]  # crude YYYY-MM-DD fallback
+    else:
+        date_str = None
+
     return {
-        "id": str(row['id']),  # Ensure ID is string for frontend compatibility
+        "id": str(row['id']),
         "title": row['title'],
         "author": {
             "name": row['author'],
-            # Use avatar from database or default
             "avatar": row.get('avatar') or "https://randomuser.me/api/portraits/men/29.jpg"
         },
-        "date": row.get('date', row['created_at']).strftime('%Y-%m-%d') if row.get('date') or row['created_at'] else None,
+        "date": date_str,
         "content": row['content'],
-        # Fallback to a professional stock image if no image is provided
         "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
         "tags": row['tags'] if row['tags'] else [],
         "slug": row.get('slug'),
