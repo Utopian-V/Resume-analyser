@@ -44,12 +44,30 @@ const ErrorState = ({ title, message }) => (
   </Container>
 );
 
-const BlogMeta = ({ author, date }) => (
-  <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', opacity: 0.9 }}>
-    <span><FiUser /> {author}</span>
-    <span><FiCalendar /> {date}</span>
-  </div>
-);
+const BlogMeta = ({ author, date }) => {
+  let formattedDate = 'Unknown Date';
+
+  if (date) {
+    const parsed = new Date(date);
+    if (!isNaN(parsed.getTime())) {
+      formattedDate = parsed.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } else if (typeof date === 'string') {
+      formattedDate = date.substring(0, 10); // fallback
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', opacity: 0.9 }}>
+      <span><FiUser /> {author}</span>
+      <span><FiCalendar /> {formattedDate}</span>
+    </div>
+  );
+};
+
 
 const BlogTags = ({ tags, variant = 'default' }) => {
   if (!Array.isArray(tags) || tags.length === 0) return null;
