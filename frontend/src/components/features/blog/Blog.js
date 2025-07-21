@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 // Configuration
-const API_BASE_URL = process.env.REACT_API_URL;
+const API_BASE_URL = process.env.REACT_API_URL || 'https://resume-analyser-o3eu.onrender.com';
 
 // Shared Components
 const Container = styled.div`
