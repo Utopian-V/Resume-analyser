@@ -32,6 +32,8 @@ import { dashboardRoutes, publicRoutes, adminRoutes } from './config/routes.js';
 // API functions for user registration
 import { registerFirebaseUser } from './api.js';
 
+import { BlogPost } from './components/features/blog/Blog';
+
 /**
  * Main application container with dark theme background
  * Uses min-height: 100vh to ensure full viewport coverage
@@ -123,7 +125,8 @@ function App() {
               exact={exact}
             />
           ))}
-          
+          {/* Blog post route for /blog/:id */}
+          <Route path="/blog/:id" element={<BlogPost />} />
           {/* Admin Routes - Restricted to admin users */}
           {/* Admin portal and content management features */}
           {adminRoutes.map(({ path, component: Component, exact }) => (
