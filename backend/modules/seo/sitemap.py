@@ -14,7 +14,7 @@ from core.database import db
 router = APIRouter(prefix="/seo", tags=["seo"])
 
 class SitemapGenerator:
-    def __init__(self, base_url: str = "https://prepnexus.netlify.app"):
+    def __init__(self, base_url: str = "https://resume-analyser-o3eu.onrender.com/"):
         self.base_url = base_url
         self.static_pages = [
             "/",
