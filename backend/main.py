@@ -1,21 +1,4 @@
-"""
-Main FastAPI Application Entry Point
-Handled by: DevOps Team
-Purpose: Application startup, routing, middleware configuration, and lifecycle management
 
-This module serves as the main entry point for the PrepNexus backend API.
-It configures the FastAPI application, sets up middleware, includes all
-feature routers, and manages the application lifecycle including database
-connections.
-
-Key responsibilities:
-- FastAPI application configuration and startup
-- CORS middleware setup for frontend communication
-- Database connection lifecycle management
-- Feature router inclusion and organization
-- Health check and monitoring endpoints
-- SEO module integration (sitemap, RSS)
-"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -23,32 +6,16 @@ from contextlib import asynccontextmanager
 # Database connection management
 from core.database import db
 
-# Feature-specific endpoint routers
-# Each router handles a specific domain of the application
 from endpoints import blogs, jobs, aptitude, users, dsa, resume, interview
 
-# SEO and content management modules
-# These provide sitemap generation and RSS feeds for better SEO
-from modules.seo import sitemap, rss
+from modules.seo.rss import  router as rss_router
+from modules.seo.sitemap import router as sitemap_router
 
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Application lifespan manager for startup and shutdown events.
     
-    This function handles:
-    - Database connection initialization on startup
-    - Graceful database connection cleanup on shutdown
-    - Application state management
-    
-    Args:
-        app: FastAPI application instance
-        
-    Yields:
-        None: Application runs during yield
-    """
     # Application startup - initialize database connection pool
     await db.initialize()
     print("🚀 Application started - Database initialized")
@@ -72,9 +39,7 @@ app = FastAPI(
     redoc_url="/redoc"  # ReDoc documentation
 )
 
-# CORS (Cross-Origin Resource Sharing) middleware configuration
-# Allows frontend application to communicate with the API
-# In production, replace "*" with specific frontend domain
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # TODO: Restrict to specific domains in production
@@ -112,8 +77,8 @@ app.include_router(redis.router)  # Redis cache management endpoints
 
 # SEO and Content Discovery
 # These routers provide sitemap and RSS feeds for better search engine visibility
-app.include_router(sitemap.router, prefix="/seo")   # XML sitemap generation
-app.include_router(rss.router, prefix="/seo")       # RSS feed generation
+app.include_router(sitemap_router)   # XML sitemap generation
+app.include_router(rss_router, prefix="/seo")       # RSS feed generation
 
 @app.get("/")
 async def root():

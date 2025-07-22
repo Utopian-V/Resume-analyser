@@ -3,19 +3,21 @@ Sitemap Generation Service
 Handled by: SEO Team
 Responsibilities: Generate dynamic sitemap.xml, ping search engines
 """
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Request
 from datetime import datetime
 from typing import List, Dict
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
+import httpx
 
 from core.database import db
 
 router = APIRouter(prefix="/seo", tags=["seo"])
 
 class SitemapGenerator:
-    def __init__(self, base_url: str = "https://resume-analyser-o3eu.onrender.com/"):
-        self.base_url = base_url
+    def __init__(self, base_url: str ):
+        
+        self.base_url = base_url.rstrip("/")
         self.static_pages = [
             "/",
             "/about",
@@ -33,6 +35,7 @@ class SitemapGenerator:
     async def generate_sitemap(self) -> str:
         """Generate complete sitemap.xml"""
         # Create root element
+        
         urlset = ET.Element("urlset")
         urlset.set("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9")
         
@@ -48,7 +51,7 @@ class SitemapGenerator:
                 f"{self.base_url}/blog/{blog['id']}", 
                 "0.8", 
                 "weekly",
-                blog.get('updated_at', blog.get('created_at'))
+                blog.get('created_at')
             )
             urlset.append(url_elem)
         
@@ -76,15 +79,22 @@ class SitemapGenerator:
         return url_elem
     
     async def _get_all_blogs(self) -> List[Dict]:
+    
         """Get all blogs from database"""
-        query = "SELECT id, created_at, updated_at FROM blogs ORDER BY created_at DESC"
+        query = "SELECT id, created_at FROM blogs ORDER BY created_at DESC"
         return await db.fetch(query)
 
+@router.get("/test")
+async def test_sitemap():
+    print("here")
+    return {"status": "sitemap router is working"}
+
 @router.get("/sitemap.xml")
-async def get_sitemap():
+async def get_sitemap(request: Request):
     """Generate and return sitemap.xml"""
     try:
-        generator = SitemapGenerator()
+        base_url = str(request.base_url)
+        generator = SitemapGenerator(base_url=base_url)
         sitemap_content = await generator.generate_sitemap()
         return Response(content=sitemap_content, media_type="application/xml")
     except Exception as e:
@@ -102,6 +112,10 @@ async def ping_search_engines():
         bing_ping_url = f"https://www.bing.com/ping?sitemap={sitemap_url}"
         
         # TODO: Implement actual HTTP requests
+        
+
+        await httpx.get(google_ping_url)
+        await httpx.get(bing_ping_url)
         return {
             "success": True,
             "message": "Sitemap pinged successfully",
@@ -109,3 +123,5 @@ async def ping_search_engines():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Sitemap ping failed: {str(e)}") 
+
+
