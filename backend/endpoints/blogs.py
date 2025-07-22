@@ -27,6 +27,7 @@ def format_blog_response(row) -> dict:
     Format database row into standardized blog response.
     Handles both datetime and string for date fields.
     """
+    print(row)
     date_value = row.get('date', row['created_at'])
     date_str = None
     if date_value:
@@ -52,14 +53,90 @@ def format_blog_response(row) -> dict:
             "avatar": row.get('avatar') or "https://randomuser.me/api/portraits/men/29.jpg"
         },
         "date": date_str,
-        "content": row['content'][:100] + "...",
         "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
         "tags": row['tags'] if row['tags'] else [],
+        "content": row["content"],
         "slug": row.get('slug'),
         "view_count": 0,  # Default since column doesn't exist in current schema
         "meta_description": None  # Default since column doesn't exist in current schema
     }
 
+def format_blog_preview(row) -> dict:
+    """
+    Lightweight format for blog listing. Excludes full content.
+    """
+    date_value = row.get('date', row['created_at'])
+    date_str = None
+    if date_value:
+        if isinstance(date_value, str):
+            try:
+                parsed_date = datetime.fromisoformat(date_value)
+                date_str = parsed_date.strftime('%Y-%m-%d')
+            except ValueError:
+                date_str = date_value[:10]
+        elif hasattr(date_value, 'strftime'):
+            date_str = date_value.strftime('%Y-%m-%d')
+        else:
+            date_str = str(date_value)[:10]
+    
+    return {
+        "id": str(row['id']),
+        "title": row['title'],
+        "image": row['image'] or "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop",
+        "slug": row.get('slug'),
+        "author": {
+            "name": row['author'],
+            "avatar": row.get('avatar') or "https://randomuser.me/api/portraits/men/29.jpg"
+        },
+        "date": date_str
+    }
+
+
+
+
+@router.get("/{blog_id}")
+async def get_blog_by_id(blog_id: int):
+    try:
+        print("here")
+        # Query for specific blog by ID - only select columns that exist
+        query = """
+        SELECT id, title, author, content, image, created_at, tags, slug, avatar, date
+        FROM blogs
+        WHERE id = $1
+        """
+        
+        row = await db.fetchrow(query, blog_id)
+
+        
+        if not row:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Blog post with ID {blog_id} not found"
+            )
+        
+        # Try to increment view count if the column exists
+        try:
+            await db.execute(
+                "UPDATE blogs SET view_count = COALESCE(view_count, 0) + 1 WHERE id = $1",
+                blog_id
+            )
+        except Exception as e:
+            logger.warning(f"Failed to increment view count for blog {blog_id}: {e}")
+        
+        print(row)
+        return format_blog_response(row)
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 404) without modification
+        raise
+    except Exception as e:
+        # Log the error for debugging
+        logger.error(f"Error fetching blog {blog_id}: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail="Failed to fetch blog post. Please try again later."
+        )
+    
 @router.get("/")
 async def get_blogs(
     limit: Optional[int] = Query(20, ge=1, le=50, description="Number of blogs to return"),
@@ -82,6 +159,7 @@ async def get_blogs(
         HTTPException: If database query fails
     """
     try:
+        print("here")
         # Optimized query with caching - only fetch essential fields that exist
         query = """
         SELECT id, title, author, content, image, created_at, tags, slug, avatar, date
@@ -96,7 +174,10 @@ async def get_blogs(
         # Optimize response formatting
         blogs = []
         for row in rows:
-            blogs.append(format_blog_response(row))
+            blogs.append(format_blog_preview(row))
+
+
+
         
         # Get total count for pagination
         count_query = """
@@ -122,61 +203,6 @@ async def get_blogs(
         )
 
 
-
-@router.get("/{blog_id}")
-async def get_blog_by_id(blog_id: int):
-    """
-    Get a specific blog post by ID.
-    
-    Retrieves a single blog post with all its content and metadata.
-    Used for individual blog post pages and detailed views.
-    
-    Args:
-        blog_id: Unique identifier of the blog post
-        
-    Returns:
-        dict: Complete blog post data
-        
-    Raises:
-        HTTPException: If blog not found or database error occurs
-    """
-    try:
-        # Query for specific blog by ID - only select columns that exist
-        query = """
-        SELECT id, title, author, content, image, created_at, tags, slug, avatar, date
-        FROM blogs
-        WHERE id = $1
-        """
-        
-        row = await db.fetchrow(query, blog_id)
-        
-        if not row:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"Blog post with ID {blog_id} not found"
-            )
-        
-        # Try to increment view count if the column exists
-        try:
-            await db.execute(
-                "UPDATE blogs SET view_count = COALESCE(view_count, 0) + 1 WHERE id = $1",
-                blog_id
-            )
-        except Exception as e:
-            logger.warning(f"Failed to increment view count for blog {blog_id}: {e}")
-        
-        return format_blog_response(row)
-        
-    except HTTPException:
-        # Re-raise HTTP exceptions (like 404) without modification
-        raise
-    except Exception as e:
-        # Log the error for debugging
-        logger.error(f"Error fetching blog {blog_id}: {e}")
-        raise HTTPException(
-            status_code=500, 
-            detail="Failed to fetch blog post. Please try again later."
-        )
 
 @router.post("/")
 async def create_blog(
