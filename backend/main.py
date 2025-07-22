@@ -78,7 +78,7 @@ app.include_router(redis.router)  # Redis cache management endpoints
 # SEO and Content Discovery
 # These routers provide sitemap and RSS feeds for better search engine visibility
 app.include_router(sitemap_router)   # XML sitemap generation
-app.include_router(rss_router, prefix="/seo")       # RSS feed generation
+app.include_router(rss_router)       # RSS feed generation
 
 @app.get("/")
 async def root():

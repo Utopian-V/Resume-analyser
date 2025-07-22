@@ -68,7 +68,14 @@ class SitemapGenerator:
         
         if lastmod:
             lastmod_elem = ET.SubElement(url_elem, "lastmod")
-            lastmod_elem.text = lastmod
+            try:
+                if isinstance(lastmod, datetime):
+                    lastmod_elem.text = lastmod.date().isoformat()
+                else:
+                    lastmod_elem.text = str(datetime.fromisoformat(lastmod).date())
+            except Exception:
+                lastmod_elem.text = datetime.utcnow().date().isoformat()
+
         
         changefreq_elem = ET.SubElement(url_elem, "changefreq")
         changefreq_elem.text = changefreq
@@ -113,9 +120,10 @@ async def ping_search_engines():
         
         # TODO: Implement actual HTTP requests
         
-
-        await httpx.get(google_ping_url)
-        await httpx.get(bing_ping_url)
+        async with httpx.AsyncClient() as client:
+            await client.get(google_ping_url)
+            await client.get(bing_ping_url)
+        
         return {
             "success": True,
             "message": "Sitemap pinged successfully",
